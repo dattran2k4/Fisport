@@ -1,5 +1,6 @@
 package com.Fisport.model;
 
+import com.Fisport.util.EFieldStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,6 +34,10 @@ public class Field extends AbstractEntity {
     @Column(name = "slug", nullable = false,  unique = true)
     private String slug;
 
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private EFieldStatus fieldStatus;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User owner;
@@ -53,6 +58,9 @@ public class Field extends AbstractEntity {
 
     @OneToMany(mappedBy = "field",  cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FieldServiceItem> fieldServiceItems = new HashSet<>();
+
+    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Review>  reviews = new HashSet<>();
 
     @CreationTimestamp
     @Column(name = "created_at")

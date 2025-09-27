@@ -52,6 +52,9 @@ public class User extends AbstractEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private Set<Booking>  bookings = new HashSet<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Review> reviews = new HashSet<>();
+
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
     private LocalDateTime createdAt;
