@@ -4,18 +4,18 @@ import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.dto.response.ResponseData;
 import com.Fisport.dto.response.ResponseError;
 import com.Fisport.service.FieldService;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/field")
 @RequiredArgsConstructor
+@Validated
 public class FieldApiController {
 
     private final FieldService fieldService;
@@ -29,4 +29,5 @@ public class FieldApiController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get Fields By Ward And Type Id Error");
         }
     }
+
 }
