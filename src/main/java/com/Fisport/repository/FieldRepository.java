@@ -9,10 +9,5 @@ import java.util.List;
 
 public interface FieldRepository extends JpaRepository<Field,Integer> {
 
-    @Query("""
-        SELECT f FROM Field f
-        JOIN f.ward w
-        WHERE (w.id = :wardId)
-    """)
-    List<Field> findByWardId(@Param("wardId") long wardId);
+    List<Field> findByWardIdAndFieldTypeId(long wardId, long fieldTypeId);
 }
