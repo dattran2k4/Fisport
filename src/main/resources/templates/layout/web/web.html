@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">Home Web</title>
+    <link rel="stylesheet" th:href="@{/web/css/style.css}">
+</head>
+<body>
+
+<!-- Header -->
+<header th:replace="fragments/web/header :: header"></header>
+
+<!-- Nội dung riêng -->
+<main layout:fragment="content"></main>
+
+<!-- Footer -->
+<footer th:replace="fragments/web/footer :: footer"></footer>
+
+</body>
+</html>
