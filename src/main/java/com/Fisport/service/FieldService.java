@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface FieldService {
     List<FieldResponse> getFieldByWardAndType(long wardId, long fieldTypeId);
+    List<FieldResponse> getFieldByFieldTypeId(long fieldTypeId);
 }
