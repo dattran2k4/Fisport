@@ -10,4 +10,5 @@ public interface FieldService {
     List<FieldResponse> getFieldByFieldTypeId(long fieldTypeId);
     List<FieldResponse> getFieldByOwnerId(Long ownerId);
     void createFieldByOwnerId(FieldRequest fieldRequest, Long ownerId);
+    void updateFieldByOwnerId(FieldRequest fieldRequest, Long ownerId, Long fieldId);
 }

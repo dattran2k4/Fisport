@@ -29,4 +29,15 @@ public class OwnerFieldApiController {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Create Field Error", e.getMessage());
         }
     }
+
+    @PutMapping("/{fieldId}")
+    public ResponseData<?> updateField(@Valid @RequestBody FieldRequest fieldRequest, @PathVariable Long fieldId, @PathVariable Long ownerId) {
+        try {
+            fieldService.updateFieldByOwnerId(fieldRequest, fieldId, ownerId);
+            return new ResponseData<>(HttpStatus.OK.value(), "Update Field Success");
+        }
+        catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Update Field Error", e.getMessage());
+        }
+    }
 }

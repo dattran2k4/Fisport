@@ -70,6 +70,23 @@ public class FieldServiceImpl implements FieldService {
                 .build());
     }
 
+    @Override
+    public void updateFieldByOwnerId(FieldRequest fieldRequest, Long ownerId, Long fieldId) {
+        Field field = fieldRepository.findById(fieldId).orElseThrow(() -> new ResourceNotFoundException("Field not found"));
+        User user = userRepository.findById(ownerId).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        Ward ward = wardRepository.findById(fieldRequest.getWardId()).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        FieldType fieldType = fieldRepository.findById(fieldRequest.getFieldTypeId()).orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
+        field.setName(fieldRequest.getName());
+        field.setAddress(fieldRequest.getAddress());
+        field.setSlug(fieldRequest.getSlug());
+        field.setBanner(fieldRequest.getBanner());
+        field.setFieldStatus(fieldRequest.getStatus());
+        field.setDescription(fieldRequest.getDescription());
+        field.setWard(ward);
+        field.setFieldType(fieldType);
+        fieldRepository.save(field);
+    }
+
     private FieldResponse toDto(Field f) {
         return new FieldResponse(
                 f.getName(),
