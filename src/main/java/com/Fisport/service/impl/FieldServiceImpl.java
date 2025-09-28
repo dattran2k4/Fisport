@@ -70,6 +70,7 @@ public class FieldServiceImpl implements FieldService {
                 .build());
     }
 
+
     @Override
     public void updateFieldByOwnerId(FieldRequest fieldRequest, Long ownerId, Long fieldId) {
         Field field = fieldRepository.findById(fieldId).orElseThrow(() -> new ResourceNotFoundException("Field not found"));
@@ -86,6 +87,7 @@ public class FieldServiceImpl implements FieldService {
         field.setFieldType(fieldType);
         fieldRepository.save(field);
     }
+
 
     private FieldResponse toDto(Field f) {
         return new FieldResponse(

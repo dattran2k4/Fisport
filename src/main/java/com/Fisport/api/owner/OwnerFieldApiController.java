@@ -29,6 +29,7 @@ public class OwnerFieldApiController {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Create Field Error", e.getMessage());
         }
     }
+<<<<<<< HEAD
 
     @PutMapping("/{fieldId}")
     public ResponseData<?> updateField(@Valid @RequestBody FieldRequest fieldRequest, @PathVariable Long fieldId, @PathVariable Long ownerId) {
@@ -40,4 +41,6 @@ public class OwnerFieldApiController {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Update Field Error", e.getMessage());
         }
     }
+=======
+>>>>>>> b9fe963e7ad5ba57adaddec96a77a23467fc6767
 }
