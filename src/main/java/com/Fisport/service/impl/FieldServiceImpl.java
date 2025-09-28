@@ -12,6 +12,7 @@ import com.Fisport.repository.FieldRepository;
 import com.Fisport.repository.UserRepository;
 import com.Fisport.repository.WardRepository;
 import com.Fisport.service.FieldService;
+import com.Fisport.util.EFieldStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +69,8 @@ public class FieldServiceImpl implements FieldService {
                 f.getAddress(),
                 f.getBanner(),
                 f.getSlug(),
+                f.getDescription(),
+                f.getFieldStatus(),
                 new WardResponse(
                         f.getWard().getId(),
                         f.getWard().getName(),
