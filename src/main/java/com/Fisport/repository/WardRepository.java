@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface WardRepository extends CrudRepository<Ward,Integer> {
+public interface WardRepository extends CrudRepository<Ward,Long> {
     List<Ward> findByCityId(long cityId);
 }
