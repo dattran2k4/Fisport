@@ -6,12 +6,15 @@ import com.Fisport.dto.response.FieldTypeResponse;
 import com.Fisport.dto.response.WardResponse;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.Field;
+import com.Fisport.model.FieldType;
 import com.Fisport.model.User;
 import com.Fisport.model.Ward;
 import com.Fisport.repository.FieldRepository;
+import com.Fisport.repository.FieldTypeRepository;
 import com.Fisport.repository.UserRepository;
 import com.Fisport.repository.WardRepository;
 import com.Fisport.service.FieldService;
+import com.Fisport.util.EFieldStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +26,7 @@ public class FieldServiceImpl implements FieldService {
     private final FieldRepository fieldRepository;
     private final WardRepository wardRepository;
     private final UserRepository userRepository;
+    private final FieldTypeRepository fieldTypeRepository;
 
     @Override
     public List<FieldResponse> getFieldByWardAndType(long wardId, long fieldTypeId) {
@@ -51,14 +55,18 @@ public class FieldServiceImpl implements FieldService {
     @Override
     public void createFieldByOwnerId(FieldRequest fieldRequest, Long ownerId) {
         User user = userRepository.findById(ownerId).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
-        Ward ward = wardRepository.findById(fieldRequest.getWardId());
+        Ward ward = wardRepository.findById(fieldRequest.getWardId()).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        FieldType fieldType = fieldRepository.findById(fieldRequest.getFieldTypeId()).orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
         fieldRepository.save(Field.builder()
                 .name(fieldRequest.getName())
                 .banner(fieldRequest.getBanner())
                 .address(fieldRequest.getAddress())
+                .slug(fieldRequest.getSlug())
                 .ward(ward)
                 .owner(user)
+                .fieldType(fieldType)
                 .description(fieldRequest.getDescription())
+                .fieldStatus(EFieldStatus.INACTIVE)
                 .build());
     }
 

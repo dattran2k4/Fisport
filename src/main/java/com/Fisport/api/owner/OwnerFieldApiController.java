@@ -20,7 +20,13 @@ public class OwnerFieldApiController {
         return new ResponseData<>(HttpStatus.OK.value(), "Get All Fields", fieldService.getFieldByOwnerId(ownerId));
     }
 
+    @PostMapping()
     public ResponseData<?> createFields(@Valid @RequestBody FieldRequest fieldRequest, @PathVariable Long ownerId) {
-
+        try {
+            fieldService.createFieldByOwnerId(fieldRequest, ownerId);
+            return new ResponseData<>(HttpStatus.OK.value(), "Create Field Success");
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Create Field Error", e.getMessage());
+        }
     }
 }
