@@ -3,6 +3,7 @@ package com.Fisport.api.owner;
 import com.Fisport.dto.request.FieldRequest;
 import com.Fisport.dto.response.ResponseData;
 import com.Fisport.service.FieldService;
+import com.Fisport.util.EFieldStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class OwnerFieldApiController {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Create Field Error", e.getMessage());
         }
     }
-<<<<<<< HEAD
+
 
     @PutMapping("/{fieldId}")
     public ResponseData<?> updateField(@Valid @RequestBody FieldRequest fieldRequest, @PathVariable Long fieldId, @PathVariable Long ownerId) {
@@ -41,6 +42,14 @@ public class OwnerFieldApiController {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Update Field Error", e.getMessage());
         }
     }
-=======
->>>>>>> b9fe963e7ad5ba57adaddec96a77a23467fc6767
+
+    @PatchMapping("/{fieldId}")
+    public ResponseData<?> updateFieldStatus(@PathVariable Long ownerId, @PathVariable Long fieldId, @RequestParam EFieldStatus fieldStatus) {
+        try {
+            fieldService.changeStatusFieldByOwnerId(ownerId, fieldId, fieldStatus);
+            return new ResponseData<>(HttpStatus.OK.value(), "Update Field Status Success");
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Update Field Status Error", e.getMessage());
+        }
+    }
 }
