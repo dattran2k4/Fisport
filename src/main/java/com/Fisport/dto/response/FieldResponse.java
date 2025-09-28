@@ -12,6 +12,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class FieldResponse {
+    private Long id;
     private String name;
     private String address;
     private String banner;

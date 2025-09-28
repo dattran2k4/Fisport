@@ -6,9 +6,11 @@ import com.Fisport.dto.response.FieldTypeResponse;
 import com.Fisport.dto.response.WardResponse;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.Field;
+import com.Fisport.model.FieldType;
 import com.Fisport.model.User;
 import com.Fisport.model.Ward;
 import com.Fisport.repository.FieldRepository;
+import com.Fisport.repository.FieldTypeRepository;
 import com.Fisport.repository.UserRepository;
 import com.Fisport.repository.WardRepository;
 import com.Fisport.service.FieldService;
@@ -24,6 +26,7 @@ public class FieldServiceImpl implements FieldService {
     private final FieldRepository fieldRepository;
     private final WardRepository wardRepository;
     private final UserRepository userRepository;
+    private final FieldTypeRepository fieldTypeRepository;
 
     @Override
     public List<FieldResponse> getFieldByWardAndType(long wardId, long fieldTypeId) {
@@ -52,19 +55,87 @@ public class FieldServiceImpl implements FieldService {
     @Override
     public void createFieldByOwnerId(FieldRequest fieldRequest, Long ownerId) {
         User user = userRepository.findById(ownerId).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
-        Ward ward = wardRepository.findById(fieldRequest.getWardId());
+        Ward ward = wardRepository.findById(fieldRequest.getWardId()).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        FieldType fieldType = fieldRepository.findById(fieldRequest.getFieldTypeId()).orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
         fieldRepository.save(Field.builder()
                 .name(fieldRequest.getName())
                 .banner(fieldRequest.getBanner())
                 .address(fieldRequest.getAddress())
+                .slug(fieldRequest.getSlug())
                 .ward(ward)
                 .owner(user)
+                .fieldType(fieldType)
                 .description(fieldRequest.getDescription())
+                .fieldStatus(EFieldStatus.INACTIVE)
                 .build());
     }
 
+
+    @Override
+    public void updateFieldByOwnerId(FieldRequest fieldRequest, Long ownerId, Long fieldId) {
+        Field field = getFieldByid(fieldId);
+        User user = userRepository.findById(ownerId).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        Ward ward = wardRepository.findById(fieldRequest.getWardId()).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        FieldType fieldType = fieldRepository.findById(fieldRequest.getFieldTypeId()).orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
+        field.setName(fieldRequest.getName());
+        field.setAddress(fieldRequest.getAddress());
+        field.setSlug(fieldRequest.getSlug());
+        field.setBanner(fieldRequest.getBanner());
+        field.setDescription(fieldRequest.getDescription());
+        field.setWard(ward);
+        field.setFieldType(fieldType);
+        fieldRepository.save(field);
+    }
+
+    @Override
+    public void changeStatusFieldByOwnerId(Long ownerId, Long fieldId, EFieldStatus fieldStatus) {
+        Field field = getFieldByid(fieldId);
+        field.setFieldStatus(fieldStatus);
+        fieldRepository.save(field);
+    }
+
+    private Field getFieldByid(Long fieldId) {
+        return fieldRepository.findById(fieldId).orElseThrow(() -> new ResourceNotFoundException("Field not found"));
+    }
+
+    @Override
+    public FieldResponse getField(Long fieldId) {
+        Field field = fieldRepository.findById(fieldId).orElseThrow(() -> new ResourceNotFoundException("Field not found"));
+        return FieldResponse.builder()
+                .id(field.getId())
+                .name(field.getName())
+                .banner(field.getBanner())
+                .address(field.getAddress())
+                .slug(field.getSlug())
+                .wardResponse(toWardDto(field.getWard()))
+                .fieldTypeResponse(toFieldTypeResponseDto(field.getFieldType()))
+                .build();
+    }
+
+
+
+    private FieldTypeResponse toFieldTypeResponseDto(FieldType fieldType) {
+        return FieldTypeResponse.builder()
+                .id(fieldType.getId())
+                .name(fieldType.getName())
+                .slug(fieldType.getSlug())
+                .build();
+    }
+
+    private WardResponse toWardDto(Ward ward) {
+        return WardResponse.builder()
+                .id(ward.getId())
+                .name(ward.getName())
+                .slug(ward.getSlug())
+                .build();
+    }
+
+
+
+
     private FieldResponse toDto(Field f) {
         return new FieldResponse(
+                f.getId(),
                 f.getName(),
                 f.getAddress(),
                 f.getBanner(),

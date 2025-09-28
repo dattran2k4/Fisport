@@ -1,6 +1,7 @@
 package com.Fisport.dto.request;
 
 
+import com.Fisport.util.EFieldStatus;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -13,6 +14,11 @@ public class FieldRequest implements Serializable {
     private String banner;
     private String slug;
     private String description;
+
+    private EFieldStatus status;
+
     private Long fieldTypeId;
     private Long wardId;
+
+
 }
