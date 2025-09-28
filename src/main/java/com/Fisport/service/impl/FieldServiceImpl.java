@@ -1,10 +1,16 @@
 package com.Fisport.service.impl;
 
+import com.Fisport.dto.request.FieldRequest;
 import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.dto.response.FieldTypeResponse;
 import com.Fisport.dto.response.WardResponse;
+import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.Field;
+import com.Fisport.model.User;
+import com.Fisport.model.Ward;
 import com.Fisport.repository.FieldRepository;
+import com.Fisport.repository.UserRepository;
+import com.Fisport.repository.WardRepository;
 import com.Fisport.service.FieldService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +21,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FieldServiceImpl implements FieldService {
     private final FieldRepository fieldRepository;
+    private final WardRepository wardRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<FieldResponse> getFieldByWardAndType(long wardId, long fieldTypeId) {
@@ -30,6 +38,28 @@ public class FieldServiceImpl implements FieldService {
         return fields.stream()
                 .map(this::toDto)
                 .toList();
+    }
+
+    @Override
+    public List<FieldResponse> getFieldByOwnerId(Long ownerId) {
+        List<Field> fields = fieldRepository.findByOwnerId(ownerId);
+        return fields.stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    @Override
+    public void createFieldByOwnerId(FieldRequest fieldRequest, Long ownerId) {
+        User user = userRepository.findById(ownerId).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        Ward ward = wardRepository.findById(fieldRequest.getWardId());
+        fieldRepository.save(Field.builder()
+                .name(fieldRequest.getName())
+                .banner(fieldRequest.getBanner())
+                .address(fieldRequest.getAddress())
+                .ward(ward)
+                .owner(user)
+                .description(fieldRequest.getDescription())
+                .build());
     }
 
     private FieldResponse toDto(Field f) {
