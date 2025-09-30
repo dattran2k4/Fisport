@@ -57,9 +57,9 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs*/**").permitAll()
-                        .requestMatchers("/login", "/logout", "/api/auth/**", "/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/owner/**").hasAuthority("OWNER")
+                        .requestMatchers("/api/owner/**").hasRole("OWNER")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form.disable())

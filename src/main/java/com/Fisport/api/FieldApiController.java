@@ -1,5 +1,6 @@
 package com.Fisport.api;
 
+import com.Fisport.dto.response.FieldHasTimeSlotResponse;
 import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.dto.response.ResponseData;
 import com.Fisport.dto.response.ResponseError;
@@ -34,5 +35,15 @@ public class FieldApiController {
     public ResponseData<?> getFieldById(@Min(1) @PathVariable Long id) {
         FieldResponse fieldResponse = fieldService.getField(id);
         return new ResponseData<>(HttpStatus.OK.value(), "Get Field Success", fieldResponse);
+    }
+
+    @GetMapping("/{id}/timeslots")
+    public ResponseData<?> getTimeSlotsByField(@Min(1) @PathVariable Long id) {
+        try {
+            List<FieldHasTimeSlotResponse> responses = fieldService.getTimeSlotAndPriceByFieldId(id);
+            return new ResponseData<>(HttpStatus.OK.value(), "Get Time Slots Success", responses);
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get Time Slots By Field Id Error");
+        }
     }
 }

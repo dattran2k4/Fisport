@@ -1,8 +1,10 @@
 package com.Fisport.service;
 
 import com.Fisport.dto.request.FieldRequest;
+import com.Fisport.dto.response.FieldHasTimeSlotResponse;
 import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.util.EFieldStatus;
+import jakarta.validation.constraints.Min;
 
 import java.util.List;
 
@@ -15,4 +17,6 @@ public interface FieldService {
     void updateFieldByOwnerId(FieldRequest fieldRequest, Long ownerId, Long fieldId);
     void changeStatusFieldByOwnerId(Long ownerId, Long fieldId,  EFieldStatus fieldStatus);
     FieldResponse getField(Long fieldId);
+
+    List<FieldHasTimeSlotResponse> getTimeSlotAndPriceByFieldId(Long id);
 }

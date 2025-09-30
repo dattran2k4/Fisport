@@ -47,7 +47,7 @@ public class Field extends AbstractEntity {
     private Ward ward;
 
     @OneToMany(mappedBy = "field",  fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<FieldTimeSlot> fieldTimeSlots = new HashSet<>();
+    private Set<FieldHasTimeSlot> fieldTimeSlots = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "field_type_id")

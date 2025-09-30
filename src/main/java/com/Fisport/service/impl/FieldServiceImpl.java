@@ -1,18 +1,13 @@
 package com.Fisport.service.impl;
 
 import com.Fisport.dto.request.FieldRequest;
+import com.Fisport.dto.response.FieldHasTimeSlotResponse;
 import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.dto.response.FieldTypeResponse;
 import com.Fisport.dto.response.WardResponse;
 import com.Fisport.exception.ResourceNotFoundException;
-import com.Fisport.model.Field;
-import com.Fisport.model.FieldType;
-import com.Fisport.model.User;
-import com.Fisport.model.Ward;
-import com.Fisport.repository.FieldRepository;
-import com.Fisport.repository.FieldTypeRepository;
-import com.Fisport.repository.UserRepository;
-import com.Fisport.repository.WardRepository;
+import com.Fisport.model.*;
+import com.Fisport.repository.*;
 import com.Fisport.service.FieldService;
 import com.Fisport.util.EFieldStatus;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +22,8 @@ public class FieldServiceImpl implements FieldService {
     private final WardRepository wardRepository;
     private final UserRepository userRepository;
     private final FieldTypeRepository fieldTypeRepository;
+    private final TimeSlotRepository timeSlotRepository;
+    private final FieldHasTimeSlotRepository fieldHasTimeSlotRepository;
 
     @Override
     public List<FieldResponse> getFieldByWardAndType(long wardId, long fieldTypeId) {
@@ -112,6 +109,17 @@ public class FieldServiceImpl implements FieldService {
                 .build();
     }
 
+    @Override
+    public List<FieldHasTimeSlotResponse> getTimeSlotAndPriceByFieldId(Long id) {
+        Field field = getFieldByid(id);
+        List<FieldHasTimeSlot> fieldHasTimeSlots = fieldHasTimeSlotRepository.findByFieldId(id);
+        return fieldHasTimeSlots.stream()
+                .map(fieldHasTimeSlot -> FieldHasTimeSlotResponse.builder()
+                .id(fieldHasTimeSlot.getId())
+                .startTime(fieldHasTimeSlot.getTimeSlot().getStartTime())
+                .price(fieldHasTimeSlot.getPrice())
+                .build()).toList();
+    }
 
 
     private FieldTypeResponse toFieldTypeResponseDto(FieldType fieldType) {

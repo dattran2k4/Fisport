@@ -13,6 +13,7 @@ import com.Fisport.repository.RoleRepository;
 import com.Fisport.repository.UserRepository;
 import com.Fisport.security.CustomUserDetails;
 import com.Fisport.service.AuthService;
+import com.Fisport.service.UserDetailsService;
 import com.Fisport.util.ERole;
 import com.Fisport.util.EUserStatus;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,8 +25,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
 
@@ -36,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
-
+    private final UserDetailsService userDetailsService;
 
 
     @Override
@@ -101,7 +104,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse loginApi(LoginRequestDTO request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+    public LoginResponse loginApi(LoginRequestDTO request, HttpSession session) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -111,13 +114,10 @@ public class AuthServiceImpl implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        System.out.println(authentication.getAuthorities());
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext());
 
-        // Tạo session để sinh JSESSIONID
-        HttpSession session = httpRequest.getSession(true);
-        String jsessionId = session.getId();
-
-        new ChangeSessionIdAuthenticationStrategy().onAuthentication(authentication, httpRequest, httpResponse);
+//        new ChangeSessionIdAuthenticationStrategy().onAuthentication(authentication, httpRequest, httpResponse);
 
         // Lấy thông tin user
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -127,7 +127,6 @@ public class AuthServiceImpl implements AuthService {
                 .orElse(null);
 
         return LoginResponse.builder()
-                .sessionId(jsessionId)
                 .userId(userDetails.getUser().getId())
                 .username(userDetails.getUsername())
                 .birthDate(userDetails.getUser().getBirthday())
@@ -137,7 +136,8 @@ public class AuthServiceImpl implements AuthService {
                 .role(role)
                 .build();
     }
-    }
+
+}
 
 
 

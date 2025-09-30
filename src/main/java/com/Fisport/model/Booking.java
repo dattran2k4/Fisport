@@ -38,7 +38,7 @@ public class Booking extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "field_time_slot_id")
-    private FieldTimeSlot fieldTimeSlot;
+    private FieldHasTimeSlot fieldTimeSlot;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

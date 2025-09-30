@@ -25,9 +25,10 @@ public class AuthApiController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseData<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+    public ResponseData<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpSession session) {
         try {
-            LoginResponse loginResponse = authService.loginApi(loginRequestDTO, httpRequest, httpResponse);
+            LoginResponse loginResponse = authService.loginApi(loginRequestDTO, session);
+            session.setAttribute("loginResponse", loginResponse);
             return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng nhập thành công!",  loginResponse);
         }
         catch (Exception e) {
