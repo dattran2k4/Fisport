@@ -2,11 +2,12 @@ package com.Fisport.api;
 
 import com.Fisport.dto.request.LoginRequestDTO;
 import com.Fisport.dto.request.RegisterRequestDTO;
-import com.Fisport.dto.response.LoginResponseDTO;
-import com.Fisport.dto.response.RegisterResponseDTO;
-import com.Fisport.dto.response.ResponseData;
-import com.Fisport.dto.response.ResponseError;
+import com.Fisport.dto.response.*;
 import com.Fisport.service.AuthService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,18 +17,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@RequiredArgsConstructor
 @RestController
 @Validated
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
 public class AuthApiController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseData<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+    public ResponseData<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         try {
-            LoginResponseDTO loginResponseDTO = authService.login(loginRequestDTO);
-            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng nhập thành công!",  loginResponseDTO);
+            LoginResponse loginResponse = authService.loginApi(loginRequestDTO, httpRequest, httpResponse);
+            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng nhập thành công!",  loginResponse);
         }
         catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Đăng nhập thất bại");

@@ -2,6 +2,7 @@ package com.Fisport.service.impl;
 
 import com.Fisport.dto.request.LoginRequestDTO;
 import com.Fisport.dto.request.RegisterRequestDTO;
+import com.Fisport.dto.response.LoginResponse;
 import com.Fisport.dto.response.LoginResponseDTO;
 import com.Fisport.dto.response.RegisterResponseDTO;
 import com.Fisport.exception.InvalidDataException;
@@ -10,12 +11,24 @@ import com.Fisport.model.Role;
 import com.Fisport.model.User;
 import com.Fisport.repository.RoleRepository;
 import com.Fisport.repository.UserRepository;
+import com.Fisport.security.CustomUserDetails;
 import com.Fisport.service.AuthService;
 import com.Fisport.util.ERole;
 import com.Fisport.util.EUserStatus;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.session.ChangeSessionIdAuthenticationStrategy;
 import org.springframework.stereotype.Service;
+
 
 @RequiredArgsConstructor
 @Service
@@ -23,6 +36,9 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final AuthenticationManager authenticationManager;
+
+
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
@@ -85,5 +101,44 @@ public class AuthServiceImpl implements AuthService {
                 .build();
     }
 
+    @Override
+    public LoginResponse loginApi(LoginRequestDTO request, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()
+                )
+        );
 
-}
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        System.out.println(authentication.getAuthorities());
+
+        // Tạo session để sinh JSESSIONID
+        HttpSession session = httpRequest.getSession(true);
+        String jsessionId = session.getId();
+
+        new ChangeSessionIdAuthenticationStrategy().onAuthentication(authentication, httpRequest, httpResponse);
+
+        // Lấy thông tin user
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        String role = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse(null);
+
+        return LoginResponse.builder()
+                .sessionId(jsessionId)
+                .userId(userDetails.getUser().getId())
+                .username(userDetails.getUsername())
+                .birthDate(userDetails.getUser().getBirthday())
+                .phoneNumber(userDetails.getUser().getPhone())
+                .email(userDetails.getUser().getEmail())
+                .gender(String.valueOf(userDetails.getUser().getGender()))
+                .role(role)
+                .build();
+    }
+    }
+
+
+
