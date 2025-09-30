@@ -13,7 +13,7 @@ INSERT INTO user (username, email, password, phone, birth_day, status, gender, r
 VALUES
     ('dattran0901', 'tranquocdat@gmail.com', '$2a$10$s3go5e.GYivSMmrJXG6jceddjfSAbg6O832Sip8XIVNRRLIjXNP6G', '0785819692', '2004-01-09', 'ACTIVE', 'MALE', 1),
     ('johndoe', 'dattranquoc@gmail.com', '$2a$10$2rQkUgA4sMS5z4QK8f1QXeF6p3iP63PHGQo2og4g0oY6Qp1QjOq9e', '0912345678', '1998-08-15', 'ACTIVE', 'FEMALE', 2),
-    ('vitidsarn', 'dattran@gmail.com', '$10$rdj4PofmprN4QDf.uanJoOmcru3qmRU6zlGImoOyWhsrVIRIbdv6C', '0934567890', '1990-01-10', 'INACTIVE', 'MALE', 3);
+    ('vitidsarn', 'dattran@gmail.com', '$2a$10$llGgE5VlZzM0.pCzbOLGWev.cqdovrjSsq0lGM87wo0FVgATXsh12', '0934567890', '1990-01-10', 'INACTIVE', 'MALE', 3);
 
 
 -- ========================
