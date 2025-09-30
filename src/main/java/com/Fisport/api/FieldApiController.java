@@ -30,4 +30,9 @@ public class FieldApiController {
         }
     }
 
+    @GetMapping("{id}")
+    public ResponseData<?> getFieldById(@Min(1) @PathVariable Long id) {
+        FieldResponse fieldResponse = fieldService.getField(id);
+        return new ResponseData<>(HttpStatus.OK.value(), "Get Field Success", fieldResponse);
+    }
 }
