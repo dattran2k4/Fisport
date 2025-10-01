@@ -98,15 +98,7 @@ public class FieldServiceImpl implements FieldService {
     @Override
     public FieldResponse getField(Long fieldId) {
         Field field = fieldRepository.findById(fieldId).orElseThrow(() -> new ResourceNotFoundException("Field not found"));
-        return FieldResponse.builder()
-                .id(field.getId())
-                .name(field.getName())
-                .banner(field.getBanner())
-                .address(field.getAddress())
-                .slug(field.getSlug())
-                .wardResponse(toWardDto(field.getWard()))
-                .fieldTypeResponse(toFieldTypeResponseDto(field.getFieldType()))
-                .build();
+        return toDto(field);
     }
 
     @Override
@@ -149,6 +141,8 @@ public class FieldServiceImpl implements FieldService {
                 f.getBanner(),
                 f.getSlug(),
                 f.getDescription(),
+                f.getOpenTime(),
+                f.getCloseTime(),
                 f.getFieldStatus(),
                 new WardResponse(
                         f.getWard().getId(),

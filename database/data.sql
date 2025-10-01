@@ -140,31 +140,32 @@ INSERT INTO field_type (name, slug) VALUES
                                         ('Bơi lội', 'boi-loi'),
                                         ('Pickleball', 'pickleball');
 
-INSERT INTO field (name, slug, address, ward_id, user_id, field_type_id, description, banner, status, created_at, updated_at)
+INSERT INTO field (name, slug, address, ward_id, user_id, field_type_id, description, banner, open_time, close_time, status, created_at, updated_at)
 VALUES
 -- Bóng đá (field_type_id = 1)
-('Sân Bóng đá 1', 'san-bong-da-1', '123 Nguyễn Văn Linh', 1, 1, 1, 'Sân bóng đá rộng, cỏ nhân tạo chất lượng cao', '/images/fields/san-bong-da-1.jpg', 'ACTIVE', NOW(), NOW()),
-('Sân Bóng đá 2', 'san-bong-da-2', '456 Lê Duẩn', 1, 1, 1, 'Sân bóng đá tiêu chuẩn 7 người, có đèn chiếu sáng', '/images/fields/san-bong-da-2.jpg', 'ACTIVE', NOW(), NOW()),
+('Sân Bóng đá 1', 'san-bong-da-1', '123 Nguyễn Văn Linh', 1, 1, 1, 'Sân bóng đá rộng, cỏ nhân tạo chất lượng cao', '/images/fields/san-bong-da-1.jpg', '06:00:00', '22:00:00', 'ACTIVE', NOW(), NOW()),
+('Sân Bóng đá 2', 'san-bong-da-2', '456 Lê Duẩn', 1, 1, 1, 'Sân bóng đá tiêu chuẩn 7 người, có đèn chiếu sáng', '/images/fields/san-bong-da-2.jpg', '06:00:00', '22:00:00', 'ACTIVE', NOW(), NOW()),
 
 -- Cầu lông (field_type_id = 2)
-('Sân Cầu lông 1', 'san-cau-long-1', '12 Trần Phú', 1, 1, 2, 'Sân cầu lông tiêu chuẩn, nền gỗ chống trơn trượt', '/images/fields/san-cau-long-1.jpg', 'ACTIVE', NOW(), NOW()),
-('Sân Cầu lông 2', 'san-cau-long-2', '34 Phan Chu Trinh', 1, 1, 2, 'Sân cầu lông trong nhà, có điều hòa', '/images/fields/san-cau-long-2.jpg', 'ACTIVE', NOW(), NOW()),
+('Sân Cầu lông 1', 'san-cau-long-1', '12 Trần Phú', 1, 1, 2, 'Sân cầu lông tiêu chuẩn, nền gỗ chống trơn trượt', '/images/fields/san-cau-long-1.jpg', '07:00:00', '21:00:00', 'ACTIVE', NOW(), NOW()),
+('Sân Cầu lông 2', 'san-cau-long-2', '34 Phan Chu Trinh', 1, 1, 2, 'Sân cầu lông trong nhà, có điều hòa', '/images/fields/san-cau-long-2.jpg', '07:00:00', '21:00:00', 'ACTIVE', NOW(), NOW()),
 
 -- Tennis (field_type_id = 3)
-('Sân Tennis 1', 'san-tennis-1', '56 Nguyễn Hoàng', 1, 1, 3, 'Sân tennis ngoài trời, mặt sân cứng', '/images/fields/san-tennis-1.jpg', 'ACTIVE', NOW(), NOW()),
-('Sân Tennis 2', 'san-tennis-2', '78 Hoàng Diệu', 1, 1, 3, 'Sân tennis tiêu chuẩn quốc tế', '/images/fields/san-tennis-2.jpg', 'INACTIVE', NOW(), NOW()),
+('Sân Tennis 1', 'san-tennis-1', '56 Nguyễn Hoàng', 1, 1, 3, 'Sân tennis ngoài trời, mặt sân cứng', '/images/fields/san-tennis-1.jpg', '06:00:00', '23:00:00', 'ACTIVE', NOW(), NOW()),
+('Sân Tennis 2', 'san-tennis-2', '78 Hoàng Diệu', 1, 1, 3, 'Sân tennis tiêu chuẩn quốc tế', '/images/fields/san-tennis-2.jpg', '06:00:00', '23:00:00', 'INACTIVE', NOW(), NOW()),
 
 -- Bóng rổ (field_type_id = 4)
-('Sân Bóng rổ 1', 'san-bong-ro-1', '90 Lý Thái Tổ', 1, 1, 4, 'Sân bóng rổ ngoài trời, phù hợp thi đấu 5x5', '/images/fields/san-bong-ro-1.jpg', 'ACTIVE', NOW(), NOW()),
-('Sân Bóng rổ 2', 'san-bong-ro-2', '22 Nguyễn Văn Cừ', 1, 1, 4, 'Sân bóng rổ trong nhà, sàn gỗ', '/images/fields/san-bong-ro-2.jpg', 'ACTIVE', NOW(), NOW()),
+('Sân Bóng rổ 1', 'san-bong-ro-1', '90 Lý Thái Tổ', 1, 1, 4, 'Sân bóng rổ ngoài trời, phù hợp thi đấu 5x5', '/images/fields/san-bong-ro-1.jpg', '08:00:00', '22:00:00', 'ACTIVE', NOW(), NOW()),
+('Sân Bóng rổ 2', 'san-bong-ro-2', '22 Nguyễn Văn Cừ', 1, 1, 4, 'Sân bóng rổ trong nhà, sàn gỗ', '/images/fields/san-bong-ro-2.jpg', '08:00:00', '22:00:00', 'ACTIVE', NOW(), NOW()),
 
 -- Bơi lội (field_type_id = 5)
-('Hồ Bơi 1', 'ho-boi-1', '11 Điện Biên Phủ', 1, 1, 5, 'Hồ bơi 25m, phù hợp luyện tập và thi đấu', '/images/fields/ho-boi-1.jpg', 'ACTIVE', NOW(), NOW()),
-('Hồ Bơi 2', 'ho-boi-2', '33 Nguyễn Chí Thanh', 1, 1, 5, 'Hồ bơi ngoài trời, có khu vui chơi trẻ em', '/images/fields/ho-boi-2.jpg', 'INACTIVE', NOW(), NOW()),
+('Hồ Bơi 1', 'ho-boi-1', '11 Điện Biên Phủ', 1, 1, 5, 'Hồ bơi 25m, phù hợp luyện tập và thi đấu', '/images/fields/ho-boi-1.jpg', '05:30:00', '20:30:00', 'ACTIVE', NOW(), NOW()),
+('Hồ Bơi 2', 'ho-boi-2', '33 Nguyễn Chí Thanh', 1, 1, 5, 'Hồ bơi ngoài trời, có khu vui chơi trẻ em', '/images/fields/ho-boi-2.jpg', '05:30:00', '20:30:00', 'INACTIVE', NOW(), NOW()),
 
 -- Pickleball (field_type_id = 6)
-('Sân Pickleball 1', 'san-pickleball-1', '44 Hùng Vương', 1, 1, 6, 'Sân pickleball tiêu chuẩn, phù hợp thi đấu đôi', '/images/fields/san-pickleball-1.jpg', 'ACTIVE', NOW(), NOW()),
-('Sân Pickleball 2', 'san-pickleball-2', '55 Pasteur', 1, 1, 6, 'Sân pickleball trong nhà, có mái che', '/images/fields/san-pickleball-2.jpg', 'ACTIVE', NOW(), NOW());
+('Sân Pickleball 1', 'san-pickleball-1', '44 Hùng Vương', 1, 1, 6, 'Sân pickleball tiêu chuẩn, phù hợp thi đấu đôi', '/images/fields/san-pickleball-1.jpg', '07:00:00', '22:00:00', 'ACTIVE', NOW(), NOW()),
+('Sân Pickleball 2', 'san-pickleball-2', '55 Pasteur', 1, 1, 6, 'Sân pickleball trong nhà, có mái che', '/images/fields/san-pickleball-2.jpg', '07:00:00', '22:00:00', 'ACTIVE', NOW(), NOW());
+
 -- ========================
 -- 5. Time Slot & Field Slot
 -- ========================

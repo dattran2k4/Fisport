@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 @Setter
@@ -18,6 +20,8 @@ public class FieldResponse {
     private String banner;
     private String slug;
     private String description;
+    private LocalDateTime openTime;
+    private LocalDateTime closeTime;
     private EFieldStatus status;
 
     private WardResponse wardResponse;

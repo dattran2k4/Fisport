@@ -34,6 +34,12 @@ public class Field extends AbstractEntity {
     @Column(name = "slug", nullable = false,  unique = true)
     private String slug;
 
+    @Column(name = "open_time", nullable = false)
+    private LocalDateTime openTime;
+
+    @Column(name = "close_time", nullable = false)
+    private LocalDateTime closeTime;
+
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private EFieldStatus fieldStatus;
