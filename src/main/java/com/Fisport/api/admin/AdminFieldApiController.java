@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/owner/fields")
+@RequestMapping("/admin/fields")
 public class AdminFieldApiController {
 
     private final FieldService fieldService;

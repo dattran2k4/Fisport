@@ -132,6 +132,31 @@ INSERT INTO brand (name, code) VALUES
 -- 4. Field & Feature
 -- ========================
 
+INSERT INTO feature (name, slug) VALUES
+-- Các tiện ích chung
+('Có mái che', 'co-mai-che'),
+('Có đèn chiếu sáng ban đêm', 'co-den-chieu-sang-ban-dem'),
+('Có chỗ để xe', 'co-cho-de-xe'),
+('Có phòng thay đồ', 'co-phong-thay-do'),
+('Có phòng tắm', 'co-phong-tam'),
+('Có wifi miễn phí', 'co-wifi-mien-phi'),
+
+-- Riêng cho bóng đá
+('Sân cỏ nhân tạo chất lượng cao', 'san-co-nhan-tao'),
+('Có khung thành tiêu chuẩn', 'khung-thanh-tieu-chuan'),
+
+-- Cầu lông / Tennis / Pickleball
+('Sàn gỗ chống trượt', 'san-go-chong-truot'),
+('Có vạch kẻ chuẩn quốc tế', 'vach-ke-chuan'),
+
+-- Bơi lội
+('Hồ bơi nước nóng', 'ho-boi-nuoc-nong'),
+('Có huấn luyện viên hỗ trợ', 'co-huan-luyen-vien'),
+
+-- Bóng rổ
+('Bảng rổ tiêu chuẩn NBA', 'bang-ro-nba'),
+('Sàn cao su giảm chấn', 'san-cao-su-giam-chan');
+
 INSERT INTO field_type (name, slug) VALUES
                                         ('Bóng đá', 'bong-da'),
                                         ('Cầu lông', 'cau-long'),
@@ -165,6 +190,72 @@ VALUES
 -- Pickleball (field_type_id = 6)
 ('Sân Pickleball 1', 'san-pickleball-1', '44 Hùng Vương', 1, 1, 6, 'Sân pickleball tiêu chuẩn, phù hợp thi đấu đôi', '/images/fields/san-pickleball-1.jpg', '07:00:00', '22:00:00', 'ACTIVE', NOW(), NOW()),
 ('Sân Pickleball 2', 'san-pickleball-2', '55 Pasteur', 1, 1, 6, 'Sân pickleball trong nhà, có mái che', '/images/fields/san-pickleball-2.jpg', '07:00:00', '22:00:00', 'ACTIVE', NOW(), NOW());
+
+INSERT INTO field_feature (field_id, feature_id) VALUES
+-- Bóng đá (field_type_id = 1)
+(1, 7), -- Sân Bóng đá 1 có cỏ nhân tạo
+(1, 8), -- Khung thành tiêu chuẩn
+(1, 2), -- Có đèn chiếu sáng ban đêm
+(1, 3), -- Có chỗ để xe
+
+(2, 7),
+(2, 8),
+(2, 2),
+(2, 3),
+
+-- Cầu lông (field_type_id = 2)
+(3, 9), -- Sàn gỗ chống trượt
+(3, 10), -- Vạch kẻ chuẩn
+(3, 1),  -- Có mái che
+(3, 3),
+
+(4, 9),
+(4, 10),
+(4, 1),
+(4, 6), -- Wifi miễn phí
+
+-- Tennis (field_type_id = 3)
+(5, 10),
+(5, 2),
+(5, 3),
+
+(6, 10),
+(6, 2),
+(6, 1),
+
+-- Bóng rổ (field_type_id = 4)
+(7, 13), -- Bảng rổ NBA
+(7, 14), -- Sàn cao su giảm chấn
+(7, 2),
+(7, 3),
+
+(8, 13),
+(8, 14),
+(8, 1),
+(8, 6),
+
+-- Bơi lội (field_type_id = 5)
+(9, 4), -- Phòng thay đồ
+(9, 5), -- Phòng tắm
+(9, 12), -- Có huấn luyện viên
+(9, 3),
+
+(10, 4),
+(10, 5),
+(10, 11), -- Hồ bơi nước nóng
+(10, 3),
+
+-- Pickleball (field_type_id = 6)
+(11, 9),
+(11, 10),
+(11, 2),
+(11, 3),
+
+(12, 9),
+(12, 10),
+(12, 1),
+(12, 6);
+
 
 -- ========================
 -- 5. Time Slot & Field Slot

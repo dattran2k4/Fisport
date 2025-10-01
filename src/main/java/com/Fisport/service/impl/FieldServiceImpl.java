@@ -1,10 +1,7 @@
 package com.Fisport.service.impl;
 
 import com.Fisport.dto.request.FieldRequest;
-import com.Fisport.dto.response.FieldHasTimeSlotResponse;
-import com.Fisport.dto.response.FieldResponse;
-import com.Fisport.dto.response.FieldTypeResponse;
-import com.Fisport.dto.response.WardResponse;
+import com.Fisport.dto.response.*;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.*;
 import com.Fisport.repository.*;
@@ -14,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +23,7 @@ public class FieldServiceImpl implements FieldService {
     private final FieldTypeRepository fieldTypeRepository;
     private final TimeSlotRepository timeSlotRepository;
     private final FieldHasTimeSlotRepository fieldHasTimeSlotRepository;
+    private final FieldHasFeatureRepository fieldHasFeatureRepository;
 
     @Override
     public List<FieldResponse> getFieldByWardAndType(long wardId, long fieldTypeId) {
@@ -115,6 +115,16 @@ public class FieldServiceImpl implements FieldService {
                 .startTime(fieldHasTimeSlot.getTimeSlot().getStartTime())
                 .price(fieldHasTimeSlot.getPrice())
                 .build()).toList();
+    }
+
+    @Override
+    public Set<FeatureResponse> getFeautresByField(Long id) {
+        Set<Feature> feature = fieldHasFeatureRepository.findFeaturesByFieldId(id);
+        return feature.stream().map(f -> FeatureResponse.builder()
+                .id(f.getId())
+                .name(f.getName())
+                .slug(f.getSlug())
+                .build()).collect(Collectors.toSet());
     }
 
 
