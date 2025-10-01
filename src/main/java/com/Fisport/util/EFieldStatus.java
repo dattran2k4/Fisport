@@ -6,5 +6,7 @@ public enum EFieldStatus {
     @JsonProperty("active")
     ACTIVE,
     @JsonProperty("inactive")
-    INACTIVE;
+    INACTIVE,
+    @JsonProperty("pending")
+    PENDING
 }

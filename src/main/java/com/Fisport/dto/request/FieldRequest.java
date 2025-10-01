@@ -5,6 +5,7 @@ import com.Fisport.util.EFieldStatus;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Getter
 public class FieldRequest implements Serializable {
@@ -14,6 +15,9 @@ public class FieldRequest implements Serializable {
     private String banner;
     private String slug;
     private String description;
+
+    private LocalDateTime openTime;
+    private LocalDateTime closeTime;
 
     private EFieldStatus status;
 

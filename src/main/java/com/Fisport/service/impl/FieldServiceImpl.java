@@ -59,11 +59,13 @@ public class FieldServiceImpl implements FieldService {
                 .banner(fieldRequest.getBanner())
                 .address(fieldRequest.getAddress())
                 .slug(fieldRequest.getSlug())
+                .openTime(fieldRequest.getOpenTime())
+                .closeTime(fieldRequest.getCloseTime())
                 .ward(ward)
                 .owner(user)
                 .fieldType(fieldType)
                 .description(fieldRequest.getDescription())
-                .fieldStatus(EFieldStatus.INACTIVE)
+                .fieldStatus(EFieldStatus.PENDING)
                 .build());
     }
 
@@ -79,6 +81,8 @@ public class FieldServiceImpl implements FieldService {
         field.setSlug(fieldRequest.getSlug());
         field.setBanner(fieldRequest.getBanner());
         field.setDescription(fieldRequest.getDescription());
+        field.setOpenTime(fieldRequest.getOpenTime());
+        field.setCloseTime(fieldRequest.getCloseTime());
         field.setWard(ward);
         field.setFieldType(fieldType);
         fieldRepository.save(field);
