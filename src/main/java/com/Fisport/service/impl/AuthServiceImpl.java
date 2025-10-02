@@ -2,6 +2,7 @@ package com.Fisport.service.impl;
 
 import com.Fisport.dto.request.LoginRequestDTO;
 import com.Fisport.dto.request.RegisterRequestDTO;
+import com.Fisport.dto.request.TwoFARequest;
 import com.Fisport.dto.response.LoginResponse;
 import com.Fisport.dto.response.LoginResponseDTO;
 import com.Fisport.dto.response.RegisterResponseDTO;
@@ -43,26 +44,6 @@ public class AuthServiceImpl implements AuthService {
     private final MailService mailService;
     private final CaffeineTokenService tokenService;
     private final TwoFAService  twoFAService;
-
-    @Override
-    public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
-        User user = userRepository.findByUsername(loginRequestDTO.getUsername())
-                .orElseThrow(() -> new ResourceNotFoundException("Không thấy tài khoản hoặc mật khẩu"));
-
-        if (!passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword())) {
-            throw new InvalidDataException("Mật khẩu không đúng");
-        }
-        return LoginResponseDTO.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .phone(user.getPhone())
-                .birthday(user.getBirthday())
-                .gender(user.getGender())
-                .status(user.getStatus())
-                .roleName(String.valueOf(user.getRole().getName()))
-                .build();
-    }
 
     @Override
     public RegisterResponseDTO register(RegisterRequestDTO  registerRequestDTO) throws MessagingException, UnsupportedEncodingException {
@@ -119,15 +100,27 @@ public class AuthServiceImpl implements AuthService {
                 )
         );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        // Lấy thông tin user
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = userDetails.getUser();
 
+        if (user.isTwoFAEnable()) {
+            session.setAttribute("PRE_AUTH_USER", request.getUsername());
+            return LoginResponse.builder()
+                    .username(user.getUsername())
+                    .email(user.getEmail())
+                    .is2FAEnabled(true)
+                    .message("Vui lòng nhập mã 2FA từ Google Authenticator")
+                    .build();
+        }
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext());
 
 //        new ChangeSessionIdAuthenticationStrategy().onAuthentication(authentication, httpRequest, httpResponse);
 
-        // Lấy thông tin user
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
         String role = userDetails.getAuthorities().stream()
                 .findFirst()
                 .map(GrantedAuthority::getAuthority)
@@ -141,6 +134,48 @@ public class AuthServiceImpl implements AuthService {
                 .email(userDetails.getUser().getEmail())
                 .gender(String.valueOf(userDetails.getUser().getGender()))
                 .role(role)
+                .is2FAEnabled(false)
+                .message("Đăng nhập thành công")
+                .build();
+    }
+
+    @Override
+    public LoginResponse verify2FA(TwoFARequest request, HttpSession session) {
+        String preAuthUser = (String) session.getAttribute("PRE_AUTH_USER");
+        if (preAuthUser == null || !preAuthUser.equals(request.getUsername())) {
+            throw new RuntimeException("Session không hợp lệ hoặc đã hết hạn");
+        }
+
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
+
+        if (!twoFAService.verifyCode(user.getTwoFASecret(), request.getCode())) {
+            throw new ResourceNotFoundException("Mã 2FA không hợp lệ");
+        }
+
+        CustomUserDetails userDetails = new CustomUserDetails(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+        session.removeAttribute("PRE_AUTH_USER");
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+                SecurityContextHolder.getContext());
+
+        return LoginResponse.builder()
+                .userId(userDetails.getUser().getId())
+                .username(userDetails.getUsername())
+                .birthDate(userDetails.getUser().getBirthday())
+                .phoneNumber(userDetails.getUser().getPhone())
+                .email(userDetails.getUser().getEmail())
+                .gender(String.valueOf(userDetails.getUser().getGender()))
+                .role(userDetails.getAuthorities().stream()
+                        .findFirst()
+                        .map(GrantedAuthority::getAuthority)
+                        .orElse(null))
+                .message("Đăng nhập thành công")
                 .build();
     }
 
