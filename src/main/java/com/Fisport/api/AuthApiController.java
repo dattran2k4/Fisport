@@ -12,10 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -44,6 +41,16 @@ public class AuthApiController {
         }
         catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Đăng ký thất bại!");
+        }
+    }
+
+    @PatchMapping("/confirm/{userId}")
+    public ResponseData<?> confirm(Long userId, @RequestParam String verifyCode) {
+        try {
+            authService.confirmUser(userId, verifyCode);
+            return new ResponseData<>(HttpStatus.OK.value(), "Confirm successfully");
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Confirm failed");
         }
     }
 }
