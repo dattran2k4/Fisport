@@ -40,7 +40,7 @@ public class AuthApiController {
             return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng ký thành công!", registerResponseDTO);
         }
         catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Đăng ký thất bại!");
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
 

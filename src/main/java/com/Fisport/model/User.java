@@ -32,7 +32,7 @@ public class User extends AbstractEntity {
     @Column(unique = true, nullable = false, length = 20)
     private String phone;
 
-    @Column(unique = true, nullable = false, name = "birth_day")
+    @Column(nullable = false, name = "birth_day")
     @Temporal(TemporalType.DATE)
     private LocalDate birthday;
 

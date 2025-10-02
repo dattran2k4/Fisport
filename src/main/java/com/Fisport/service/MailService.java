@@ -63,7 +63,7 @@ public class MailService {
         MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED, StandardCharsets.UTF_8.name());
         Context context =  new Context();
 
-        String confirmLink = String.format("%s%s?verifyCode=%s", endPointConfirmUser, userId, verifyCode);
+        String confirmLink = String.format("%s/%s?verifyCode=%s", endPointConfirmUser, userId, verifyCode);
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("confirmLink", confirmLink);
@@ -72,7 +72,7 @@ public class MailService {
         helper.setFrom(emailFrom, "Đạt Trần");
         helper.setTo(emailTo);
         helper.setSubject("Xác nhận tài khoản");
-        String html = templateEngine.process("confirmLink", context);
+        String html = templateEngine.process("confirm-email.html", context);
         helper.setText(html, true);
 
         mailSender.send(message);
