@@ -40,5 +40,6 @@ public class RegisterRequestDTO implements Serializable {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthday;
 
+    @NotBlank(message = "Vui lòng chọn giới tính")
     private EGender gender;
 }
