@@ -15,6 +15,7 @@ import com.Fisport.security.CustomUserDetails;
 import com.Fisport.service.AuthService;
 import com.Fisport.service.CaffeineTokenService;
 import com.Fisport.service.MailService;
+import com.Fisport.service.TwoFAService;
 import com.Fisport.util.ERole;
 import com.Fisport.util.EUserStatus;
 import jakarta.mail.MessagingException;
@@ -41,6 +42,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final MailService mailService;
     private final CaffeineTokenService tokenService;
+    private final TwoFAService  twoFAService;
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
@@ -150,15 +152,24 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
 
         //Remove token if user active
-        if (user.getStatus().equals(EUserStatus.INACTIVE)) {
+        if (user.getStatus().equals(EUserStatus.ACTIVE)) {
             tokenService.invalidateToken(verifyCode);
+            return "Tài khoản đã được kích hoạt trước đó.";
         }
 
         user.setStatus(EUserStatus.ACTIVE);
+
+        //Set secret from GGAuthentication
+        String secret = twoFAService.generateSecret();
+        user.setTwoFAEnable(true);
+        user.setTwoFASecret(secret);
+
+        String qrURL = twoFAService.getOtpAuthURL(user.getUsername(), secret);
+
         userRepository.save(user);
 
         tokenService.invalidateToken(verifyCode);
-        return "Confirm successfully";
+        return String.format("Kích hoạt tài khoản thành công. Sử dụng ứng dụng Google Authentication để kích hoạt bảo vệ tài khoản: QR Code 2FA: %s", qrURL);
     }
 
 }
