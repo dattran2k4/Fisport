@@ -85,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
                 .phone(registerRequestDTO.getPhone())
                 .birthday(registerRequestDTO.getBirthday())
                 .gender(registerRequestDTO.getGender())
-                .status(EUserStatus.ACTIVE)
+                .status(EUserStatus.INACTIVE)
                 .role(role)
                 .build();
 
@@ -144,7 +144,21 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String confirmUser(Long userId, String verifyCode) {
-        return "Confirmed !";
+        //Check email
+        String email = tokenService.getEmailByToken(verifyCode).orElseThrow(() -> new ResourceNotFoundException("Token không hợp lệ"));
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
+
+        //Remove token if user active
+        if (user.getStatus().equals(EUserStatus.INACTIVE)) {
+            tokenService.invalidateToken(verifyCode);
+        }
+
+        user.setStatus(EUserStatus.ACTIVE);
+        userRepository.save(user);
+
+        tokenService.invalidateToken(verifyCode);
+        return "Confirm successfully";
     }
 
 }
