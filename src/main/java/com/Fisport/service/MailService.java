@@ -24,6 +24,7 @@ public class MailService {
 
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
+    private final CaffeineTokenService tokenService;
 
     @Value("${spring.mail.from}")
     private String emailFrom;
@@ -62,6 +63,7 @@ public class MailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED, StandardCharsets.UTF_8.name());
         Context context =  new Context();
+
 
         String confirmLink = String.format("%s/%s?verifyCode=%s", endPointConfirmUser, userId, verifyCode);
 

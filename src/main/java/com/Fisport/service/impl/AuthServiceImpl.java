@@ -13,6 +13,7 @@ import com.Fisport.repository.RoleRepository;
 import com.Fisport.repository.UserRepository;
 import com.Fisport.security.CustomUserDetails;
 import com.Fisport.service.AuthService;
+import com.Fisport.service.CaffeineTokenService;
 import com.Fisport.service.MailService;
 import com.Fisport.util.ERole;
 import com.Fisport.util.EUserStatus;
@@ -39,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
     private final MailService mailService;
-
+    private final CaffeineTokenService tokenService;
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
@@ -90,7 +91,10 @@ public class AuthServiceImpl implements AuthService {
 
         userRepository.save(user);
 
-        mailService.sendConfirmLink(user.getEmail(), user.getId(), "abcxyz123");
+        //Create token
+        String verifyCode = tokenService.createTokenForEmail(registerRequestDTO.getEmail());
+
+        mailService.sendConfirmLink(user.getEmail(), user.getId(), verifyCode);
 
         return RegisterResponseDTO.builder()
                 .id(user.getId())
