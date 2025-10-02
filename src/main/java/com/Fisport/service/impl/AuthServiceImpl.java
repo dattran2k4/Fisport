@@ -13,8 +13,11 @@ import com.Fisport.repository.RoleRepository;
 import com.Fisport.repository.UserRepository;
 import com.Fisport.security.CustomUserDetails;
 import com.Fisport.service.AuthService;
+import com.Fisport.service.CaffeineTokenService;
+import com.Fisport.service.MailService;
 import com.Fisport.util.ERole;
 import com.Fisport.util.EUserStatus;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +29,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
+
 
 @RequiredArgsConstructor
 @Service
@@ -34,7 +39,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
     private final AuthenticationManager authenticationManager;
-
+    private final MailService mailService;
+    private final CaffeineTokenService tokenService;
 
     @Override
     public LoginResponseDTO login(LoginRequestDTO loginRequestDTO) {
@@ -57,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public RegisterResponseDTO register(RegisterRequestDTO  registerRequestDTO) {
+    public RegisterResponseDTO register(RegisterRequestDTO  registerRequestDTO) throws MessagingException, UnsupportedEncodingException {
         if (userRepository.findByUsername(registerRequestDTO.getUsername()).isPresent()) {
             throw new InvalidDataException("tài khoản đã tồn tại");
         }
@@ -79,11 +85,16 @@ public class AuthServiceImpl implements AuthService {
                 .phone(registerRequestDTO.getPhone())
                 .birthday(registerRequestDTO.getBirthday())
                 .gender(registerRequestDTO.getGender())
-                .status(EUserStatus.ACTIVE)
+                .status(EUserStatus.INACTIVE)
                 .role(role)
                 .build();
 
         userRepository.save(user);
+
+        //Create token
+        String verifyCode = tokenService.createTokenForEmail(registerRequestDTO.getEmail());
+
+        mailService.sendConfirmLink(user.getEmail(), user.getId(), verifyCode);
 
         return RegisterResponseDTO.builder()
                 .id(user.getId())
@@ -129,6 +140,25 @@ public class AuthServiceImpl implements AuthService {
                 .gender(String.valueOf(userDetails.getUser().getGender()))
                 .role(role)
                 .build();
+    }
+
+    @Override
+    public String confirmUser(Long userId, String verifyCode) {
+        //Check email
+        String email = tokenService.getEmailByToken(verifyCode).orElseThrow(() -> new ResourceNotFoundException("Token không hợp lệ"));
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
+
+        //Remove token if user active
+        if (user.getStatus().equals(EUserStatus.INACTIVE)) {
+            tokenService.invalidateToken(verifyCode);
+        }
+
+        user.setStatus(EUserStatus.ACTIVE);
+        userRepository.save(user);
+
+        tokenService.invalidateToken(verifyCode);
+        return "Confirm successfully";
     }
 
 }
