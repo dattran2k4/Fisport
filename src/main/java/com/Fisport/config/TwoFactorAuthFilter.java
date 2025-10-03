@@ -16,22 +16,22 @@ import java.util.List;
 @Component
 public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
-    private static final List<String> ALLOWED_PATHS = List.of(
-            "/api/auth/login",
-            "/api/auth/register",
-            "/api/auth/confirm",
-            "/api/auth/2fa/verify"
-    );
+//    private static final List<String> ALLOWED_PATHS = List.of(
+//            "/api/auth/login",
+//            "/api/auth/register",
+//            "/api/auth/confirm",
+//            "/api/auth/2fa/verify"
+//    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         String path = request.getRequestURI();
 
-        if (ALLOWED_PATHS.stream().anyMatch(path::startsWith)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+//        if (ALLOWED_PATHS.stream().anyMatch(path::startsWith)) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
 
         if (session == null) {
             writeJsonError(response, HttpServletResponse.SC_UNAUTHORIZED, "Chưa đăng nhập");

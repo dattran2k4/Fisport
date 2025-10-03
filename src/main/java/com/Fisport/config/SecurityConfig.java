@@ -23,10 +23,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final TwoFactorAuthFilter twoFactorAuthFilter;
+
+    private String[] WHITE_LIST = {"/api/auth/**", "/fields/**", "/common/**"};
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -59,7 +62,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/auth/**", "/common/**").permitAll()
+                        .requestMatchers(WHITE_LIST).permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/owner/**").hasRole("OWNER")
                         .anyRequest().authenticated()
