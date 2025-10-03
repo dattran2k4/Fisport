@@ -27,6 +27,7 @@ public class RegisterRequestDTO implements Serializable {
             regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
             message = "Định dạng email không hợp lệ"
     )
+    @Email
     private String email;
 
     @NotBlank(message = "Số điện thoại không được để trống")
