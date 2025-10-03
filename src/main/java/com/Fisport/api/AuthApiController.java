@@ -4,11 +4,9 @@ import com.Fisport.dto.request.LoginRequestDTO;
 import com.Fisport.dto.request.RegisterRequestDTO;
 import com.Fisport.dto.response.*;
 import com.Fisport.service.AuthService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -37,7 +35,7 @@ public class AuthApiController {
     public ResponseData<?> register(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
         try  {
             RegisterResponseDTO registerResponseDTO = authService.register(registerRequestDTO);
-            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng ký thành công!", registerResponseDTO);
+            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng ký thành công! Xác nhận email để kích hoạt tài khoản", registerResponseDTO);
         }
         catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
@@ -45,10 +43,10 @@ public class AuthApiController {
     }
 
     @PatchMapping("/confirm/{userId}")
-    public ResponseData<?> confirm(Long userId, @RequestParam String verifyCode) {
+    public ResponseData<?> confirm(@Min(1) @PathVariable Long userId, @RequestParam String verifyCode) {
         try {
-            authService.confirmUser(userId, verifyCode);
-            return new ResponseData<>(HttpStatus.OK.value(), "Confirm successfully");
+            String message = authService.confirmUser(userId, verifyCode);
+            return new ResponseData<>(HttpStatus.OK.value(), "Confirm successfully", message);
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Confirm failed");
         }

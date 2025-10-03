@@ -15,5 +15,7 @@ public class LoginResponse {
     private String phoneNumber;
     private String gender;
     private LocalDate birthDate;
+    private boolean is2FAEnabled;
+    private String message;
     private String role;
 }

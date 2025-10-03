@@ -1,14 +1,12 @@
 package com.Fisport.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.io.Serializable;
 
 @Getter
+@Builder
 public class ResponseData<T> implements Serializable {
     private final int status;
     private final String message;

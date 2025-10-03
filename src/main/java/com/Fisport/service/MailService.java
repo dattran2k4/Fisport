@@ -69,6 +69,7 @@ public class MailService {
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("confirmLink", confirmLink);
+        properties.put("verifyCode", verifyCode);
         context.setVariables(properties);
 
         helper.setFrom(emailFrom, "Đạt Trần");

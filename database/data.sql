@@ -9,7 +9,7 @@ INSERT INTO role (name) VALUES
                             ('OWNER');
 
 
-INSERT INTO user (username, email, password, phone, birth_day, status, gender, role_id)
+INSERT INTO user (username, email, password, phone, birth_day, status, gender, is_two_factor, two_fa_secret, role_id)
 VALUES
     ('dattran0901', 'tranquocdat@gmail.com', '$2a$10$s3go5e.GYivSMmrJXG6jceddjfSAbg6O832Sip8XIVNRRLIjXNP6G', '0785819692', '2004-01-09', 'ACTIVE', 'MALE', 1),
     ('johndoe', 'dattranquoc@gmail.com', '$2a$10$2rQkUgA4sMS5z4QK8f1QXeF6p3iP63PHGQo2og4g0oY6Qp1QjOq9e', '0912345678', '1998-08-15', 'ACTIVE', 'FEMALE', 2),

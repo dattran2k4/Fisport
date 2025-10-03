@@ -46,6 +46,12 @@
     </dependencyManagement>
 
 	<dependencies>
+        <!--  2FA      -->
+        <dependency>
+            <groupId>com.warrenstrange</groupId>
+            <artifactId>googleauth</artifactId>
+            <version>1.5.0</version>
+        </dependency>
         <!--  Caffeine      -->
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
