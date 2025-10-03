@@ -50,10 +50,11 @@ public class FieldServiceImpl implements FieldService {
     }
 
     @Override
-    public void createFieldByOwnerId(FieldRequest fieldRequest, Long ownerId) {
-        User user = userRepository.findById(ownerId).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+    public void createFieldByOwnerId(FieldRequest fieldRequest, String name) {
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
         Ward ward = wardRepository.findById(fieldRequest.getWardId()).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
         FieldType fieldType = fieldRepository.findById(fieldRequest.getFieldTypeId()).orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
+
         fieldRepository.save(Field.builder()
                 .name(fieldRequest.getName())
                 .banner(fieldRequest.getBanner())
@@ -61,11 +62,11 @@ public class FieldServiceImpl implements FieldService {
                 .slug(fieldRequest.getSlug())
                 .openTime(fieldRequest.getOpenTime())
                 .closeTime(fieldRequest.getCloseTime())
+                .fieldStatus(EFieldStatus.INACTIVE)
                 .ward(ward)
                 .owner(user)
                 .fieldType(fieldType)
                 .description(fieldRequest.getDescription())
-                .fieldStatus(EFieldStatus.PENDING)
                 .build());
     }
 

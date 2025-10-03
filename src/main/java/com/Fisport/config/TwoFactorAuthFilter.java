@@ -16,42 +16,32 @@ import java.util.List;
 @Component
 public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
-//    private static final List<String> ALLOWED_PATHS = List.of(
-//            "/api/auth/login",
-//            "/api/auth/register",
-//            "/api/auth/confirm",
-//            "/api/auth/2fa/verify"
-//    );
+    private static final List<String> WHITELIST = List.of(
+            "/api/auth/**", "/api/fields", "/common/**"
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
-        String path = request.getRequestURI();
-
-//        if (ALLOWED_PATHS.stream().anyMatch(path::startsWith)) {
-//            filterChain.doFilter(request, response);
-//            return;
-//        }
 
         if (session == null) {
-            writeJsonError(response, HttpServletResponse.SC_UNAUTHORIZED, "Chưa đăng nhập");
-            return;
-        }
-
-        if (session.getAttribute("PRE_AUTH_USER") != null) {
-            writeJsonError(response, HttpServletResponse.SC_UNAUTHORIZED, "Bạn phải xác thực 2FA trước khi truy cập API khác");
-            return;
-        }
-
-        // Nếu có full SecurityContext → cho qua
-        if (session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY) != null) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Trường hợp khác (session có nhưng không hợp lệ)
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        writeJsonError(response, HttpServletResponse.SC_UNAUTHORIZED, "Session không hợp lệ");
+        String path = request.getRequestURI();
+        if (WHITELIST.stream().anyMatch(path::startsWith)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        if (session.getAttribute("PRE_AUTH_USER") != null && session.getAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY) == null) {
+            filterChain.doFilter(request, response);
+//            writeJsonError(response, HttpServletResponse.SC_UNAUTHORIZED, "Bạn phải xác thực 2FA trước khi truy cập API khác");
+            return;
+        }
+
+        filterChain.doFilter(request, response);
     }
 
     private void writeJsonError(HttpServletResponse response, int status, String message) throws IOException {

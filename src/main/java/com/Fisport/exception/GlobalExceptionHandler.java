@@ -5,10 +5,10 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.UnexpectedTypeException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
@@ -28,8 +28,7 @@ public class GlobalExceptionHandler {
      * @return errorResponse
      */
     @ExceptionHandler({ConstraintViolationException.class,
-            MissingServletRequestParameterException.class, MethodArgumentNotValidException.class})
-    @ResponseStatus(BAD_REQUEST)
+            MissingServletRequestParameterException.class, MethodArgumentNotValidException.class, UnexpectedTypeException.class})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "400", description = "Bad Request",
                     content = {@Content(mediaType = APPLICATION_JSON_VALUE,
@@ -66,6 +65,9 @@ public class GlobalExceptionHandler {
         } else if (e instanceof ConstraintViolationException) {
             errorResponse.setError("Invalid Parameter");
             errorResponse.setMessage(message.substring(message.indexOf(" ") + 1));
+        } else if (e instanceof UnexpectedTypeException) {
+            errorResponse.setError("Invalid Parameter");
+            errorResponse.setMessage(message.substring(message.indexOf(" ") + 1));
         } else {
             errorResponse.setError("Invalid Data");
             errorResponse.setMessage(message);
@@ -83,7 +85,6 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(ResourceNotFoundException.class)
-    @ResponseStatus(NOT_FOUND)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "404", description = "Bad Request",
                     content = {@Content(mediaType = APPLICATION_JSON_VALUE,
@@ -120,7 +121,6 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ExceptionHandler(InvalidDataException.class)
-    @ResponseStatus(CONFLICT)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "409", description = "Conflict",
                     content = {@Content(mediaType = APPLICATION_JSON_VALUE,
@@ -157,7 +157,6 @@ public class GlobalExceptionHandler {
      * @return error
      */
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(INTERNAL_SERVER_ERROR)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "500", description = "Internal Server Error",
                     content = {@Content(mediaType = APPLICATION_JSON_VALUE,

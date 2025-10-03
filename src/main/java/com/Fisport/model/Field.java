@@ -6,8 +6,8 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 @Getter
@@ -35,10 +35,10 @@ public class Field extends AbstractEntity {
     private String slug;
 
     @Column(name = "open_time", nullable = false)
-    private LocalDateTime openTime;
+    private LocalTime openTime;
 
     @Column(name = "close_time", nullable = false)
-    private LocalDateTime closeTime;
+    private LocalTime closeTime;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

@@ -29,7 +29,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final TwoFactorAuthFilter twoFactorAuthFilter;
 
-    private String[] WHITE_LIST = {"/api/auth/**", "/fields/**", "/common/**"};
+    private String[] WHITE_LIST = {"/api/auth/**", "/api/fields/**", "/common/**"};
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -63,8 +63,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(WHITE_LIST).permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/owner/**").hasRole("OWNER")
+//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
+//                        .requestMatchers("/api/owner/**").hasRole("OWNER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(twoFactorAuthFilter, UsernamePasswordAuthenticationFilter.class)

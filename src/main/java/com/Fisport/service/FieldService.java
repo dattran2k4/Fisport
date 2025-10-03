@@ -6,6 +6,7 @@ import com.Fisport.dto.response.FieldHasTimeSlotResponse;
 import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.util.EFieldStatus;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Set;
 
@@ -13,7 +14,7 @@ public interface FieldService {
     List<FieldResponse> getFieldByWardAndType(long wardId, long fieldTypeId);
     List<FieldResponse> getFieldByFieldTypeId(long fieldTypeId);
     List<FieldResponse> getFieldByOwnerId(Long ownerId);
-    void createFieldByOwnerId(FieldRequest fieldRequest, Long ownerId);
+    void createFieldByOwnerId(FieldRequest fieldRequest, String name);
 
     void updateFieldByOwnerId(FieldRequest fieldRequest, Long ownerId, Long fieldId);
     void changeStatusFieldByOwnerId(Long ownerId, Long fieldId,  EFieldStatus fieldStatus);
