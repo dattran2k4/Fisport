@@ -14,7 +14,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 @Table(name = "field_time_slot")
-public class FieldTimeSlot extends AbstractEntity {
+public class FieldHasTimeSlot extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "field_id",  nullable = false)

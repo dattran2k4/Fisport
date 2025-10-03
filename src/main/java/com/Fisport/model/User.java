@@ -32,8 +32,7 @@ public class User extends AbstractEntity {
     @Column(unique = true, nullable = false, length = 20)
     private String phone;
 
-    @Column(unique = true, nullable = false, name = "birth_day")
-    @Temporal(TemporalType.DATE)
+    @Column(nullable = false, name = "birth_day")
     private LocalDate birthday;
 
     @Enumerated(EnumType.STRING)
@@ -42,15 +41,27 @@ public class User extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private EUserStatus status;
 
+    @Column(name = "is_two_factor")
+    private boolean twoFAEnable = false;
+
+    @Column(name = "two_fa_secret")
+    private String twoFASecret;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @Builder.Default
     private Set<Field> fields = new HashSet<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @Builder.Default
     private Set<Booking>  bookings = new HashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private Set<Review> reviews = new HashSet<>();
 
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)

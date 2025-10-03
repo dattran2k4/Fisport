@@ -1,5 +1,6 @@
 package com.Fisport.model;
 
+import com.Fisport.util.EFieldStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,6 +34,16 @@ public class Field extends AbstractEntity {
     @Column(name = "slug", nullable = false,  unique = true)
     private String slug;
 
+    @Column(name = "open_time", nullable = false)
+    private LocalDateTime openTime;
+
+    @Column(name = "close_time", nullable = false)
+    private LocalDateTime closeTime;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private EFieldStatus fieldStatus;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User owner;
@@ -42,7 +53,7 @@ public class Field extends AbstractEntity {
     private Ward ward;
 
     @OneToMany(mappedBy = "field",  fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<FieldTimeSlot> fieldTimeSlots = new HashSet<>();
+    private Set<FieldHasTimeSlot> fieldTimeSlots = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "field_type_id")
@@ -53,6 +64,9 @@ public class Field extends AbstractEntity {
 
     @OneToMany(mappedBy = "field",  cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FieldServiceItem> fieldServiceItems = new HashSet<>();
+
+    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Review>  reviews = new HashSet<>();
 
     @CreationTimestamp
     @Column(name = "created_at")

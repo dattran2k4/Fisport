@@ -1,5 +1,6 @@
 package com.Fisport.dto.request;
 
+import com.Fisport.dto.validator.EnumValue;
 import com.Fisport.util.EGender;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
@@ -40,5 +41,7 @@ public class RegisterRequestDTO implements Serializable {
     @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthday;
 
+    @NotNull(message = "Vui lòng chọn giới tính")
+    @EnumValue(name = "gender", enumClass = EGender.class)
     private EGender gender;
 }

@@ -38,11 +38,14 @@ public class Booking extends AbstractEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "field_time_slot_id")
-    private FieldTimeSlot fieldTimeSlot;
+    private FieldHasTimeSlot fieldTimeSlot;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "booking")
+    private Review review;
 
     @OneToMany(mappedBy = "booking",  cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookingServiceItem> bookingServiceItems = new HashSet<BookingServiceItem>();
