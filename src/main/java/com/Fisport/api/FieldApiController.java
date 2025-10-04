@@ -60,10 +60,16 @@ public class FieldApiController {
         }
     }
 
-//    @GetMapping()
-//    public ResponseData<?> getAllFieldsByOwner(@PathVariable Long ownerId) {
-//        return new ResponseData<>(HttpStatus.OK.value(), "Get All Fields", fieldService.getFieldByOwnerId(ownerId));
-//    }
+    @PreAuthorize("hasRole('OWNER')")
+    @GetMapping("/me")
+    public ResponseData<?> getFeatureByOwner(Principal principal) {
+        try {
+            List<FieldResponse> fieldResponses = fieldService.getFieldByOwner(principal.getName());
+            return new ResponseData<>(HttpStatus.OK.value(), "Get Field Success", fieldResponses);
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get Feature By Owner Error");
+        }
+    }
 
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping("/add")

@@ -2,9 +2,9 @@ package com.Fisport.service.impl;
 
 import com.Fisport.dto.request.LoginRequestDTO;
 import com.Fisport.dto.request.RegisterRequestDTO;
+import com.Fisport.dto.request.ResetPasswordRequest;
 import com.Fisport.dto.request.TwoFARequest;
 import com.Fisport.dto.response.LoginResponse;
-import com.Fisport.dto.response.LoginResponseDTO;
 import com.Fisport.dto.response.RegisterResponseDTO;
 import com.Fisport.exception.InvalidDataException;
 import com.Fisport.exception.ResourceNotFoundException;
@@ -22,6 +22,7 @@ import com.Fisport.util.EUserStatus;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,11 +34,18 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Optional;
 
 
 @RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
+
+    @Value("${endpoint.confirmUser}")
+    private String endPointConfirmUser;
+
+    @Value("${endpoint.endPointResetPassword}")
+    private String endPointResetPassword;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -56,10 +64,6 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidDataException("email đã tồn tại");
         }
 
-        if (userRepository.findByPhone(registerRequestDTO.getPhone()).isPresent()) {
-            throw new InvalidDataException("số điện thoại đã tồn tại");
-        }
-
         Role role = roleRepository.findByName(ERole.USER)
                 .orElseThrow(() -> new ResourceNotFoundException("Default role 'USER' not found"));
 
@@ -67,9 +71,6 @@ public class AuthServiceImpl implements AuthService {
                 .username(registerRequestDTO.getUsername())
                 .email(registerRequestDTO.getEmail())
                 .password(passwordEncoder.encode(registerRequestDTO.getPassword()))
-                .phone(registerRequestDTO.getPhone())
-                .birthday(registerRequestDTO.getBirthday())
-                .gender(registerRequestDTO.getGender())
                 .status(EUserStatus.INACTIVE)
                 .role(role)
                 .build();
@@ -79,7 +80,7 @@ public class AuthServiceImpl implements AuthService {
         //Create token
         String verifyCode = tokenService.createTokenForEmail(registerRequestDTO.getEmail());
 
-        mailService.sendConfirmLink(user.getEmail(), user.getId(), verifyCode);
+        mailService.sendConfirmLink(user.getEmail(), "confirm-email.html", endPointConfirmUser, verifyCode);
 
         return RegisterResponseDTO.builder()
                 .id(user.getId())
@@ -182,11 +183,11 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String confirmUser(Long userId, String verifyCode) {
+    public String confirmUser(String verifyCode) {
         //Check email
         String email = tokenService.getEmailByToken(verifyCode).orElseThrow(() -> new ResourceNotFoundException("Token không hợp lệ"));
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
 
         //Remove token if user active
         if (user.getStatus().equals(EUserStatus.ACTIVE)) {
@@ -223,7 +224,39 @@ public class AuthServiceImpl implements AuthService {
         return "Đăng xuất thành công!";
     }
 
+    @Override
+    public String forgotPassword(String email) throws MessagingException, UnsupportedEncodingException {
+        if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+            return "Email sai định dạng";
+        }
 
+        User user = userRepository.findByEmail(email).orElse(null);
+        if (user != null) {
+            String token = tokenService.createTokenForEmail(user.getUsername());
+            mailService.sendConfirmLink(email, "reset-password-email.html", endPointResetPassword, token);
+        }
+
+        return "Kiểm tra email để tạo lại mật khẩu";
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordRequest request, String verifyCode) {
+        //user không phải email
+        //String email = tokenService.getEmailByToken(verifyCode).orElseThrow(() -> new RuntimeException("Token không hợp lệ hoặc đã hết hạn"));
+
+        String username =tokenService.getEmailByToken(verifyCode).orElseThrow(() -> new RuntimeException("Token không hợp lệ hoặc đã hết hạn"));
+
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
+
+        if (!request.getPassword().equals(request.getConfirmPassword())) {
+            throw new RuntimeException("Mật khẩu xác nhận không khớp");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        userRepository.save(user);
+
+        tokenService.invalidateToken(verifyCode);
+    }
 }
 
 

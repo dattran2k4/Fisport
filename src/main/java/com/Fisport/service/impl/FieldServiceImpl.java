@@ -42,8 +42,10 @@ public class FieldServiceImpl implements FieldService {
     }
 
     @Override
-    public List<FieldResponse> getFieldByOwnerId(Long ownerId) {
-        List<Field> fields = fieldRepository.findByOwnerId(ownerId);
+    public List<FieldResponse> getFieldByOwner(String name) {
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+
+        List<Field> fields = fieldRepository.findByOwnerId(user.getId());
         return fields.stream()
                 .map(this::toDto)
                 .toList();

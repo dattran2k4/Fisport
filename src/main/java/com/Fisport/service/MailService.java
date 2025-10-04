@@ -29,9 +29,6 @@ public class MailService {
     @Value("${spring.mail.from}")
     private String emailFrom;
 
-    @Value("${endpoint.confirmUser}")
-    private String endPointConfirmUser;
-
     public String sendEmail(String recipients, String subject, String content, MultipartFile[] files) throws UnsupportedEncodingException, MessagingException {
 
         MimeMessage message = mailSender.createMimeMessage();
@@ -58,14 +55,14 @@ public class MailService {
         return "Sent";
     }
 
-    public void sendConfirmLink(String emailTo, Long userId, String verifyCode) throws MessagingException, UnsupportedEncodingException {
+    public void sendConfirmLink(String emailTo, String template, String endPointConfirmUser, String verifyCode) throws MessagingException, UnsupportedEncodingException {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED, StandardCharsets.UTF_8.name());
         Context context =  new Context();
 
 
-        String confirmLink = String.format("%s/%s?verifyCode=%s", endPointConfirmUser, userId, verifyCode);
+        String confirmLink = String.format("%s?verifyCode=%s", endPointConfirmUser, verifyCode);
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("confirmLink", confirmLink);
@@ -75,7 +72,7 @@ public class MailService {
         helper.setFrom(emailFrom, "Đạt Trần");
         helper.setTo(emailTo);
         helper.setSubject("Xác nhận tài khoản");
-        String html = templateEngine.process("confirm-email.html", context);
+        String html = templateEngine.process(template, context);
         helper.setText(html, true);
 
         mailSender.send(message);

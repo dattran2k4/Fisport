@@ -1,7 +1,9 @@
 package com.Fisport.api;
 
+import com.Fisport.dto.request.ForgotPasswordRequest;
 import com.Fisport.dto.request.LoginRequestDTO;
 import com.Fisport.dto.request.RegisterRequestDTO;
+import com.Fisport.dto.request.ResetPasswordRequest;
 import com.Fisport.dto.response.*;
 import com.Fisport.service.AuthService;
 import jakarta.servlet.http.HttpSession;
@@ -25,28 +27,26 @@ public class AuthApiController {
         try {
             LoginResponse loginResponse = authService.loginApi(loginRequestDTO, session);
 //            session.setAttribute("loginResponse", loginResponse);
-            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng nhập thành công!",  loginResponse);
-        }
-        catch (Exception e) {
+            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng nhập thành công!", loginResponse);
+        } catch (Exception e) {
             return new ResponseError(HttpStatus.NOT_FOUND.value(), "Đăng nhập thất bại");
         }
     }
 
     @PostMapping("/register")
     public ResponseData<?> register(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
-        try  {
+        try {
             RegisterResponseDTO registerResponseDTO = authService.register(registerRequestDTO);
             return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng ký thành công! Xác nhận email để kích hoạt tài khoản", registerResponseDTO);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
 
-    @PatchMapping("/confirm/{userId}")
-    public ResponseData<?> confirm(@Min(1) @PathVariable Long userId, @RequestParam String verifyCode) {
+    @PatchMapping("/confirm")
+    public ResponseData<?> confirm(@RequestParam String verifyCode) {
         try {
-            String message = authService.confirmUser(userId, verifyCode);
+            String message = authService.confirmUser(verifyCode);
             return new ResponseData<>(HttpStatus.OK.value(), "Confirm successfully", message);
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Confirm failed");
@@ -56,11 +56,30 @@ public class AuthApiController {
     @PostMapping("/logout")
     public ResponseData<?> logout(HttpSession session) {
         try {
-          String message = authService.logout(session);
-          return new ResponseData<>(HttpStatus.OK.value(), "Logout successfully", message);
+            String message = authService.logout(session);
+            return new ResponseData<>(HttpStatus.OK.value(), "Logout successfully", message);
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Logout failed");
         }
     }
 
+    @PostMapping("/forgot-password")
+    public ResponseData<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        try {
+            String message = authService.forgotPassword(request.getEmail());
+            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Loading", message);
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Forgot password failed");
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseData<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request, @RequestParam String verifyCode) {
+        try {
+            authService.resetPassword(request, verifyCode);
+            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Reset password successfully");
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Reset password failed");
+        }
+    }
 }
