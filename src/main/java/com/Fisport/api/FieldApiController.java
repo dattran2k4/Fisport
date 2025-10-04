@@ -24,15 +24,15 @@ public class FieldApiController {
 
     private final FieldService fieldService;
 
-//    @GetMapping()
-//    public ResponseData<?> getFieldByWardIdAndTypeId(@RequestParam(required = false) long wardId, @RequestParam(required = false) long typeId) {
-//        try {
-//            List<FieldResponse> fieldResponses = fieldService.getFieldByWardAndType(wardId, typeId);
-//            return new ResponseData<>(HttpStatus.OK.value(), "Get Fields By Ward And Type Id Success", fieldResponses);
-//        } catch (Exception e) {
-//            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get Fields By Ward And Type Id Error");
-//        }
-//    }
+    @GetMapping()
+    public ResponseData<?> getFieldByWardIdAndTypeId(@RequestParam(required = false) long wardId, @RequestParam(required = false) long typeId) {
+        try {
+            List<FieldResponse> fieldResponses = fieldService.getFieldByWardAndType(wardId, typeId);
+            return new ResponseData<>(HttpStatus.OK.value(), "Get Fields By Ward And Type Id Success", fieldResponses);
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get Fields By Ward And Type Id Error");
+        }
+    }
 
     @GetMapping("/{id}")
     public ResponseData<?> getFieldById(@Min(1) @PathVariable Long id) {

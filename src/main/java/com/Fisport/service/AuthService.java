@@ -16,4 +16,5 @@ public interface AuthService {
 
     String confirmUser(Long userId, String verifyCode);
     LoginResponse verify2FA(TwoFARequest request, HttpSession session);
+    String logout(HttpSession session);
 }

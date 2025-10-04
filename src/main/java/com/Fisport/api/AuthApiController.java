@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,7 @@ public class AuthApiController {
     public ResponseData<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpSession session) {
         try {
             LoginResponse loginResponse = authService.loginApi(loginRequestDTO, session);
-            session.setAttribute("loginResponse", loginResponse);
+//            session.setAttribute("loginResponse", loginResponse);
             return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng nhập thành công!",  loginResponse);
         }
         catch (Exception e) {
@@ -51,4 +52,15 @@ public class AuthApiController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Confirm failed");
         }
     }
+
+    @PostMapping("/logout")
+    public ResponseData<?> logout(HttpSession session) {
+        try {
+          String message = authService.logout(session);
+          return new ResponseData<>(HttpStatus.OK.value(), "Logout successfully", message);
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Logout failed");
+        }
+    }
+
 }

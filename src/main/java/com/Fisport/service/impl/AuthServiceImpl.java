@@ -32,11 +32,13 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 
 @RequiredArgsConstructor
 @Service
 public class AuthServiceImpl implements AuthService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
@@ -206,6 +208,21 @@ public class AuthServiceImpl implements AuthService {
         tokenService.invalidateToken(verifyCode);
         return String.format("Kích hoạt tài khoản thành công. Sử dụng ứng dụng Google Authentication để kích hoạt bảo vệ tài khoản: QR Code 2FA: %s", qrURL);
     }
+
+    @Override
+    public String logout(HttpSession session) {
+        if (session != null) {
+            List<String> attrsToRemove = List.of(
+                    "PRE_AUTH_USER",       // 2FA
+                    "SPRING_SECURITY_CONTEXT"
+            );
+            attrsToRemove.forEach(session::removeAttribute);
+            session.invalidate();
+        }
+        SecurityContextHolder.clearContext();
+        return "Đăng xuất thành công!";
+    }
+
 
 }
 
