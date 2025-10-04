@@ -90,7 +90,7 @@ public class FieldServiceImpl implements FieldService {
     }
 
     @Override
-    public void changeStatusFieldByOwnerId(Long ownerId, Long fieldId, EFieldStatus fieldStatus) {
+    public void changeStatusFieldByAdmin(Long fieldId, EFieldStatus fieldStatus) {
         Field field = getFieldByid(fieldId);
         field.setFieldStatus(fieldStatus);
         fieldRepository.save(field);

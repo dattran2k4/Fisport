@@ -27,7 +27,7 @@ public class AuthApiController {
             return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng nhập thành công!",  loginResponse);
         }
         catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Đăng nhập thất bại");
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), "Đăng nhập thất bại");
         }
     }
 

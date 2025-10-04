@@ -17,7 +17,7 @@ public interface FieldService {
     void createFieldByOwnerId(FieldRequest fieldRequest, String name);
 
     void updateFieldByOwnerId(FieldRequest fieldRequest, Long ownerId, Long fieldId);
-    void changeStatusFieldByOwnerId(Long ownerId, Long fieldId,  EFieldStatus fieldStatus);
+    void changeStatusFieldByAdmin(Long fieldId,  EFieldStatus fieldStatus);
     FieldResponse getField(Long fieldId);
 
     List<FieldHasTimeSlotResponse> getTimeSlotAndPriceByFieldId(Long id);

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/fields")
+@RequestMapping("/api/v1/fields")
 @RequiredArgsConstructor
 @Validated
 public class FieldApiController {
@@ -76,7 +76,7 @@ public class FieldApiController {
         }
     }
 
-
+    @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/{fieldId}")
     public ResponseData<?> updateField(@Valid @RequestBody FieldRequest fieldRequest, @PathVariable Long fieldId, @PathVariable Long ownerId) {
         try {
@@ -88,11 +88,12 @@ public class FieldApiController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{fieldId}")
-    public ResponseData<?> updateFieldStatus(@PathVariable Long ownerId, @PathVariable Long fieldId, @RequestParam EFieldStatus fieldStatus) {
+    public ResponseData<?> approveFieldStatusByAdmin(@PathVariable Long fieldId, @RequestParam EFieldStatus fieldStatus) {
         try {
-            fieldService.changeStatusFieldByOwnerId(ownerId, fieldId, fieldStatus);
-            return new ResponseData<>(HttpStatus.OK.value(), "Update Field Status Success");
+            fieldService.changeStatusFieldByAdmin(fieldId, fieldStatus);
+            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Update Field Status Success");
         } catch (Exception e) {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Update Field Status Error", e.getMessage());
         }
