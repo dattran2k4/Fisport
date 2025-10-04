@@ -36,7 +36,7 @@ public class UserApiController {
         }
     }
 
-    @PatchMapping("/password")
+    @PatchMapping("/change-password")
     public ResponseData<?> changePassword(@RequestBody ChangePasswordRequest request, Principal principal) {
         try {
             userService.changePasswordByUserName(request, principal.getName());
