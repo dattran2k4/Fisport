@@ -8,9 +8,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SubFieldRepository extends JpaRepository<SubField, Long> {
+    boolean existsByNameAndFieldId(String name, Long fieldId);
+    Optional<SubField> findByName(String name);
     @Query(value = "SELECT s FROM SubField s WHERE " +
             "(:fieldId is NULL OR s.field.id = :fieldId)" +
             "AND (:status IS NULL OR s.status =:status)")
