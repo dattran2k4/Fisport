@@ -35,6 +35,7 @@ public class SubFieldApiController {
         }
     }
 
+    @PreAuthorize("hasRole('OWNER')")
     @PostMapping("/create")
     public ResponseData<?> createSubField(@Valid @RequestBody SubFieldRequest subFieldRequest, Principal principal) {
         try {
@@ -44,7 +45,7 @@ public class SubFieldApiController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Create SubField Error");
         }
     }
-
+    @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/{id}/update")
     public ResponseData<?> updateSubField(@Min(1) @PathVariable Long id, @Valid @RequestBody SubFieldRequest subFieldRequest, Principal principal) {
         try {
