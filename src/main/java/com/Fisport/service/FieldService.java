@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface FieldService {
-    List<FieldResponse> getFieldByWardAndType(long wardId, long fieldTypeId);
+    List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, String username, Long[] features);
     List<FieldResponse> getFieldByFieldTypeId(long fieldTypeId);
     List<FieldResponse> getFieldByOwner(String name);
     void createFieldByOwnerId(FieldRequest fieldRequest, String name);
