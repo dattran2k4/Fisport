@@ -98,6 +98,8 @@ public class SubFieldServiceImpl implements SubFieldService {
                 .name(subField.getName())
                 .status(subField.getStatus())
                 .fieldId(subField.getField().getId())
+                .created_at(subField.getCreate_at())
+                .update_at(subField.getUpdate_at())
                 .build();
     }
 }
