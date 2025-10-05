@@ -23,8 +23,6 @@ public class FieldRequest implements Serializable {
     @NotBlank(message = "Vui lòng thêm banner")
     private String banner;
 
-    private String slug;
-
     @NotBlank(message = "Thêm mô tả chi tiết sân")
     private String description;
 

@@ -19,10 +19,10 @@ public class FeatureServiceImpl implements FeatureService {
     @Override
     public List<FeatureResponse> getListFeatures() {
         List<Feature> features = featureRepository.findAll();
-        return features.stream().map(feature -> FeatureResponse.builder()
+        return (features.stream().map(feature -> FeatureResponse.builder()
                 .id(feature.getId())
                 .name(feature.getName())
                 .slug(feature.getSlug())
-                .build() ).toList();
+                .build() ).toList());
     }
 }

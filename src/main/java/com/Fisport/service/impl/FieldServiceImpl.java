@@ -7,6 +7,7 @@ import com.Fisport.model.*;
 import com.Fisport.repository.*;
 import com.Fisport.service.FieldService;
 import com.Fisport.common.EFieldStatus;
+import com.Fisport.util.SlugUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -54,14 +55,20 @@ public class FieldServiceImpl implements FieldService {
     @Override
     public void createFieldByOwnerId(FieldRequest fieldRequest, String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
-        Ward ward = wardRepository.findById(fieldRequest.getWardId()).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        Ward ward = wardRepository.findById(fieldRequest.getWardId()).orElseThrow(() -> new ResourceNotFoundException("Ward not found"));
         FieldType fieldType = fieldRepository.findById(fieldRequest.getFieldTypeId()).orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
+
+        String slug = SlugUtils.slugify(fieldRequest.getName());
+
+        if (!fieldRequest.getOpenTime().isBefore(fieldRequest.getCloseTime())) {
+            throw new IllegalArgumentException("Giờ mở cửa phải sớm hơn giờ đóng cửa");
+        }
 
         fieldRepository.save(Field.builder()
                 .name(fieldRequest.getName())
                 .banner(fieldRequest.getBanner())
                 .address(fieldRequest.getAddress())
-                .slug(fieldRequest.getSlug())
+                .slug(slug)
                 .openTime(fieldRequest.getOpenTime())
                 .closeTime(fieldRequest.getCloseTime())
                 .fieldStatus(EFieldStatus.INACTIVE)
@@ -81,7 +88,7 @@ public class FieldServiceImpl implements FieldService {
         FieldType fieldType = fieldRepository.findById(fieldRequest.getFieldTypeId()).orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
         field.setName(fieldRequest.getName());
         field.setAddress(fieldRequest.getAddress());
-        field.setSlug(fieldRequest.getSlug());
+        field.setSlug(SlugUtils.slugify(fieldRequest.getName()));
         field.setBanner(fieldRequest.getBanner());
         field.setDescription(fieldRequest.getDescription());
         field.setOpenTime(fieldRequest.getOpenTime());

@@ -46,6 +46,12 @@
     </dependencyManagement>
 
 	<dependencies>
+        <!--  Slug      -->
+        <dependency>
+            <groupId>com.github.slugify</groupId>
+            <artifactId>slugify</artifactId>
+            <version>3.0.7</version>
+        </dependency>
         <!--  2FA      -->
         <dependency>
             <groupId>com.warrenstrange</groupId>
