@@ -31,7 +31,8 @@ public class SubFieldServiceImpl implements SubFieldService {
 
     @Override
     public SubFieldResponse getSubFieldById(Long id) {
-        return null;
+        SubField s = getSubField(id);
+        return toDto(s);
     }
 
     @Override
@@ -65,12 +66,12 @@ public class SubFieldServiceImpl implements SubFieldService {
             throw new InvalidDataException("Tên sân con đã tồn tại trong sân");
         }
 
-        Field field = fieldRepository.findById(request.getFieldId())
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sân"));
-
-        if (!field.getOwner().getUsername().equals(username)) {
-            throw new AccessDeniedException("Không có quyền truy cập sân này");
-        }
+//        Field field = fieldRepository.findById(request.getFieldId())
+//                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sân"));
+//
+//        if (!field.getOwner().getUsername().equals(username)) {
+//            throw new AccessDeniedException("Không có quyền truy cập sân này");
+//        }
 
         subField.setName(request.getName());
         subField.setStatus(request.getStatus());
