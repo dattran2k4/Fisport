@@ -10,20 +10,13 @@ import java.util.List;
 import java.util.Set;
 
 public interface FieldService {
-    List<FieldResponse> getFieldByWardAndType(long wardId, long fieldTypeId);
-    List<FieldResponse> getFieldByFieldTypeId(long fieldTypeId);
-    List<FieldResponse> getFieldByOwner(String name);
+    List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, String username, Long[] features);
     void createFieldByOwnerId(FieldRequest fieldRequest, String name);
-
     void updateFieldByOwnerId(FieldRequest fieldRequest, Long ownerId, Long fieldId);
     void changeStatusFieldByAdmin(Long fieldId,  EFieldStatus fieldStatus);
     FieldResponse getField(Long fieldId);
-
     List<FieldHasTimeSlotResponse> getTimeSlotAndPriceByFieldId(Long id);
-
     Set<FeatureResponse> getFeautresByField(Long id);
-
     List<FieldResponse> getAllPendingFields();
-
     List<FieldResponse> getAllPendingFieldsByOwner(String name);
 }

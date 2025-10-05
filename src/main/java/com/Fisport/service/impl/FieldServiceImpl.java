@@ -32,7 +32,6 @@ public class FieldServiceImpl implements FieldService {
     public List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, String username, Long... featureIds) {
         Specification<Field> specification = FieldSpecification.filterFields(wardId, fieldTypeId, status, keyword, username, featureIds);
         List<Field> fieds = fieldRepository.findAll(specification);
-        System.out.println(fieds);
         return fieds.stream().map(this::toDto).toList();
     }
 
