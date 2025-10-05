@@ -6,7 +6,7 @@ import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.*;
 import com.Fisport.repository.*;
 import com.Fisport.service.FieldService;
-import com.Fisport.util.EFieldStatus;
+import com.Fisport.common.EFieldStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -133,7 +133,7 @@ public class FieldServiceImpl implements FieldService {
     @Override
     public List<FieldResponse> getAllPendingFields() {
         List<Field>  fields = fieldRepository.findByFieldStatus(EFieldStatus.PENDING);
-        return fields.stream().map(this::toDto).collect(Collectors.toList());
+        return fields.stream().map(this::toDto).toList();
     }
 
     @Override
@@ -141,7 +141,7 @@ public class FieldServiceImpl implements FieldService {
         User user =  userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chủ sân"));
 
         List<Field>  fields = fieldRepository.findByFieldStatusAndOwner_Username(EFieldStatus.PENDING, name);
-        return fields.stream().map(this::toDto).collect(Collectors.toList());
+        return fields.stream().map(this::toDto).toList();
     }
 
 

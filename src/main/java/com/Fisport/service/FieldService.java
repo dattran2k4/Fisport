@@ -4,9 +4,8 @@ import com.Fisport.dto.request.FieldRequest;
 import com.Fisport.dto.response.FeatureResponse;
 import com.Fisport.dto.response.FieldHasTimeSlotResponse;
 import com.Fisport.dto.response.FieldResponse;
-import com.Fisport.util.EFieldStatus;
+import com.Fisport.common.EFieldStatus;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Set;
 

@@ -1,7 +1,7 @@
 package com.Fisport.dto.request;
 
 import com.Fisport.dto.validator.EnumValue;
-import com.Fisport.util.EGender;
+import com.Fisport.common.EGender;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -3,8 +3,8 @@ package com.Fisport.service;
 import com.Fisport.dto.request.ChangePasswordRequest;
 import com.Fisport.dto.request.UpdateProfileRequest;
 import com.Fisport.dto.response.UserResponse;
-import com.Fisport.util.ERole;
-import com.Fisport.util.EUserStatus;
+import com.Fisport.common.ERole;
+import com.Fisport.common.EUserStatus;
 
 import java.util.List;
 

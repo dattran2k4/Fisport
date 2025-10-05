@@ -7,12 +7,11 @@ import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.User;
 import com.Fisport.repository.UserRepository;
 import com.Fisport.service.UserService;
-import com.Fisport.util.ERole;
-import com.Fisport.util.EUserStatus;
+import com.Fisport.common.ERole;
+import com.Fisport.common.EUserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;

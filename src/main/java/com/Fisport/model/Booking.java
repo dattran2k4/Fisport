@@ -1,6 +1,6 @@
 package com.Fisport.model;
 
-import com.Fisport.util.EBookingStatus;
+import com.Fisport.common.EBookingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

@@ -3,7 +3,7 @@ package com.Fisport.api;
 import com.Fisport.dto.request.FieldRequest;
 import com.Fisport.dto.response.*;
 import com.Fisport.service.FieldService;
-import com.Fisport.util.EFieldStatus;
+import com.Fisport.common.EFieldStatus;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;

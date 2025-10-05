@@ -1,7 +1,7 @@
 package com.Fisport.model;
 
-import com.Fisport.util.EGender;
-import com.Fisport.util.EUserStatus;
+import com.Fisport.common.EGender;
+import com.Fisport.common.EUserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

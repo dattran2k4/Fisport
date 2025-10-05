@@ -17,8 +17,8 @@ import com.Fisport.service.AuthService;
 import com.Fisport.service.CaffeineTokenService;
 import com.Fisport.service.MailService;
 import com.Fisport.service.TwoFAService;
-import com.Fisport.util.ERole;
-import com.Fisport.util.EUserStatus;
+import com.Fisport.common.ERole;
+import com.Fisport.common.EUserStatus;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.Optional;
 
 
 @RequiredArgsConstructor

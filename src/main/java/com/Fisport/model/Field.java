@@ -1,6 +1,6 @@
 package com.Fisport.model;
 
-import com.Fisport.util.EFieldStatus;
+import com.Fisport.common.EFieldStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

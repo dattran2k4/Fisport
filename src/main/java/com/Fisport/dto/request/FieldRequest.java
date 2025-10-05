@@ -2,14 +2,13 @@ package com.Fisport.dto.request;
 
 
 import com.Fisport.dto.validator.EnumValue;
-import com.Fisport.util.EFieldStatus;
+import com.Fisport.common.EFieldStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter

@@ -1,7 +1,7 @@
 package com.Fisport.dto.response;
 
 
-import com.Fisport.util.EFieldStatus;
+import com.Fisport.common.EFieldStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

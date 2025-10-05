@@ -1,7 +1,7 @@
 package com.Fisport.dto.response;
 
-import com.Fisport.util.EGender;
-import com.Fisport.util.EUserStatus;
+import com.Fisport.common.EGender;
+import com.Fisport.common.EUserStatus;
 import lombok.Builder;
 import lombok.Getter;
 

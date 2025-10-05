@@ -1,4 +1,4 @@
-package com.Fisport.util;
+package com.Fisport.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
