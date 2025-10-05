@@ -6,10 +6,8 @@ import com.Fisport.dto.response.ResponseError;
 import com.Fisport.service.FeatureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,4 +27,24 @@ public class FeatureApiController {
             return new ResponseError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "get all features failed");
         }
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/add")
+    public ResponseData<?> addFeature(FeatureRequest request) {
+        try {
+
+        } catch (Exception e) {
+
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}/delete")
+    public ResponseData<?> deleteFeature(Long id) {
+        try {
+
+        } catch (Exception e) {}
+    }
+
+
 }

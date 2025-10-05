@@ -7,10 +7,14 @@ import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.User;
 import com.Fisport.repository.UserRepository;
 import com.Fisport.service.UserService;
+import com.Fisport.util.ERole;
+import com.Fisport.util.EUserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -67,10 +71,38 @@ public class IUserService implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public List<UserResponse> getAllUsers(String keyword) {
+        List<User> users = userRepository.searchByKeyword(keyword);
+        return users.stream().map(this::toUserResponse).toList();
+    }
+
+    @Override
+    public void changeStatus(Long id, EUserStatus status) {
+        User user = getUser(id);
+        user.setStatus(status);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void assignRole(Long id, ERole role) {
+        User user = getUser(id);
+        user.getRole().setName(role);
+        userRepository.save(user);
+    }
+
 
     @Override
     public UserResponse getUserById(Long id) {
         User user = getUser(id);
+        return toUserResponse(user);
+    }
+
+    public User getUser(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
+    }
+
+    private UserResponse toUserResponse(User user) {
         return UserResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
@@ -83,10 +115,6 @@ public class IUserService implements UserService {
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();
-    }
-
-    public User getUser(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
     }
 
 }

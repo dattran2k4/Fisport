@@ -14,12 +14,22 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/ward")
-@RequiredArgsConstructor
+@RequestMapping("/api/wards")
+@RequiredArgsConstructors
 @Validated
 public class WardApiController {
 
     private final WardService wardService;
+
+    @GetMapping("/")
+    public ResponseData<?> getAllWards() {
+        try {
+            List<WardResponse> responses = wardService.getAll();
+            return new ResponseData<>(HttpStatus.OK.value(),  "Wards found", responses);
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), "Wards not found");
+        }
+    }
 
     @GetMapping
     public ResponseData<?> getWardByCityId(@Valid @Min(1) @RequestParam long cityId) {
