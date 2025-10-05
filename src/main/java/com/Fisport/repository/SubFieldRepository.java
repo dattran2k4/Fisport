@@ -1,0 +1,18 @@
+package com.Fisport.repository;
+
+import com.Fisport.common.ESubFieldStatus;
+import com.Fisport.model.SubField;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface SubFieldRepository extends JpaRepository<SubField, Long> {
+    @Query(value = "SELECT s FROM SubField s WHERE " +
+            "(:fieldId is NULL OR s.field.id = :fieldId)" +
+            "AND (:status IS NULL OR s.status =:status)")
+    List<SubField> findAllSubFields(@Param("fieldId") Long fieldId, @Param("status") ESubFieldStatus status);
+}
