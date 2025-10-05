@@ -4,6 +4,7 @@ import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.dto.response.ResponseData;
 import com.Fisport.model.FieldType;
 import com.Fisport.service.FieldService;
+import com.Fisport.service.FieldTypeBookDurationService;
 import com.Fisport.service.FieldTypeService;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -17,21 +18,26 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/field-types")
+@RequestMapping("/api/v1/field-types")
 @Validated
 @RequiredArgsConstructor
 public class FieldTypeController {
 
     private final FieldTypeService fieldTypeService;
-    private final FieldService fieldService;
+    private final FieldTypeBookDurationService fieldTypeBookDurationService;
 
     @GetMapping
     public ResponseData<?> getAllFieldTypes() {
         return new ResponseData<>(HttpStatus.OK.value(), "Get All Field Types", fieldTypeService.findAll());
     }
 
-    @GetMapping("/{id}/fields")
-    public ResponseData<?> getFieldsByType(@Min(1) @PathVariable long id) {
-        return new ResponseData<>(HttpStatus.OK.value(), "Get Field Types", fieldService.getFieldByFieldTypeId(id));
+//    @GetMapping("/{id}/fields")
+//    public ResponseData<?> getFieldsByType(@Min(1) @PathVariable long id) {
+//        return new ResponseData<>(HttpStatus.OK.value(), "Get Field Types", fieldService.getFieldByFieldTypeId(id));
+//    }
+    @GetMapping("/{id}/durations")
+    public ResponseData<?> getDurationById(@PathVariable Long id) {
+        return new ResponseData<>(HttpStatus.OK.value(), "Get durations by field type id succes", fieldTypeBookDurationService.getDurationByFieldTypeId(id));
     }
+
 }

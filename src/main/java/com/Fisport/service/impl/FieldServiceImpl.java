@@ -34,23 +34,23 @@ public class FieldServiceImpl implements FieldService {
                 .toList();
     }
 
-    @Override
-    public List<FieldResponse> getFieldByFieldTypeId(long fieldTypeId) {
-        List<Field> fields = fieldRepository.findByFieldTypeId(fieldTypeId);
-        return fields.stream()
-                .map(this::toDto)
-                .toList();
-    }
+//    @Override
+//    public List<FieldResponse> getFieldByFieldTypeId(long fieldTypeId) {
+//        List<Field> fields = fieldRepository.findByFieldTypeId(fieldTypeId);
+//        return fields.stream()
+//                .map(this::toDto)
+//                .toList();
+//    }
 
-    @Override
-    public List<FieldResponse> getFieldByOwner(String name) {
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
-
-        List<Field> fields = fieldRepository.findByOwnerId(user.getId());
-        return fields.stream()
-                .map(this::toDto)
-                .toList();
-    }
+//    @Override
+//    public List<FieldResponse> getFieldByOwner(String name) {
+//        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+//
+//        List<Field> fields = fieldRepository.findByOwnerId(user.getId());
+//        return fields.stream()
+//                .map(this::toDto)
+//                .toList();
+//    }
 
     @Override
     public void createFieldByOwnerId(FieldRequest fieldRequest, String name) {

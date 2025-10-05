@@ -1,9 +1,15 @@
 package com.Fisport.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.Set;
 
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "duration")
 public class Duration extends AbstractEntity {
