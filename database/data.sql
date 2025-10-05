@@ -256,6 +256,56 @@ INSERT INTO field_feature (field_id, feature_id) VALUES
 (12, 1),
 (12, 6);
 
+INSERT INTO sub_field (name, status, field_id, create_at, update_at)
+VALUES
+-- Sub-fields cho Sân Bóng đá 1 (field_id = 1)
+('Sân 1', 'AVAILABLE', 1, NOW(), NOW()),
+('Sân 2', 'MAINTAIN', 1, NOW(), NOW()),
+
+-- Sub-fields cho Sân Bóng đá 2 (field_id = 2)
+('Sân 1', 'AVAILABLE', 2, NOW(), NOW()),
+('Sân 2', 'INACTIVE', 2, NOW(), NOW()),
+
+-- Sub-fields cho Sân Cầu lông 1 (field_id = 3)
+('Sân 1', 'AVAILABLE', 3, NOW(), NOW()),
+('Sân 2', 'MAINTAIN', 3, NOW(), NOW()),
+
+-- Sub-fields cho Sân Cầu lông 2 (field_id = 4)
+('Sân 1', 'AVAILABLE', 4, NOW(), NOW()),
+('Sân 2', 'INACTIVE', 4, NOW(), NOW()),
+
+-- Sub-fields cho Sân Tennis 1 (field_id = 5)
+('Sân 1', 'AVAILABLE', 5, NOW(), NOW()),
+('Sân 2', 'MAINTAIN', 5, NOW(), NOW()),
+
+-- Sub-fields cho Sân Tennis 2 (field_id = 6)
+('Sân 1', 'AVAILABLE', 6, NOW(), NOW()),
+('Sân 2', 'INACTIVE', 6, NOW(), NOW()),
+
+-- Sub-fields cho Sân Bóng rổ 1 (field_id = 7)
+('Sân 1', 'AVAILABLE', 7, NOW(), NOW()),
+('Sân 2', 'MAINTAIN', 7, NOW(), NOW()),
+
+-- Sub-fields cho Sân Bóng rổ 2 (field_id = 8)
+('Sân 1', 'AVAILABLE', 8, NOW(), NOW()),
+('Sân 2', 'INACTIVE', 8, NOW(), NOW()),
+
+-- Sub-fields cho Hồ Bơi 1 (field_id = 9)
+('Hồ 1', 'AVAILABLE', 9, NOW(), NOW()),
+('Hồ 2', 'MAINTAIN', 9, NOW(), NOW()),
+
+-- Sub-fields cho Hồ Bơi 2 (field_id = 10)
+('Hồ 1', 'AVAILABLE', 10, NOW(), NOW()),
+('Hồ 2', 'INACTIVE', 10, NOW(), NOW()),
+
+-- Sub-fields cho Sân Pickleball 1 (field_id = 11)
+('Sân 1', 'AVAILABLE', 11, NOW(), NOW()),
+('Sân 2', 'MAINTAIN', 11, NOW(), NOW()),
+
+-- Sub-fields cho Sân Pickleball 2 (field_id = 12)
+('Sân 1', 'AVAILABLE', 12, NOW(), NOW()),
+('Sân 2', 'INACTIVE', 12, NOW(), NOW());
+
 
 -- ========================
 -- 5. Time Slot & Field Slot

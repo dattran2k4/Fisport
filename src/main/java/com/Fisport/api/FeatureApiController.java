@@ -1,9 +1,12 @@
 package com.Fisport.api;
 
+import com.Fisport.dto.request.FeatureRequest;
 import com.Fisport.dto.response.FeatureResponse;
 import com.Fisport.dto.response.ResponseData;
 import com.Fisport.dto.response.ResponseError;
 import com.Fisport.service.FeatureService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,20 +33,24 @@ public class FeatureApiController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/add")
-    public ResponseData<?> addFeature(FeatureRequest request) {
+    public ResponseData<?> addFeature(@Valid @RequestBody FeatureRequest request) {
         try {
-
+            featureService.addFeature(request);
+            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "add feature success");
         } catch (Exception e) {
-
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "add feature failed");
         }
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}/delete")
-    public ResponseData<?> deleteFeature(Long id) {
+    public ResponseData<?> deleteFeature(@Min(1) @PathVariable Long id) {
         try {
-
-        } catch (Exception e) {}
+            featureService.deleteFeature(id);
+            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "delete feature success");
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "delete feature failed");
+        }
     }
 
 
