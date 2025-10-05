@@ -4,6 +4,7 @@ import com.Fisport.dto.request.FieldRequest;
 import com.Fisport.dto.response.*;
 import com.Fisport.service.FieldService;
 import com.Fisport.common.EFieldStatus;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -25,12 +26,18 @@ public class FieldApiController {
     private final FieldService fieldService;
 
     @GetMapping()
-    public ResponseData<?> getFieldByWardIdAndTypeId(@RequestParam(required = false) long wardId, @RequestParam(required = false) long typeId) {
+    public ResponseData<?> getAllFields(@RequestParam(required = false) Long wardId,
+                                        @RequestParam(required = false) Long typeId,
+                                        @RequestParam(required = false) EFieldStatus status,
+                                        @RequestParam(required = false) String keyword,
+                                        Principal principal,
+                                        @RequestParam(required = false) Long... featureIds) {
         try {
-            List<FieldResponse> fieldResponses = fieldService.getFieldByWardAndType(wardId, typeId);
-            return new ResponseData<>(HttpStatus.OK.value(), "Get Fields By Ward And Type Id Success", fieldResponses);
+            String username = (principal != null) ? principal.getName() : null;
+            List<FieldResponse> fieldResponses = fieldService.getAllFields(wardId, typeId, status, keyword, username, featureIds);
+            return new ResponseData<>(HttpStatus.OK.value(), "Get Fields Success", fieldResponses);
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get Fields By Ward And Type Id Error");
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), "Get Fields Failed");
         }
     }
 

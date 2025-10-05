@@ -11,8 +11,8 @@ import java.util.Set;
 
 public interface FieldService {
     List<FieldResponse> getFieldByWardAndType(long wardId, long fieldTypeId);
-//    List<FieldResponse> getFieldByFieldTypeId(long fieldTypeId);
-//    List<FieldResponse> getFieldByOwner(String name);
+    List<FieldResponse> getFieldByFieldTypeId(long fieldTypeId);
+    List<FieldResponse> getFieldByOwner(String name);
     void createFieldByOwnerId(FieldRequest fieldRequest, String name);
 
     void updateFieldByOwnerId(FieldRequest fieldRequest, Long ownerId, Long fieldId);

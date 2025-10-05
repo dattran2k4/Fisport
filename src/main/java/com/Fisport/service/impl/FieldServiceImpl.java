@@ -7,8 +7,10 @@ import com.Fisport.model.*;
 import com.Fisport.repository.*;
 import com.Fisport.service.FieldService;
 import com.Fisport.common.EFieldStatus;
+import com.Fisport.service.FieldSpecification;
 import com.Fisport.util.SlugUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,11 +29,11 @@ public class FieldServiceImpl implements FieldService {
     private final FieldHasFeatureRepository fieldHasFeatureRepository;
 
     @Override
-    public List<FieldResponse> getFieldByWardAndType(long wardId, long fieldTypeId) {
-        List<Field> fields = fieldRepository.findByWardIdAndFieldTypeId(wardId, fieldTypeId);
-        return fields.stream()
-                .map(this::toDto)
-                .toList();
+    public List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, String username, Long... featureIds) {
+        Specification<Field> specification = FieldSpecification.filterFields(wardId, fieldTypeId, status, keyword, username, featureIds);
+        List<Field> fieds = fieldRepository.findAll(specification);
+        System.out.println(fieds);
+        return fieds.stream().map(this::toDto).toList();
     }
 
 //    @Override
