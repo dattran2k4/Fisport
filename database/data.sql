@@ -168,11 +168,11 @@ INSERT INTO field_type (name, slug) VALUES
 INSERT INTO field (name, slug, address, ward_id, user_id, field_type_id, description, banner, open_time, close_time, status, created_at, updated_at)
 VALUES
 -- Bóng đá (field_type_id = 1)
-('Sân Bóng đá 1', 'san-bong-da-1', '123 Nguyễn Văn Linh', 1, 3, 1, 'Sân bóng đá rộng, cỏ nhân tạo chất lượng cao', '/images/fields/san-bong-da-1.jpg', '06:00:00', '22:00:00', 'ACTIVE', NOW(), NOW()),
+('Sân Bóng đá 1', 'san-bong-da-1', '123 Nguyễn Văn Linh', 1, 3, 1, 'Sân bóng đá rộng, cỏ nhân tạo chất lượng cao', '/images/fields/san-bong-da-1.jpg', '06:00:00', '22:00:00', 'PENDING', NOW(), NOW()),
 ('Sân Bóng đá 2', 'san-bong-da-2', '456 Lê Duẩn', 1, 3, 1, 'Sân bóng đá tiêu chuẩn 7 người, có đèn chiếu sáng', '/images/fields/san-bong-da-2.jpg', '06:00:00', '22:00:00', 'ACTIVE', NOW(), NOW()),
 
 -- Cầu lông (field_type_id = 2)
-('Sân Cầu lông 1', 'san-cau-long-1', '12 Trần Phú', 1, 3, 2, 'Sân cầu lông tiêu chuẩn, nền gỗ chống trơn trượt', '/images/fields/san-cau-long-1.jpg', '07:00:00', '21:00:00', 'ACTIVE', NOW(), NOW()),
+('Sân Cầu lông 1', 'san-cau-long-1', '12 Trần Phú', 1, 3, 2, 'Sân cầu lông tiêu chuẩn, nền gỗ chống trơn trượt', '/images/fields/san-cau-long-1.jpg', '07:00:00', '21:00:00', 'PENDING', NOW(), NOW()),
 ('Sân Cầu lông 2', 'san-cau-long-2', '34 Phan Chu Trinh', 1, 3, 2, 'Sân cầu lông trong nhà, có điều hòa', '/images/fields/san-cau-long-2.jpg', '07:00:00', '21:00:00', 'ACTIVE', NOW(), NOW()),
 
 -- Tennis (field_type_id = 3)
@@ -181,7 +181,7 @@ VALUES
 
 -- Bóng rổ (field_type_id = 4)
 ('Sân Bóng rổ 1', 'san-bong-ro-1', '90 Lý Thái Tổ', 1, 3, 4, 'Sân bóng rổ ngoài trời, phù hợp thi đấu 5x5', '/images/fields/san-bong-ro-1.jpg', '08:00:00', '22:00:00', 'ACTIVE', NOW(), NOW()),
-('Sân Bóng rổ 2', 'san-bong-ro-2', '22 Nguyễn Văn Cừ', 1, 3, 4, 'Sân bóng rổ trong nhà, sàn gỗ', '/images/fields/san-bong-ro-2.jpg', '08:00:00', '22:00:00', 'ACTIVE', NOW(), NOW()),
+('Sân Bóng rổ 2', 'san-bong-ro-2', '22 Nguyễn Văn Cừ', 1, 3, 4, 'Sân bóng rổ trong nhà, sàn gỗ', '/images/fields/san-bong-ro-2.jpg', '08:00:00', '22:00:00', 'PENDING', NOW(), NOW()),
 
 -- Bơi lội (field_type_id = 5)
 ('Hồ Bơi 1', 'ho-boi-1', '11 Điện Biên Phủ', 1, 3, 5, 'Hồ bơi 25m, phù hợp luyện tập và thi đấu', '/images/fields/ho-boi-1.jpg', '05:30:00', '20:30:00', 'ACTIVE', NOW(), NOW()),

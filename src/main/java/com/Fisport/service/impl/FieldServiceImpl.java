@@ -130,6 +130,20 @@ public class FieldServiceImpl implements FieldService {
                 .build()).collect(Collectors.toSet());
     }
 
+    @Override
+    public List<FieldResponse> getAllPendingFields() {
+        List<Field>  fields = fieldRepository.findByFieldStatus(EFieldStatus.PENDING);
+        return fields.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FieldResponse> getAllPendingFieldsByOwner(String name) {
+        User user =  userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chủ sân"));
+
+        List<Field>  fields = fieldRepository.findByFieldStatusAndOwner_Username(EFieldStatus.PENDING, name);
+        return fields.stream().map(this::toDto).collect(Collectors.toList());
+    }
+
 
     private FieldTypeResponse toFieldTypeResponseDto(FieldType fieldType) {
         return FieldTypeResponse.builder()

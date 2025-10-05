@@ -95,13 +95,35 @@ public class FieldApiController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/{fieldId}")
+    @PatchMapping("/{fieldId}/approve")
     public ResponseData<?> approveFieldStatusByAdmin(@PathVariable Long fieldId, @RequestParam EFieldStatus fieldStatus) {
         try {
             fieldService.changeStatusFieldByAdmin(fieldId, fieldStatus);
             return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Update Field Status Success");
         } catch (Exception e) {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Update Field Status Error", e.getMessage());
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/pending")
+    public ResponseData<?> getPendingFields() {
+        try {
+            List<FieldResponse> responses = fieldService.getAllPendingFields();
+            return new ResponseData<>(HttpStatus.OK.value(), "Get All Fields Success", responses);
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Get All Fields Error", e.getMessage());
+        }
+    }
+
+    @PreAuthorize("hasRole('OWNER')")
+    @GetMapping("/me/pending")
+    public ResponseData<?> getPendingFieldsByOwner(Principal principal) {
+        try {
+            List<FieldResponse> responses = fieldService.getAllPendingFieldsByOwner(principal.getName());
+            return new ResponseData<>(HttpStatus.OK.value(), "Get All Fields Success", responses);
+        } catch (Exception e) {
+            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Get All Fields Error", e.getMessage());
         }
     }
 }

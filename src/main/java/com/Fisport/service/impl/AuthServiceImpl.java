@@ -232,6 +232,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userRepository.findByEmail(email).orElse(null);
         if (user != null) {
+            //to-fix
             String token = tokenService.createTokenForEmail(user.getUsername());
             mailService.sendConfirmLink(email, "reset-password-email.html", endPointResetPassword, token);
         }
