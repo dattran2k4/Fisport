@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/wards")
+@RequestMapping("/api/v1/wards")
 @RequiredArgsConstructor
 @Validated
 public class WardApiController {
@@ -32,7 +32,7 @@ public class WardApiController {
 //    }
 
     @GetMapping
-    public ResponseData<?> getWardByCityId(@Valid @Min(1) @RequestParam long cityId) {
+    public ResponseData<?> getWardByCityId(@Valid @Min(1) @RequestParam Long cityId) {
         try {
             List<WardResponse> wardResponseList = wardService.getAllWardsByCityId(cityId);
             return new ResponseData<>(HttpStatus.OK.value(), "Get Ward By City Id Succesfully", wardResponseList);
