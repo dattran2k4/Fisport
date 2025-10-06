@@ -5,20 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" th:content="${pageDescription} ?: 'Trang chủ Fisport'">
-    <title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE">Home Web</title>
-    <th:block layout:fragment="page-specific-css"></th:block>
+    <title layout:fragment="title">Default Title</title>
     <link rel="stylesheet" th:href="@{/web/css/style.css}">
 </head>
 <body>
+    HELLO
+    <!-- Include header fragment -->
+    <div th:replace="~{fragments/web/header :: header}"></div>
 
-<!-- Header -->
-<header th:replace="fragments/web/header :: header"></header>
+    <main>
+        <!-- Content sẽ được override từ page con -->
+        <div layout:fragment="abc">
+            Default Content
+        </div>
+    </main>
 
-<!-- Nội dung riêng -->
-<main layout:fragment="content"></main>
-
-<!-- Footer -->
-<footer th:replace="fragments/web/footer :: footer"></footer>
+    <!-- Include footer fragment -->
+    <div th:replace="~{fragments/web/footer :: footer}"></div>
 
 </body>
 </html>

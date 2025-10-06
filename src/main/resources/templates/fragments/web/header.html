@@ -1,51 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-</head>
-<body>
-<div th:fragment="header">
-    <nav class="navbar">
-        <div class="container nav-wrapper">
-
-            <!-- Logo -->
-            <div class="logo">
-                <a th:href="@{/}" class="logo-link">
-                    <img th:src="@{/web/images/logo.png}" alt="Fisport Logo" class="logo-img">
-                    <span class="logo-text">Fisport</span>
-                </a>
-            </div>
-
-            <!-- Navigation -->
-            <ul class="nav-links">
-                <li><a th:href="@{/}" th:classappend="${#httpServletRequest.requestURI == '/' ? 'active' : ''}">Trang chủ</a></li>
-                <li><a th:href="@{/fields}" th:classappend="${#httpServletRequest.requestURI.startsWith('/fields') ? 'active' : ''}">Đặt sân</a></li>
-                <li><a th:href="@{/about}" th:classappend="${#httpServletRequest.requestURI.startsWith('/about') ? 'active' : ''}">Giới thiệu</a></li>
-                <li><a th:href="@{/contact}" th:classappend="${#httpServletRequest.requestURI.startsWith('/contact') ? 'active' : ''}">Liên hệ</a></li>
-            </ul>
-
-            <!-- User section -->
-            <div class="user-actions">
-                <a th:if="${session.user == null}" th:href="@{/login}" class="btn-login">Đăng nhập</a>
-                <div th:if="${session.user != null}" class="dropdown">
-                    <button class="dropbtn" th:text="${session.user.fullName}">Tài khoản</button>
-                    <div class="dropdown-content">
-                        <a th:href="@{/profile}">Trang cá nhân</a>
-                        <a th:href="@{/bookings}">Lịch đặt</a>
-                        <a th:href="@{/logout}">Đăng xuất</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Mobile menu toggle -->
-            <div class="menu-toggle" onclick="toggleMenu()">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-
-        </div>
-    </nav>
-</div>
-</body>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<section layout:fragment="header">
+    <header>
+        <nav>
+            <a th:href="@{/}">Home</a> |
+            <a th:href="@{/about}">About</a>
+        </nav>
+    </header>
+</section>
 </html>
