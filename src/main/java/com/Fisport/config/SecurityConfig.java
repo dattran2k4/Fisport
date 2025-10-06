@@ -32,7 +32,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final TwoFactorAuthFilter twoFactorAuthFilter;
 
-    private String[] WHITE_LIST = {"/api/auth/**", "/common/**"};
+    private String[] WHITE_LIST = {"/api/auth/**", "/common/**", "/home/**"};
 
     @Bean
     public PasswordEncoder passwordEncoder() {
