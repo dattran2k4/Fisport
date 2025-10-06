@@ -28,4 +28,10 @@ public class FieldTypeServiceImpl implements FieldTypeService {
                 )
                 .toList();
     }
+
+    @Override
+    public FieldTypeResponse findBySlug(String slug) {
+        FieldType fieldType = fieldTypeRepository.findBySlug(slug);
+        return FieldTypeResponse.builder().id(fieldType.getId()).name(fieldType.getName()).build();
+    }
 }

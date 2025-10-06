@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/web/web}">
+<body>
+    <div layout:fragment="content">
+        
+
+        <section class="py-4">
+            <div class="container">
+        
+                <!-- Filter -->
+                <div class="row g-3 align-items-center mb-3">
+                    <!-- Khoảng cách -->
+                    <div class="col-12 col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            <select class="form-select" id="distanceSelect">
+                                <option value="">Khoảng cách</option>
+                                <option value="3">Dưới 3 km</option>
+                                <option value="5">Dưới 5 km</option>
+                                <option value="10">Dưới 10 km</option>
+                            </select>
+                        </div>
+                    </div>
+        
+                    <!-- Tiện ích -->
+                    <div class="col-12 col-md-4">
+                        <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUtilities">
+                            <i class="bi bi-sliders"></i> Tiện ích (mái che, bãi xe, ...)
+                        </button>
+                    </div>
+        
+                    <!-- Sắp xếp -->
+                    <div class="col-12 col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-filter"></i></span>
+                            <select class="form-select" id="sortSelect">
+                                <option value="top">Lựa chọn hàng đầu</option>
+                                <option value="rating_desc">Đánh giá cao → thấp</option>
+                                <option value="rating_asc">Đánh giá thấp → cao</option>
+                                <option value="distance_asc">Gần → xa</option>
+                                <option value="distance_desc">Xa → gần</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Tiện ích collapse -->
+                <div class="collapse" id="collapseUtilities">
+                    <div class="card card-body">
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3" th:each="f : ${features}">
+                                <div class="form-check">
+                                    <input class="form-check-input util-check" type="checkbox"
+                                           th:id="'feature-' + ${f.id}" th:value="${f.id}">
+                                    <label class="form-check-label"
+                                           th:for="'feature-' + ${f.id}"
+                                           th:text="${f.name}">Tiện ích</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Danh sách sân -->
+                <div class="row g-3" id="fieldsGrid">
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3" th:each="f : ${fields}">
+                        <a th:href="@{'/fields/' + ${f.slug}}" class="card h-100 text-decoration-none text-reset shadow-sm hover-shadow">
+                            <div class="ratio ratio-16x9 bg-light rounded-top"
+                                 th:style="'background:url(' + (${f.banner} != null ? ${f.banner} : '/images/default-field.jpg') + ') center/cover no-repeat'"></div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i>
+                                        <span th:text="${f.openTime}">05:00</span> - <span th:text="${f.closeTime}">22:00</span>
+                                    </small>
+                                </div>
+                                <h6 class="card-title mb-1 fw-semibold" th:text="${f.name}">Tên sân</h6>
+                                <small class="text-muted d-block">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <span th:text="${f.wardResponse.name}">Phường/Xã</span>
+                                </small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+        
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="pagination">
+                        <ul class="pagination pagination-sm" id="pager"></ul>
+                    </nav>
+                </div>
+            </div>
+        </section>
+        
+
+        <script>
+            window.addEventListener('load', function () {
+                var params = new URLSearchParams(window.location.search);
+                var initialType = params.get('fieldType') || '';
+                var currentPage = parseInt(params.get('page') || '1', 10);
+                var pageSize = parseInt(params.get('size') || '10', 10);
+
+                // Activate initial button
+                if (initialType) {
+                    document.querySelectorAll('#fieldTypeFilterBar button').forEach(function(b){
+                        b.classList.toggle('active', (b.getAttribute('data-type') === initialType));
+                    });
+                }
+
+                function buildQuery(page) {
+                    var qs = new URLSearchParams();
+                    var typeBtn = document.querySelector('#fieldTypeFilterBar .btn.active');
+                    var fieldType = typeBtn ? typeBtn.getAttribute('data-type') : '';
+                    var distance = document.getElementById('distanceSelect').value;
+                    var sort = document.getElementById('sortSelect').value;
+                    qs.set('page', page);
+                    qs.set('size', pageSize);
+                    if (fieldType) qs.set('fieldType', fieldType);
+                    if (distance) qs.set('distanceKm', distance);
+                    if (sort) qs.set('sort', sort);
+                    var utils = Array.from(document.querySelectorAll('.util-check:checked')).map(function(i){return i.value;});
+                    if (utils.length) qs.set('utilities', utils.join(','));
+                    return qs.toString();
+                }
+
+                function renderPager(totalPages) {
+                    var ul = document.getElementById('pager');
+                    ul.innerHTML = '';
+                    totalPages = Math.max(1, totalPages || 1);
+                    for (var p = 1; p <= totalPages; p++) {
+                        var li = document.createElement('li');
+                        li.className = 'page-item' + (p === currentPage ? ' active' : '');
+                        var a = document.createElement('a');
+                        a.className = 'page-link';
+                        a.href = 'javascript:void(0)';
+                        a.textContent = p;
+                        (function(page){ a.addEventListener('click', function(){ currentPage = page; load(); }); })(p);
+                        li.appendChild(a);
+                        ul.appendChild(li);
+                    }
+                }
+
+                // Server-side rendered grid via Thymeleaf (${fields})
+
+                function load() {
+                    var qs = buildQuery(currentPage);
+                    var url = '/api/v1/fields?' + qs;
+                    fetch(url)
+                        .then(function(r){ return r.ok ? r.json() : { content: [], totalPages: 1 }; })
+                        .then(function(data){
+                            // support both {content,totalPages} and array
+                            var items = Array.isArray(data) ? data : (data.content || []);
+                            var totalPages = Array.isArray(data) ? 1 : (data.totalPages || 1);
+                            renderGrid(items);
+                            renderPager(totalPages);
+                        })
+                        .catch(function(){ renderGrid([]); renderPager(1); });
+                }
+
+                // wire events
+                document.getElementById('fieldTypeFilterBar').addEventListener('click', function(e){
+                    var btn = e.target.closest('button[data-type]');
+                    if (!btn) return;
+                    this.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+                    btn.classList.add('active');
+                    currentPage = 1; load();
+                });
+                document.getElementById('distanceSelect').addEventListener('change', function(){ currentPage = 1; load(); });
+                document.getElementById('sortSelect').addEventListener('change', function(){ currentPage = 1; load(); });
+                document.getElementById('collapseUtilities').addEventListener('change', function(e){ if(e.target.classList.contains('util-check')) { currentPage = 1; load(); }});
+
+                // set titles from URL param if present
+                var mapTypeToTitle = { FOOTBALL: 'Sân bóng đá', TENNIS: 'Sân tennis', BADMINTON: 'Sân cầu lông', TABLE_TENNIS: 'Sân bóng bàn' };
+                if (initialType && mapTypeToTitle[initialType]) {
+                    document.getElementById('pageTitle').textContent = mapTypeToTitle[initialType];
+                    document.getElementById('breadcrumbType').textContent = mapTypeToTitle[initialType];
+                }
+
+                load();
+            });
+        </script>
+    </div>
+</body>
+</html>

@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FieldTypeRepository extends JpaRepository<FieldType,Long> {
+    FieldType findBySlug(String slug);
 }

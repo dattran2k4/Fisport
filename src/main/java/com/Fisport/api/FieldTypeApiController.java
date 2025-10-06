@@ -1,12 +1,8 @@
 package com.Fisport.api;
 
-import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.dto.response.ResponseData;
-import com.Fisport.model.FieldType;
-import com.Fisport.service.FieldService;
 import com.Fisport.service.FieldTypeBookDurationService;
 import com.Fisport.service.FieldTypeService;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -15,13 +11,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/v1/field-types")
 @Validated
 @RequiredArgsConstructor
-public class FieldTypeController {
+public class FieldTypeApiController {
 
     private final FieldTypeService fieldTypeService;
     private final FieldTypeBookDurationService fieldTypeBookDurationService;

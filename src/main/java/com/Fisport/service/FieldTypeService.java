@@ -7,4 +7,5 @@ import java.util.Set;
 
 public interface FieldTypeService {
     List<FieldTypeResponse> findAll();
+    FieldTypeResponse findBySlug(String slug);
 }
