@@ -14,21 +14,21 @@
 
                 <!-- Menu -->
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav mx-auto">
+                    <ul class="navbar-nav mx-auto" id="mainNav">
                         <li class="nav-item">
                             <a class="nav-link active" th:href="@{/}">Trang chủ</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/fields}">Đặt sân</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/tournaments}">Giải đấu</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/about}">Giới thiệu</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" th:href="@{/contact}">Liên hệ</a>
+                        <li class="nav-item" th:each="t : ${fieldTypes}">
+                            <a class="nav-link d-flex align-items-center" th:href="@{${t.slug}}">
+                                <i th:class="'me-1 ' + (
+                                    ${t.slug} == 'bong-da'     ? 'fa-solid fa-futbol' : (
+                                    ${t.slug} == 'cau-long'    ? 'fa-solid fa-feather-pointed' : (
+                                    ${t.slug} == 'tennis'      ? 'fa-solid fa-table-tennis-paddle-ball' : (
+                                    ${t.slug} == 'bong-ro'     ? 'fa-solid fa-basketball' : (
+                                    ${t.slug} == 'boi-loi'     ? 'fa-solid fa-person-swimming' : (
+                                    ${t.slug} == 'pickleball'  ? 'fa-solid fa-table-tennis-paddle-ball' : 'fa-regular fa-star'))))))"></i>
+                                <span th:text="${t.name}">Loại sân</span>
+                            </a>
                         </li>
                     </ul>
 
