@@ -1,12 +1,43 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
-<section layout:fragment="header">
-    <header>
-        <nav>
-            <a th:href="@{/}">Home</a> |
-            <a th:href="@{/about}">About</a>
+<header th:fragment="header" xmlns:th="http://www.thymeleaf.org">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top py-3">
+            <div class="container">
+                <!-- Logo -->
+                <a class="navbar-brand fw-bold text-primary" th:href="@{/}" style="font-size: 1.5rem;">
+                    <img th:src="@{/web/img/logo.png}" alt="Fisport" width="35" class="me-2">
+                    Fisport
+                </a>
+
+                <!-- Nút toggle (mobile) -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Menu -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" th:href="@{/}">Trang chủ</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/fields}">Đặt sân</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/tournaments}">Giải đấu</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/about}">Giới thiệu</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" th:href="@{/contact}">Liên hệ</a>
+                        </li>
+                    </ul>
+
+                    <!-- Nút đăng nhập / đăng ký -->
+                    <div class="d-flex align-items-center">
+                        <a th:href="@{/login}" class="btn btn-outline-primary me-2 px-3">Đăng nhập</a>
+                        <a th:href="@{/register}" class="btn btn-primary px-3">Đăng ký</a>
+                    </div>
+                </div>
+            </div>
         </nav>
     </header>
-</section>
-</html>

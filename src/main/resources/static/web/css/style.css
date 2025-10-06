@@ -1,0 +1,38 @@
+/* Search button hover animation */
+.btn-search {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-search:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(13, 110, 253, 0.25);
+}
+.btn-search:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
+}
+
+/* Top fields: filter buttons spacing */
+#topFieldTypeFilters .btn { margin-right: 8px; padding: 0.4rem 0.65rem; font-size: 0.85rem; border-radius: 999px; }
+#topFieldTypeFilters .btn:last-child { margin-right: 0; }
+
+/* Swiper navigation: circular, smaller, shadowed */
+.top-fields-swiper .swiper-button-prev,
+.top-fields-swiper .swiper-button-next {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  color: #0d6efd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+.top-fields-swiper .swiper-button-prev:after,
+.top-fields-swiper .swiper-button-next:after {
+  font-size: 12px; /* center arrow glyph inside the smaller circle */
+}
+.top-fields-swiper .swiper-button-prev { left: -4px; }
+.top-fields-swiper .swiper-button-next { right: -4px; }
+

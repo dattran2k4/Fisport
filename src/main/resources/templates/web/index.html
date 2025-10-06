@@ -2,14 +2,284 @@
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/web/web}">
-<head>
-    <title>Home</title>
-</head>
 <body>
-        <!-- Override content -->
-        <section layout:fragment="abc">
-            <h1>Welcome to Index Page</h1>
-            <p>This is the Index content.</p>
+    <div layout:fragment="content">
+        <!-- Hero / Banner with background Swiper and overlayed text -->
+        <section class="py-5 bg-light position-relative overflow-hidden" data-aos="fade-up" style="min-height: 420px;">
+            <!-- Background Swiper -->
+            <div class="position-absolute top-0 start-0 w-100 h-100">
+                <div class="swiper hero-swiper w-100 h-100">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide w-100 h-100" style="background:url('/web/images/hero-1.jpg') center/cover no-repeat;"></div>
+                        <div class="swiper-slide w-100 h-100" style="background:url('/web/images/hero-2.jpg') center/cover no-repeat;"></div>
+                        <div class="swiper-slide w-100 h-100" style="background:url('/web/images/hero-3.jpg') center/cover no-repeat;"></div>
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+                <!-- Dark overlay for readability -->
+                <div class="position-absolute top-0 start-0 w-100 h-100" style="background: rgba(0,0,0,0.35);"></div>
+            </div>
+
+            <!-- Foreground content -->
+            <div class="container position-relative" style="z-index: 2;">
+                <div class="row">
+                    <div class="col-lg-8 col-xl-7">
+                        <h1 class="display-5 fw-bold mb-3 text-white">Fisport - Đặt sân thể thao hiện đại</h1>
+                        <p class="lead mb-4 text-white-50">Trải nghiệm đặt sân trực tuyến nhanh chóng, mượt mà, phù hợp mọi nhu cầu luyện tập và thi đấu.</p>
+                        <div class="d-flex gap-2">
+                            <a href="/fields" class="btn btn-primary btn-lg"><i class="bi bi-geo-alt"></i> Tìm sân gần bạn</a>
+                            <a href="#promotions" class="btn btn-outline-light btn-lg"><i class="bi bi-lightning"></i> Khám phá ưu đãi</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
+
+        <!-- Quick search (refined UI/UX) -->
+        <section class="py-4 border-bottom" data-aos="fade-up" data-aos-delay="50">
+            <div class="container">
+                <div class="search-bar bg-white shadow-sm rounded-4 p-3 p-md-4">
+                    <form id="quickSearchForm" class="row g-3 g-md-2 align-items-stretch">
+                        <div class="col-12 col-md-3">
+                            <label for="fieldTypeSelect" class="visually-hidden">Loại sân</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text"><i class="bi bi-grid"></i></span>
+                                <select class="form-select" id="fieldTypeSelect">
+                                    <option selected disabled value="">Chọn loại sân</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <label for="citySelect" class="visually-hidden">Tỉnh/Thành phố</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                <select class="form-select" id="citySelect">
+                                    <option selected disabled value="">Chọn tỉnh/thành phố</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label for="wardSelect" class="visually-hidden">Phường/Xã</label>
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text"><i class="bi bi-geo"></i></span>
+                                <select class="form-select" id="wardSelect" disabled>
+                                    <option selected disabled value="">Chọn phường/xã</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-2 d-grid">
+                            <button type="submit" id="btnSearch" class="btn btn-primary btn-lg btn-search w-100" disabled title="Chọn loại sân và tỉnh/thành phố"><i class="bi bi-search"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sections placeholders -->
+        <section id="promotions" class="py-5" data-aos="fade-up" data-aos-delay="100">
+            <div class="container">
+                <h2 class="h4 mb-3">Ưu đãi</h2>
+                <div class="row g-3">
+                    <div class="col-md-4"><div class="p-4 bg-light rounded h-100">Tặng 1 nón thể thao!</div></div>
+                    <div class="col-md-4"><div class="p-4 bg-light rounded h-100">Giảm 15% lần đầu</div></div>
+                    <div class="col-md-4"><div class="p-4 bg-light rounded h-100">Voucher cuối tuần</div></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Top fields carousel -->
+        <section class="py-5" data-aos="fade-up" data-aos-delay="150">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                    <h2 class="h5 mb-0">Sân hàng đầu</h2>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="btn-group btn-group-sm" role="group" id="topFieldTypeFilters">
+                            <button type="button" class="btn btn-outline-primary active" data-type="">Tất cả</button>
+                            <button type="button" class="btn btn-outline-primary" data-type="FOOTBALL">Bóng đá</button>
+                            <button type="button" class="btn btn-outline-primary" data-type="TENNIS">Tennis</button>
+                            <button type="button" class="btn btn-outline-primary" data-type="BADMINTON">Cầu lông</button>
+                            <button type="button" class="btn btn-outline-primary" data-type="TABLE_TENNIS">Bóng bàn</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper top-fields-swiper">
+                    <div class="swiper-wrapper" id="topFieldsWrapper">
+                        <!-- Slide 1 -->
+                        <div class="swiper-slide">
+                            <div class="card h-100">
+                                <div class="ratio ratio-16x9" style="background:#dc3545;"></div>
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">Sân A</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="swiper-slide">
+                            <div class="card h-100">
+                                <div class="ratio ratio-16x9" style="background:#0d6efd;"></div>
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">Sân B</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="swiper-slide">
+                            <div class="card h-100">
+                                <div class="ratio ratio-16x9" style="background:#198754;"></div>
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">Sân C</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 4 -->
+                        <div class="swiper-slide">
+                            <div class="card h-100">
+                                <div class="ratio ratio-16x9" style="background:#ffc107;"></div>
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">Sân D</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 5 -->
+                        <div class="swiper-slide">
+                            <div class="card h-100">
+                                <div class="ratio ratio-16x9" style="background:#6f42c1;"></div>
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">Sân E</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 6 -->
+                        <div class="swiper-slide">
+                            <div class="card h-100">
+                                <div class="ratio ratio-16x9" style="background:#fd7e14;"></div>
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">Sân F</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="swiper-pagination"></div>
+                    <div class="swiper-button-prev"></div>
+                    <div class="swiper-button-next"></div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            window.addEventListener('load', function() {
+                // No custom scroll manipulation to avoid auto-jumps
+
+                // Swiper init
+                var heroSwiper = new Swiper('.hero-swiper', {
+                    loop: true,
+                    autoplay: { delay: 3500, disableOnInteraction: false },
+                    pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
+                    // no arrows on hero
+                });
+
+                var topFieldsSwiper = new Swiper('.top-fields-swiper', {
+                    loop: false,
+                    slidesPerView: 5,
+                    spaceBetween: 20,
+                    grabCursor: true,
+                    watchOverflow: true,
+                    breakpoints: {
+                        320: { slidesPerView: 1, spaceBetween: 10 },
+                        576: { slidesPerView: 3, spaceBetween: 14 },
+                        768: { slidesPerView: 4, spaceBetween: 14 },
+                        992: { slidesPerView: 5, spaceBetween: 16 },
+                        1200: { slidesPerView: 5, spaceBetween: 16 }
+                    },
+                    pagination: { el: '.top-fields-swiper .swiper-pagination', clickable: true },
+                    navigation: { nextEl: '.top-fields-swiper .swiper-button-next', prevEl: '.top-fields-swiper .swiper-button-prev' }
+                });
+
+                // Load cities
+                $.getJSON('/api/public/cities', function(data) {
+                    const $city = $('#citySelect');
+                    $city.find('option:not([disabled])').remove();
+                    (data || []).forEach(function(city){
+                        $city.append('<option value="'+ city.id +'">'+ city.name +'</option>');
+                    });
+                });
+
+                // When city changes, load wards
+                $('#citySelect').on('change', function() {
+                    const cityId = $(this).val();
+                    const $ward = $('#wardSelect');
+                    if (!cityId) {
+                        $ward.prop('disabled', true).find('option:not([disabled])').remove();
+                        return;
+                    }
+                    $.getJSON('/api/public/cities/' + cityId + '/wards', function(data) {
+                        $ward.prop('disabled', false).find('option:not([disabled])').remove();
+                        (data || []).forEach(function(w){
+                            $ward.append('<option value="'+ w.id +'">'+ w.name +'</option>');
+                        });
+                    });
+                });
+
+                // Load field types
+                $.getJSON('/api/public/field-types', function(data) {
+                    const $type = $('#fieldTypeSelect');
+                    $type.find('option:not([disabled])').remove();
+                    (data || []).forEach(function(t){
+                        $type.append('<option value="'+ (t.code || t.id) +'">'+ (t.name || t.displayName) +'</option>');
+                    });
+                });
+
+                // Optional: if you want district as a dependent select, re-add it here
+
+                // Enable search button only when required fields selected
+                function toggleSearchState() {
+                    var hasCity = $('#citySelect').val();
+                    var hasType = $('#fieldTypeSelect').val();
+                    $('#btnSearch').prop('disabled', !(hasCity && hasType));
+                }
+                $('#citySelect, #fieldTypeSelect').on('change', toggleSearchState);
+                toggleSearchState();
+
+                // No reset button; keep selections until changed
+
+                $('#quickSearchForm').on('submit', function(e) {
+                    e.preventDefault();
+                    const qs = $.param({
+                        cityId: $('#citySelect').val(),
+                        wardId: $('#wardSelect').val(),
+                        fieldType: $('#fieldTypeSelect').val()
+                    });
+                    window.location.href = '/fields?'+ qs;
+                });
+
+                // Optional: load top fields dynamically from backend
+                $.getJSON('/api/public/fields/top?limit=12', function(items) {
+                    const $wrap = $('#topFieldsWrapper');
+                    if (!Array.isArray(items) || !items.length) return;
+                    $wrap.empty();
+                    items.forEach(function(item) {
+                        // For now, use red background to visualize slides clearly
+                        var imageUrl = null;
+                        var slide = [
+                            '<div class="swiper-slide">',
+                              '<a href="/fields/'+ (item.slug || item.id) +'" class="card h-100 text-decoration-none text-reset">',
+                                '<div class="ratio ratio-16x9" style="background:#dc3545;"></div>',
+                                '<div class="card-body">',
+                                  '<h6 class="card-title mb-1">'+ (item.name || 'Sân') +'</h6>',
+                                  '<small class="text-muted">'+ (item.addressShort || item.districtName || '') +'</small>',
+                                '</div>',
+                              '</a>',
+                            '</div>'
+                        ].join('');
+                        $wrap.append(slide);
+                    });
+                    topFieldsSwiper.update();
+                });
+
+                // No delayed scroll/overflow changes
+            });
+        </script>
+    </div>
 </body>
 </html>
