@@ -44,8 +44,12 @@
                             <label for="fieldTypeSelect" class="visually-hidden">Loại sân</label>
                             <div class="input-group input-group-lg">
                                 <span class="input-group-text"><i class="bi bi-grid"></i></span>
-                                <select class="form-select" id="fieldTypeSelect">
+                                <select class="form-select" id="fieldTypeSelect" name="fieldType">
                                     <option selected disabled value="">Chọn loại sân</option>
+                                    <option th:each="ft : ${fieldTypes}"
+                                            th:value="${ft.id}"
+                                            th:text="${ft.name}">
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -53,8 +57,12 @@
                             <label for="citySelect" class="visually-hidden">Tỉnh/Thành phố</label>
                             <div class="input-group input-group-lg">
                                 <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                <select class="form-select" id="citySelect">
+                                <select class="form-select" id="citySelect" name="city">
                                     <option selected disabled value="">Chọn tỉnh/thành phố</option>
+                                    <option th:each="c : ${cities}"
+                                            th:value="${c.id}"
+                                            th:text="${c.name}">
+                                    </option>
                                 </select>
                             </div>
                         </div>
@@ -196,37 +204,32 @@
                     navigation: { nextEl: '.top-fields-swiper .swiper-button-next', prevEl: '.top-fields-swiper .swiper-button-prev' }
                 });
 
-                // Load cities
-                $.getJSON('/api/public/cities', function(data) {
-                    const $city = $('#citySelect');
-                    $city.find('option:not([disabled])').remove();
-                    (data || []).forEach(function(city){
-                        $city.append('<option value="'+ city.id +'">'+ city.name +'</option>');
-                    });
-                });
 
                 // When city changes, load wards
                 $('#citySelect').on('change', function() {
                     const cityId = $(this).val();
                     const $ward = $('#wardSelect');
-                    if (!cityId) {
-                        $ward.prop('disabled', true).find('option:not([disabled])').remove();
-                        return;
-                    }
-                    $.getJSON('/api/public/cities/' + cityId + '/wards', function(data) {
-                        $ward.prop('disabled', false).find('option:not([disabled])').remove();
-                        (data || []).forEach(function(w){
-                            $ward.append('<option value="'+ w.id +'">'+ w.name +'</option>');
-                        });
-                    });
-                });
 
-                // Load field types
-                $.getJSON('/api/public/field-types', function(data) {
-                    const $type = $('#fieldTypeSelect');
-                    $type.find('option:not([disabled])').remove();
-                    (data || []).forEach(function(t){
-                        $type.append('<option value="'+ (t.code || t.id) +'">'+ (t.name || t.displayName) +'</option>');
+                    // Reset ward dropdown
+                    $ward.prop('disabled', true).find('option:not([disabled])').remove();
+
+                    if (!cityId) return;
+
+                    // Gọi API /api/v1/wards?cityId=<id>
+                    $.getJSON('/api/v1/wards', { cityId: cityId }, function(res) {
+                        // Lấy danh sách phường từ response (trong trường hợp có wrapper)
+                        const wards = Array.isArray(res) ? res : res.data || [];
+
+                        if (wards.length > 0) {
+                            wards.forEach(w => {
+                                $ward.append(`<option value="${w.id}">${w.name}</option>`);
+                            });
+                            $ward.prop('disabled', false);
+                        } else {
+                            $ward.append('<option disabled>Không có phường/xã</option>');
+                        }
+                    }).fail(() => {
+                        console.error('Không thể tải danh sách phường/xã');
                     });
                 });
 
