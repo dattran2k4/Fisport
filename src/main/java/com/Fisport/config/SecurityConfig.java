@@ -33,7 +33,7 @@ public class SecurityConfig {
     private final TwoFactorAuthFilter twoFactorAuthFilter;
 
     private String[] WHITE_LIST = {"/api/auth/**", "/common/**", "/home/**", "/web/**", "/css/**", "/img/**", "/favicon.ico",
-                                    "/{slug}"};
+                                    "/{slug}",  "/api/v1/wards"};
 
     @Bean
     public PasswordEncoder passwordEncoder() {

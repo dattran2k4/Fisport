@@ -18,7 +18,7 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
     private static final List<String> WHITELIST = List.of(
             "/api/auth/**", "/api/v1/fields/**", "/common/**", "/api/v1/sub-fields/**", "/api/v1/field-types/**", "/web/**", "/css/**", "/img/**", "/favicon.ico",
-            "/{slug}"
+            "/{slug}", "/api/v1/wards"
     );
 
     @Override

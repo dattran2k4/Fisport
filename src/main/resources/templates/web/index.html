@@ -48,7 +48,8 @@
                                     <option selected disabled value="">Chọn loại sân</option>
                                     <option th:each="ft : ${fieldTypes}"
                                             th:value="${ft.id}"
-                                            th:text="${ft.name}">
+                                            th:text="${ft.name}"
+                                            th:attr="data-slug=${ft.slug}">>
                                     </option>
                                 </select>
                             </div>
@@ -248,12 +249,12 @@
 
                 $('#quickSearchForm').on('submit', function(e) {
                     e.preventDefault();
+                    const slug = $('#fieldTypeSelect option:selected').data('slug'); // lấy slug
                     const qs = $.param({
                         cityId: $('#citySelect').val(),
-                        wardId: $('#wardSelect').val(),
-                        fieldType: $('#fieldTypeSelect').val()
+                        wardId: $('#wardSelect').val()
                     });
-                    window.location.href = '/fields?'+ qs;
+                    window.location.href = `${slug}${qs ? '?' + qs : ''}`;
                 });
 
                 // Optional: load top fields dynamically from backend
