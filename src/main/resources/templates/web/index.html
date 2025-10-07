@@ -175,115 +175,111 @@
                 </div>
             </div>
         </section>
-
         <script>
-            window.addEventListener('load', function() {
-                // No custom scroll manipulation to avoid auto-jumps
+            $(document).ready(function() { // đảm bảo jQuery đã load
 
-                // Swiper init
-                var heroSwiper = new Swiper('.hero-swiper', {
-                    loop: true,
-                    autoplay: { delay: 3500, disableOnInteraction: false },
-                    pagination: { el: '.hero-swiper .swiper-pagination', clickable: true },
-                    // no arrows on hero
+        // 1️⃣ Init Swiper
+        var heroSwiper = new Swiper('.hero-swiper', {
+            loop: true,
+            autoplay: { delay: 3500, disableOnInteraction: false },
+            pagination: { el: '.hero-swiper .swiper-pagination', clickable: true }
+        });
+
+        var topFieldsSwiper = new Swiper('.top-fields-swiper', {
+            loop: false,
+            slidesPerView: 5,
+            spaceBetween: 20,
+            grabCursor: true,
+            watchOverflow: true,
+            breakpoints: {
+                320: { slidesPerView: 1, spaceBetween: 10 },
+                576: { slidesPerView: 3, spaceBetween: 14 },
+                768: { slidesPerView: 4, spaceBetween: 14 },
+                992: { slidesPerView: 5, spaceBetween: 16 },
+                1200: { slidesPerView: 5, spaceBetween: 16 }
+            },
+            pagination: { el: '.top-fields-swiper .swiper-pagination', clickable: true },
+            navigation: { nextEl: '.top-fields-swiper .swiper-button-next', prevEl: '.top-fields-swiper .swiper-button-prev' }
+        });
+
+        // 2️⃣ Load wards khi thay đổi city
+        $('#citySelect').on('change', function() {
+            const cityId = $(this).val();
+            const $ward = $('#wardSelect');
+
+            $ward.prop('disabled', true).empty();
+
+            if (!cityId) return;
+
+            $.getJSON('/api/v1/wards', { cityId: cityId })
+                .done(function(res) {
+                    const wards = Array.isArray(res) ? res : res.data || [];
+                    if (wards.length > 0) {
+                        wards.forEach(w => $ward.append(`<option value="${w.id}">${w.name}</option>`));
+                        $ward.prop('disabled', false);
+                    } else {
+                        $ward.append('<option disabled>Không có phường/xã</option>');
+                    }
+                })
+                .fail(function() {
+                    console.error('Không thể tải danh sách phường/xã');
                 });
+        });
 
-                var topFieldsSwiper = new Swiper('.top-fields-swiper', {
-                    loop: false,
-                    slidesPerView: 5,
-                    spaceBetween: 20,
-                    grabCursor: true,
-                    watchOverflow: true,
-                    breakpoints: {
-                        320: { slidesPerView: 1, spaceBetween: 10 },
-                        576: { slidesPerView: 3, spaceBetween: 14 },
-                        768: { slidesPerView: 4, spaceBetween: 14 },
-                        992: { slidesPerView: 5, spaceBetween: 16 },
-                        1200: { slidesPerView: 5, spaceBetween: 16 }
-                    },
-                    pagination: { el: '.top-fields-swiper .swiper-pagination', clickable: true },
-                    navigation: { nextEl: '.top-fields-swiper .swiper-button-next', prevEl: '.top-fields-swiper .swiper-button-prev' }
-                });
+        // 3️⃣ Enable search button khi đủ điều kiện
+        function toggleSearchState() {
+            var hasCity = $('#citySelect').val();
+            var hasType = $('#fieldTypeSelect').val();
+            $('#btnSearch').prop('disabled', !(hasCity && hasType));
+        }
+        $('#citySelect, #fieldTypeSelect').on('change', toggleSearchState);
+        toggleSearchState();
 
-
-                // When city changes, load wards
-                $('#citySelect').on('change', function() {
-                    const cityId = $(this).val();
-                    const $ward = $('#wardSelect');
-
-                    // Reset ward dropdown
-                    $ward.prop('disabled', true).find('option:not([disabled])').remove();
-
-                    if (!cityId) return;
-
-                    // Gọi API /api/v1/wards?cityId=<id>
-                    $.getJSON('/api/v1/wards', { cityId: cityId }, function(res) {
-                        // Lấy danh sách phường từ response (trong trường hợp có wrapper)
-                        const wards = Array.isArray(res) ? res : res.data || [];
-
-                        if (wards.length > 0) {
-                            wards.forEach(w => {
-                                $ward.append(`<option value="${w.id}">${w.name}</option>`);
-                            });
-                            $ward.prop('disabled', false);
-                        } else {
-                            $ward.append('<option disabled>Không có phường/xã</option>');
-                        }
-                    }).fail(() => {
-                        console.error('Không thể tải danh sách phường/xã');
-                    });
-                });
-
-                // Optional: if you want district as a dependent select, re-add it here
-
-                // Enable search button only when required fields selected
-                function toggleSearchState() {
-                    var hasCity = $('#citySelect').val();
-                    var hasType = $('#fieldTypeSelect').val();
-                    $('#btnSearch').prop('disabled', !(hasCity && hasType));
-                }
-                $('#citySelect, #fieldTypeSelect').on('change', toggleSearchState);
-                toggleSearchState();
-
-                // No reset button; keep selections until changed
-
-                $('#quickSearchForm').on('submit', function(e) {
-                    e.preventDefault();
-                    const slug = $('#fieldTypeSelect option:selected').data('slug'); // lấy slug
-                    const qs = $.param({
-                        cityId: $('#citySelect').val(),
-                        wardId: $('#wardSelect').val()
-                    });
-                    window.location.href = `${slug}${qs ? '?' + qs : ''}`;
-                });
-
-                // Optional: load top fields dynamically from backend
-                $.getJSON('/api/public/fields/top?limit=12', function(items) {
-                    const $wrap = $('#topFieldsWrapper');
-                    if (!Array.isArray(items) || !items.length) return;
-                    $wrap.empty();
-                    items.forEach(function(item) {
-                        // For now, use red background to visualize slides clearly
-                        var imageUrl = null;
-                        var slide = [
-                            '<div class="swiper-slide">',
-                              '<a href="/fields/'+ (item.slug || item.id) +'" class="card h-100 text-decoration-none text-reset">',
-                                '<div class="ratio ratio-16x9" style="background:#dc3545;"></div>',
-                                '<div class="card-body">',
-                                  '<h6 class="card-title mb-1">'+ (item.name || 'Sân') +'</h6>',
-                                  '<small class="text-muted">'+ (item.addressShort || item.districtName || '') +'</small>',
-                                '</div>',
-                              '</a>',
-                            '</div>'
-                        ].join('');
-                        $wrap.append(slide);
-                    });
-                    topFieldsSwiper.update();
-                });
-
-                // No delayed scroll/overflow changes
+        // 4️⃣ Quick search form
+        $('#quickSearchForm').on('submit', function(e) {
+            e.preventDefault();
+            const slug = $('#fieldTypeSelect option:selected').data('slug');
+            const qs = $.param({
+                cityId: $('#citySelect').val(),
+                wardId: $('#wardSelect').val()
             });
+            window.location.href = `${slug}${qs ? '?' + qs : ''}`;
+        });
+
+        // 5️⃣ Load top fields từ backend
+        $.getJSON('/api/public/fields/top', { limit: 12 })
+            .done(function(items) {
+                if (!Array.isArray(items) || !items.length) return;
+                const $wrap = $('#topFieldsWrapper');
+                $wrap.empty();
+                items.forEach(function(item) {
+                    const slide = `
+                        <div class="swiper-slide">
+                            <a href="/fields/${item.slug || item.id}" class="card h-100 text-decoration-none text-reset">
+                                <div class="ratio ratio-16x9" style="background:#dc3545;"></div>
+                                <div class="card-body">
+                                    <h6 class="card-title mb-1">${item.name || 'Sân'}</h6>
+                                    <small class="text-muted">${item.addressShort || item.districtName || ''}</small>
+                                </div>
+                            </a>
+                        </div>
+                    `;
+                    $wrap.append(slide);
+                });
+                topFieldsSwiper.update(); // update Swiper sau khi append slide
+            })
+            .fail(function() {
+                console.error('Không thể tải top fields');
+            });
+
+        // 6️⃣ Init AOS
+        if (typeof AOS !== 'undefined') {
+            AOS.init({ duration: 800, once: true });
+        }
+
+    });
         </script>
     </div>
+
 </body>
 </html>

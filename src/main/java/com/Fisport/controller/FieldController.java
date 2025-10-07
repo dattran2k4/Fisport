@@ -26,12 +26,18 @@ public class FieldController {
     private final FeatureService featureService;
 
     @GetMapping("/{slug}")
-    public String getField(@PathVariable String slug, Model model) {
+    public String getFields(@PathVariable String slug, Model model) {
         List<FeatureResponse> featureResponses = featureService.getListFeatures();
         FieldTypeResponse fieldTypeResponse = fieldTypeService.findBySlug(slug);
         List<FieldResponse> responses = fieldService.getAllFields(null, fieldTypeResponse.getId(), EFieldStatus.ACTIVE, null, null, null);
         model.addAttribute("fields", responses);
         model.addAttribute("features", featureResponses);
         return "web/fields.html";
+    }
+
+    @GetMapping("/{slug}/{fieldNameSlug}")
+    public String getField(@PathVariable String slug, @PathVariable String fieldNameSlug, Model model) {
+
+        return "web/field-detail.html";
     }
 }

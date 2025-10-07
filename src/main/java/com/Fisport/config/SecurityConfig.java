@@ -1,5 +1,6 @@
 package com.Fisport.config;
 
+import com.Fisport.constant.SecurityWhiteList;
 import com.Fisport.security.CustomAccessDeniedHandler;
 import com.Fisport.security.CustomAuthenticationFailureHandler;
 import com.Fisport.security.CustomUserDetailsService;
@@ -31,9 +32,6 @@ public class SecurityConfig {
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final TwoFactorAuthFilter twoFactorAuthFilter;
-
-    private String[] WHITE_LIST = {"/api/auth/**", "/common/**", "/home/**", "/web/**", "/css/**", "/img/**", "/favicon.ico",
-                                    "/{slug}",  "/api/v1/wards"};
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -69,7 +67,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/fields/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/field-types/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/sub-fields/**").permitAll()
-                        .requestMatchers(WHITE_LIST).permitAll()
+                        .requestMatchers(SecurityWhiteList.WHITE_LIST.toArray(String[]::new)).permitAll()
 //                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 //                        .requestMatchers("/api/owner/**").hasRole("OWNER")
                         .anyRequest().authenticated()

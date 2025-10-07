@@ -1,5 +1,6 @@
 package com.Fisport.config;
 
+import com.Fisport.constant.SecurityWhiteList;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,10 +17,10 @@ import java.util.List;
 @Component
 public class TwoFactorAuthFilter extends OncePerRequestFilter {
 
-    private static final List<String> WHITELIST = List.of(
-            "/api/auth/**", "/api/v1/fields/**", "/common/**", "/api/v1/sub-fields/**", "/api/v1/field-types/**", "/web/**", "/css/**", "/img/**", "/favicon.ico",
-            "/{slug}", "/api/v1/wards"
-    );
+//    private static final List<String> WHITELIST = List.of(
+//            "/api/auth/**", "/api/v1/fields/**", "/common/**", "/api/v1/sub-fields/**", "/api/v1/field-types/**", "/web/**", "/css/**", "/img/**", "/favicon.ico",
+//            "/{slug}", "/api/v1/wards"
+//    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -31,7 +32,7 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
         }
 
         String path = request.getRequestURI();
-        if (WHITELIST.stream().anyMatch(path::startsWith)) {
+        if (SecurityWhiteList.WHITE_LIST.stream().anyMatch(path::startsWith)) {
             filterChain.doFilter(request, response);
             return;
         }

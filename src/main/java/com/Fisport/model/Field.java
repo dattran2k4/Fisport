@@ -45,6 +45,12 @@ public class Field extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private EFieldStatus fieldStatus;
 
+    @Column(name = "latitude", nullable = false)
+    private Double latitude;
+
+    @Column(name = "longitude", nullable = false)
+    private Double longitude;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User owner;

@@ -6,5 +6,7 @@ public enum EBookingStatus {
     @JsonProperty("pending")
     PENDING,
     @JsonProperty("confirmed")
-    CONFIRMED;
+    CONFIRMED,
+    @JsonProperty("cancelled")
+    CANCELLED,;
 }

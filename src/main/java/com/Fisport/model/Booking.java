@@ -24,7 +24,7 @@ public class Booking extends AbstractEntity {
     @Column(name = "booking_date")
     private LocalDate bookingDate;
 
-    @Column(name = "end_time",  nullable = false)
+    @Column(name = "start_time",  nullable = false)
     private LocalTime startTime;
 
     @Column(name = "end_time",  nullable = false)
@@ -36,6 +36,7 @@ public class Booking extends AbstractEntity {
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 50)
     private EBookingStatus bookingStatus;
 

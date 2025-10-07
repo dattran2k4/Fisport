@@ -63,6 +63,14 @@ public class User extends AbstractEntity {
     @Builder.Default
     private Set<Review> reviews = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_voucher",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "voucher_id")
+    )
+    private Set<Voucher> vouchers = new HashSet<>();
+
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
     private LocalDateTime createdAt;

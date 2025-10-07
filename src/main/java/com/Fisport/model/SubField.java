@@ -28,10 +28,10 @@ public class SubField extends AbstractEntity {
     private Field field;
 
     @CreationTimestamp
-    @Column(name = "create_at", updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime create_at;
 
     @UpdateTimestamp
-    @Column(name = "update_at")
+    @Column(name = "updated_at")
     private LocalDateTime update_at;
 }
