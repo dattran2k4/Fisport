@@ -25,6 +25,9 @@ public class Booking extends AbstractEntity {
     private LocalDate bookingDate;
 
     @Column(name = "end_time",  nullable = false)
+    private LocalTime startTime;
+
+    @Column(name = "end_time",  nullable = false)
     private LocalTime endTime;
 
     @Column(name = "duration",  nullable = false)
