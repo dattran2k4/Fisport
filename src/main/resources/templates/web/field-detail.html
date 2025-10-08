@@ -51,12 +51,138 @@
 <!--                    </div>-->
         
                     <!-- Nút đặt sân -->
-                    <a th:href="@{'/booking/' + ${field.id}}" class="btn btn-primary btn-lg">
+                    <a th:href="@{javascript:void(0)}" class="btn btn-primary btn-lg" id="btn-booking">
                         Đặt sân ngay
                     </a>
+                    <!-- Modal đặt sân -->
+                    <div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Chọn ngày và giờ</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <!-- Chọn ngày -->
+                                    <div id="date-selection" class="mb-3">
+                                        <h6>Chọn ngày</h6>
+                                        <div class="d-flex overflow-auto" id="dates-container" style="gap:8px;">
+                                            <!-- JS render ngày -->
+                                        </div>
+                                    </div>
+
+                                    <!-- Chọn giờ -->
+                                    <div id="time-selection" style="display:none;">
+                                        <h6>Chọn giờ</h6>
+                                        <div class="d-flex flex-wrap gap-2" id="times-container">
+                                            <!-- JS render giờ -->
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" id="confirm-booking">Xác nhận</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
     </div>
+
+    <section layout:fragment="scripts">
+        document.addEventListener("DOMContentLoaded", function() {
+        const btnBooking = document.getElementById("btn-booking");
+        const bookingModal = new bootstrap.Modal(document.getElementById("bookingModal"));
+        const datesContainer = document.getElementById("dates-container");
+        const timesContainer = document.getElementById("times-container");
+        const timeSelection = document.getElementById("time-selection");
+
+        const openTime = [[${#dates.format(field.openTime, 'HH')}]]; // ví dụ 6
+        const closeTime = [[${#dates.format(field.closeTime, 'HH')}]]; // ví dụ 22
+
+        let selectedDate = null;
+
+        // Render ngày (10 ngày đầu)
+        function renderDates(offset = 0) {
+        datesContainer.innerHTML = '';
+        const today = new Date();
+        for(let i=0; i<10; i++){
+        const date = new Date();
+        date.setDate(today.getDate() + i + offset);
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline-primary date-btn';
+        btn.textContent = date.toLocaleDateString('vi-VN', {weekday:'short', day:'2-digit', month:'2-digit'});
+        btn.dataset.date = date.toISOString().split('T')[0];
+        datesContainer.appendChild(btn);
+        }
+        }
+
+        // Render giờ theo openTime - closeTime
+        function renderTimes() {
+        timesContainer.innerHTML = '';
+        for(let h=openTime; h< closeTime; h++){
+        const btn = document.createElement('button');
+        btn.className = 'btn btn-outline-success time-btn';
+        btn.textContent = (h<10?'0'+h:h) + ':00';
+        btn.dataset.time = (h<10?'0'+h:h) + ':00';
+
+        // TODO: Disable giờ nếu đã có booking từ BE
+        // Example:
+        // if(bookedHours.includes(btn.dataset.time)) btn.classList.add('disabled');
+
+        timesContainer.appendChild(btn);
+        }
+        timeSelection.style.display = 'block';
+        }
+
+        // Hiển thị modal
+        btnBooking.addEventListener('click', function() {
+        renderDates();
+        timeSelection.style.display = 'none';
+        selectedDate = null;
+        bookingModal.show();
+        });
+
+        // Chọn ngày
+        datesContainer.addEventListener('click', function(e) {
+        if(e.target.classList.contains('date-btn')){
+        // highlight ngày
+        document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('active'));
+        e.target.classList.add('active');
+        selectedDate = e.target.dataset.date;
+        renderTimes();
+        }
+        });
+
+        // Chọn giờ
+        timesContainer.addEventListener('click', function(e){
+        if(e.target.classList.contains('time-btn') && !e.target.classList.contains('disabled')){
+        document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active'));
+        e.target.classList.add('active');
+        }
+        });
+
+        // Xác nhận booking
+        document.getElementById('confirm-booking').addEventListener('click', function(){
+        const selectedTime = document.querySelector('.time-btn.active')?.dataset.time;
+        if(!selectedDate || !selectedTime){
+        alert('Vui lòng chọn ngày và giờ');
+        return;
+        }
+        console.log('Booking:', selectedDate, selectedTime);
+        bookingModal.hide();
+
+        // TODO: Gửi AJAX lên BE
+        /*
+        fetch('/api/book', {
+        method:'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({fieldId: [[${field.id}]], date:selectedDate, time:selectedTime})
+        }).then(r=>r.json()).then(res=>console.log(res));
+        */
+        });
+        });
+    </section>
 </body>
 </html>
