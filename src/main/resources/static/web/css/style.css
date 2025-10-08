@@ -36,3 +36,40 @@
 .top-fields-swiper .swiper-button-prev { left: -4px; }
 .top-fields-swiper .swiper-button-next { right: -4px; }
 
+
+    .field-detail .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .field-detail .card:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+    }
+
+    .field-detail h2 {
+        font-size: 2rem;
+        color: #333;
+    }
+
+    .field-detail h6 {
+        font-weight: 600;
+    }
+
+    .field-detail .badge {
+        font-size: 0.85rem;
+        padding: 0.45em 0.75em;
+        border-radius: 0.5rem;
+        background-color: #f0f0f0;
+    }
+
+    .field-detail .btn-primary {
+        font-size: 1.1rem;
+        padding: 0.65em 1.2em;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .field-detail .btn-primary:hover {
+        background-color: #0056b3;
+        transform: translateY(-2px);
+    }

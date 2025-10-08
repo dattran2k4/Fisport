@@ -3,60 +3,60 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/web/web}">
 <body>
-    <div layout:fragment="content">
-        <section class="field-detail container my-5">
-            <div class="row g-4">
-                <!-- Banner hình ảnh -->
-                <div class="col-lg-6">
-                    <div class="card shadow-sm border-0">
-                        <div class="ratio ratio-16x9 rounded"
-                             th:style="'background: url(' + ${field.banner != null ? field.banner : '/images/default-field.jpg'} + ') center/cover no-repeat;'">
-                        </div>
+<div layout:fragment="content">
+    <section class="field-detail container my-5">
+        <div class="row g-4">
+            <!-- Banner hình ảnh -->
+            <div class="col-lg-6">
+                <div class="card shadow-sm border-0">
+                    <div class="ratio ratio-16x9 rounded"
+                         th:style="'background: url(' + ${field.banner != null ? field.banner : '/images/default-field.jpg'} + ') center/cover no-repeat;'">
                     </div>
-                </div>
-        
-                <!-- Thông tin chi tiết sân -->
-                <div class="col-lg-6">
-                    <!-- Tên sân -->
-                    <h2 class="fw-bold mb-2" th:text="${field.name}">Tên sân</h2>
-        
-                    <!-- Loại sân -->
-                    <p class="text-muted mb-3" th:text="${field.fieldTypeResponse.name}">Loại sân</p>
-        
-<!--                    &lt;!&ndash; Rating &ndash;&gt;-->
-<!--                    <div class="mb-3">-->
-<!--                        <span th:text="${field.rating} + ' ★'">4.5 ★</span>-->
-<!--                    </div>-->
-        
-                    <!-- Giờ mở cửa -->
-                    <div class="mb-3">
-                        <i class="bi bi-clock me-2"></i>
-                        <span th:text="${field.openTime} + ' - ' + ${field.closeTime}">06:00 - 22:00</span>
-                    </div>
-        
-                    <!-- Mô tả -->
-                    <div class="mb-3">
-                        <h6>Mô tả</h6>
-                        <p th:text="${field.description}">Mô tả sân chi tiết...</p>
-                    </div>
-        
-<!--                    &lt;!&ndash; Tiện ích &ndash;&gt;-->
-<!--                    <div class="mb-4">-->
-<!--                        <h6>Tiện ích</h6>-->
-<!--                        <div class="d-flex flex-wrap">-->
-<!--                            <span class="badge bg-light text-dark me-2 mb-2"-->
-<!--                                  th:each="f : ${field.features}" -->
-<!--                                  th:text="${f.name}">Wifi</span>-->
-<!--                        </div>-->
-<!--                    </div>-->
-        
-                    <!-- Nút đặt sân -->
-                    <a th:href="@{'/booking/' + ${field.id}}" class="btn btn-primary btn-lg">
-                        Đặt sân ngay
-                    </a>
                 </div>
             </div>
-        </section>
-    </div>
+
+            <!-- Thông tin chi tiết sân -->
+            <div class="col-lg-6">
+                <!-- Tên sân -->
+                <h2 class="fw-bold mb-2" th:text="${field.name}">Tên sân</h2>
+
+                <!-- Loại sân -->
+                <p class="text-muted mb-3" th:text="${field.fieldTypeResponse.name}">Loại sân</p>
+
+                <!--                    &lt;!&ndash; Rating &ndash;&gt;-->
+                <!--                    <div class="mb-3">-->
+                <!--                        <span th:text="${field.rating} + ' ★'">4.5 ★</span>-->
+                <!--                    </div>-->
+
+                <!-- Giờ mở cửa -->
+                <div class="mb-3">
+                    <i class="bi bi-clock me-2"></i>
+                    <span th:text="${field.openTime} + ' - ' + ${field.closeTime}">06:00 - 22:00</span>
+                </div>
+
+                <!-- Mô tả -->
+                <div class="mb-3">
+                    <h6>Mô tả</h6>
+                    <p th:text="${field.description}">Mô tả sân chi tiết...</p>
+                </div>
+
+                <!--                    &lt;!&ndash; Tiện ích &ndash;&gt;-->
+                <!--                    <div class="mb-4">-->
+                <!--                        <h6>Tiện ích</h6>-->
+                <!--                        <div class="d-flex flex-wrap">-->
+                <!--                            <span class="badge bg-light text-dark me-2 mb-2"-->
+                <!--                                  th:each="f : ${field.features}" -->
+                <!--                                  th:text="${f.name}">Wifi</span>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+
+                <!-- Nút đặt sân -->
+                <a th:href="@{'/booking/' + ${field.id}}" class="btn btn-primary btn-lg">
+                    Đặt sân ngay
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
 </body>
 </html>
