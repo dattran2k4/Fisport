@@ -61,7 +61,7 @@
                                 <select class="form-select" id="citySelect" name="city">
                                     <option selected disabled value="">Chọn tỉnh/thành phố</option>
                                     <option th:each="c : ${cities}"
-                                            th:value="${c.id}"
+                                            th:value="${c.slug}"
                                             th:text="${c.name}">
                                     </option>
                                 </select>
@@ -179,7 +179,7 @@
     </div>
     <section layout:fragment="scripts">
         <script>
-            $(document).ready(function() { // đảm bảo jQuery đã load
+        $(document).ready(function() { // đảm bảo jQuery đã load
 
         // 1️⃣ Init Swiper
         var heroSwiper = new Swiper('.hero-swiper', {
@@ -218,7 +218,7 @@
                 .done(function(res) {
                     const wards = Array.isArray(res) ? res : res.data || [];
                     if (wards.length > 0) {
-                        wards.forEach(w => $ward.append(`<option value="${w.id}">${w.name}</option>`));
+                        wards.forEach(w => $ward.append(`<option value="${w.name}">${w.name}</option>`));
                         $ward.prop('disabled', false);
                     } else {
                         $ward.append('<option disabled>Không có phường/xã</option>');
@@ -243,8 +243,8 @@
             e.preventDefault();
             const slug = $('#fieldTypeSelect option:selected').data('slug');
             const qs = $.param({
-                cityId: $('#citySelect').val(),
-                wardId: $('#wardSelect').val()
+                city: $('#citySelect').value(),
+                ward: $('#wardSelect').value()
             });
             window.location.href = `${slug}${qs ? '?' + qs : ''}`;
         });

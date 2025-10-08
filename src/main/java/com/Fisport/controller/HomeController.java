@@ -25,10 +25,10 @@ public class HomeController {
     private final CityService cityService;
     private WardService wardService;
 
-    @GetMapping("/")
-    public RedirectView root() {
-        return new RedirectView("/home");
-    }
+//    @GetMapping("/")
+//    public RedirectView root() {
+//        return new RedirectView("/home");
+//    }
 
     @GetMapping("/home")
     public String home(Model model) {
