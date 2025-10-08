@@ -73,3 +73,12 @@
         background-color: #0056b3;
         transform: translateY(-2px);
     }
+.swiper-slide {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.swiper-wrapper.loading .swiper-slide {
+    opacity: 0;
+}
+

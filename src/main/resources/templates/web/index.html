@@ -107,7 +107,7 @@
                             <!-- Nút Tất cả -->
                             <button type="button"
                             class="btn btn-outline-primary active"
-                            data-type="">
+                            data-id="">
                             <i class="fas fa-th-large me-1"></i> Tất cả
                             </button>
                 
@@ -116,14 +116,13 @@
                                     th:each="type : ${fieldTypes}"
                                     th:data-type="${type.slug}"
                                     th:data-id="${type.id}">
-                                <i class="me-1"
-                                th:classappend="|${type.slug == 'bong-da' ? 'fas fa-futbol' :
-                                                    type.slug == 'cau-long' ? 'fas fa-feather-pointed' :
-                                                    type.slug == 'tennis' ? 'fas fa-table-tennis-paddle-ball' :
-                                                    type.slug == 'bong-ro' ? 'fas fa-basketball' :
-                                                    type.slug == 'boi-loi' ? 'fas fa-person-swimming' :
-                                                    type.slug == 'pickleball' ? 'fas fa-table-tennis-paddle-ball' :
-                                                    'far fa-star'}|"></i>
+                                <i th:class="'me-1 ' + (
+                                    ${type.slug} == 'bong-da'     ? 'fa-solid fa-futbol' : (
+                                    ${type.slug} == 'cau-long'    ? 'fa-solid fa-feather-pointed' : (
+                                    ${type.slug} == 'tennis'      ? 'fa-solid fa-table-tennis-paddle-ball' : (
+                                    ${type.slug} == 'bong-ro'     ? 'fa-solid fa-basketball' : (
+                                    ${type.slug} == 'boi-loi'     ? 'fa-solid fa-person-swimming' : (
+                                    ${type.slug} == 'pickleball'  ? 'fa-solid fa-table-tennis-paddle-ball' : 'fa-regular fa-star'))))))"></i>
                                 <span th:text="${type.name}"></span>
                             </button>
                         </div>
@@ -155,9 +154,9 @@
                     <div class="swiper-button-prev"></div>
                     <div class="swiper-button-next"></div>
                 </div>
+                </div>
             </div>
         </section>
-
     </div>
     <section layout:fragment="scripts">
         <script>
@@ -232,22 +231,20 @@
             window.location.href = `${slug}${qs ? '?' + qs : ''}`;
         });
 
-        // Load from api
-            $('#topFieldTypeFilters').on('click', 'button', function() {
-            // active class
-            $('#topFieldTypeFilters button').removeClass('active');
-            $(this).addClass('active');
+        $('#topFieldTypeFilters').on('click', 'button', function() {
+                $('#topFieldTypeFilters button').removeClass('active');
+                $(this).addClass('active');
 
-            const typeId = $(this).data('id');
-            loadFields(typeId);
-        });
+                const typeId = $(this).data('id') || null; // null = tất cả
+                console.log('Clicked typeId:', typeId);
+
+                loadFields(typeId);
+            });
 
         // ===============================
         // Hàm gọi API
         // ===============================
         function loadFields(typeId) {
-            $('#fieldsGrid').html('<p class="text-center">Đang tải...</p>');
-
             $.ajax({
                 url: '/api/v1/fields',
                 type: 'GET',
@@ -269,7 +266,55 @@
         // ===============================
         // Hàm render danh sách fields
         // ===============================
-        
+
+            function renderFields(fields) {
+                const $wrapper = $('#topFieldsWrapper');
+                $wrapper.addClass('loading');
+
+                if (!fields || fields.length === 0) {
+                    $wrapper.html('<p class="text-center w-100">Không có sân nào.</p>');
+                    window.topFieldsSwiper.update();
+                    return;
+                }
+
+                setTimeout(() => {
+                    $wrapper.empty();
+
+                    fields.forEach(field => {
+                        const banner = field.banner || '/images/default-field.jpg';
+                        const wardName = field.wardResponse ? field.wardResponse.name : '';
+                        const openTime = field.openTime || '00:00';
+                        const closeTime = field.closeTime || '23:59';
+
+                        const slideHtml = `
+                <div class="swiper-slide">
+                    <div class="card h-100">
+                        <div class="ratio ratio-16x9 rounded-top bg-light"
+                             style="background: url('${banner}') center/cover no-repeat;">
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title mb-1">${field.name}</h6>
+                            <small class="text-muted d-block">
+                                <i class="bi bi-geo-alt"></i> ${wardName}
+                            </small>
+                            <small class="text-muted d-block">
+                                <i class="bi bi-clock"></i> ${openTime} - ${closeTime}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            `;
+                        $wrapper.append(slideHtml);
+                    });
+
+                    // Update Swiper
+                    window.topFieldsSwiper.update();
+
+                    // Remove class loading để fade-in
+                    setTimeout(() => $wrapper.removeClass('loading'), 10);
+
+                }, 50); // delay nhỏ để fade-out nhận effect
+            }
 
         // ===============================
         // Load mặc định: tất cả

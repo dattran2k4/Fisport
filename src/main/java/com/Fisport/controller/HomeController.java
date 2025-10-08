@@ -1,13 +1,8 @@
 package com.Fisport.controller;
 
-import com.Fisport.dto.response.CityResponse;
-import com.Fisport.dto.response.FeatureResponse;
-import com.Fisport.dto.response.FieldTypeResponse;
-import com.Fisport.dto.response.WardResponse;
-import com.Fisport.service.CityService;
-import com.Fisport.service.FeatureService;
-import com.Fisport.service.FieldTypeService;
-import com.Fisport.service.WardService;
+import com.Fisport.common.EFieldStatus;
+import com.Fisport.dto.response.*;
+import com.Fisport.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +21,7 @@ public class HomeController {
 
     private final FieldTypeService fieldTypeService;
     private final CityService cityService;
+    private final FieldService fieldService;
 
 //    @GetMapping("/")
 //    public RedirectView root() {
@@ -43,8 +39,11 @@ public class HomeController {
         List<FieldTypeResponse> types = fieldTypeService.findAll();
         List<CityResponse> cities = cityService.findAll();
 
+        List<FieldResponse> fields = fieldService.getAllFields(null, null, EFieldStatus.ACTIVE, null, null, null);
+
         model.addAttribute("fieldTypes", types);
         model.addAttribute("cities", cities);
+        model.addAttribute("fields", fields);
 
         return "web/index";
     }
