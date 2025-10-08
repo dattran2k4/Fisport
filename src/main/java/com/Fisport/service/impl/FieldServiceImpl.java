@@ -152,6 +152,12 @@ public class FieldServiceImpl implements FieldService {
         return fields.stream().map(this::toDto).toList();
     }
 
+    @Override
+    public FieldResponse findBySlug(String fieldNameSlug) {
+        Field field = fieldRepository.findBySlug(fieldNameSlug);
+        return toDto(field);
+    }
+
 
     private FieldTypeResponse toFieldTypeResponseDto(FieldType fieldType) {
         return FieldTypeResponse.builder()

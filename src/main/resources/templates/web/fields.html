@@ -101,6 +101,9 @@
         <script>
             $(document).ready(function() {
 
+                const params = new URLSearchParams(window.location.search);
+                const wardSlug = params.get("ward");
+
                 // ===============================
                 // Biến global
                 // ===============================
@@ -133,6 +136,7 @@
                     // Utilities
                     const utils = getSelectedFeatures();
                     if (utils.length) qs.featureIds = utils.join(',');
+                    if (wardSlug) qs.wardSlug = wardSlug;
 
                     // Pagination
                     // qs.page = currentPage;
@@ -163,7 +167,7 @@
                                             <small class="text-muted">
                                                 <i class="bi bi-clock"></i>
                                                 ${f.openTime} - ${f.closeTime}
-                                            </small>
+                                            </small> 
                                         </div>
                                         <h6 class="card-title mb-1 fw-semibold">${f.name}</h6>
                                         <small class="text-muted d-block">

@@ -14,4 +14,6 @@ public interface FieldRepository extends JpaRepository<Field,Long>, JpaSpecifica
     List<Field> findByOwnerId(Long ownerId);
     List<Field> findByFieldStatus(EFieldStatus fieldStatus);
     List<Field> findByFieldStatusAndOwner_Username(EFieldStatus fieldStatus, String userName);
+
+    Field findBySlug(String fieldNameSlug);
 }

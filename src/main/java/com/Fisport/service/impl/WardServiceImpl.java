@@ -22,4 +22,13 @@ public class WardServiceImpl implements WardService {
                 .map(w -> new WardResponse(w.getId(), w.getName(), w.getSlug()))
                 .toList();
     }
+
+    @Override
+    public WardResponse getWardBySlug(String slug) {
+        Ward ward = wardRepository.findBySlug(slug);
+        return WardResponse.builder()
+                .id(ward.getId())
+                .name(ward.getName())
+                .slug(slug).build();
+    }
 }

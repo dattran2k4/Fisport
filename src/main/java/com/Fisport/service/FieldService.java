@@ -19,4 +19,6 @@ public interface FieldService {
     Set<FeatureResponse> getFeautresByField(Long id);
     List<FieldResponse> getAllPendingFields();
     List<FieldResponse> getAllPendingFieldsByOwner(String name);
+
+    FieldResponse findBySlug(String fieldNameSlug);
 }

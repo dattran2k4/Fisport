@@ -61,7 +61,8 @@
                                 <select class="form-select" id="citySelect" name="city">
                                     <option selected disabled value="">Chọn tỉnh/thành phố</option>
                                     <option th:each="c : ${cities}"
-                                            th:value="${c.slug}"
+                                            th:value="${c.id}"
+                                            th:data-name="${c.slug}"
                                             th:text="${c.name}">
                                     </option>
                                 </select>
@@ -96,79 +97,60 @@
             </div>
         </section>
 
-        <!-- Top fields carousel -->
+        <!-- All fields carousel -->
         <section class="py-5" data-aos="fade-up" data-aos-delay="150">
             <div class="container">
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-                    <h2 class="h5 mb-0">Sân hàng đầu</h2>
+                    <h2 class="h5 mb-0">Tất cả sân thể thao</h2>
                     <div class="d-flex align-items-center gap-2">
                         <div class="btn-group btn-group-sm" role="group" id="topFieldTypeFilters">
-                            <button type="button" class="btn btn-outline-primary active" data-type="">Tất cả</button>
-                            <button type="button" class="btn btn-outline-primary" data-type="FOOTBALL">Bóng đá</button>
-                            <button type="button" class="btn btn-outline-primary" data-type="TENNIS">Tennis</button>
-                            <button type="button" class="btn btn-outline-primary" data-type="BADMINTON">Cầu lông</button>
-                            <button type="button" class="btn btn-outline-primary" data-type="TABLE_TENNIS">Bóng bàn</button>
+                            <!-- Nút Tất cả -->
+                            <button type="button"
+                            class="btn btn-outline-primary active"
+                            data-type="">
+                            <i class="fas fa-th-large me-1"></i> Tất cả
+                            </button>
+                
+                            <button type="button"
+                                    class="btn btn-outline-primary"
+                                    th:each="type : ${fieldTypes}"
+                                    th:data-type="${type.slug}"
+                                    th:data-id="${type.id}">
+                                <i class="me-1"
+                                th:classappend="|${type.slug == 'bong-da' ? 'fas fa-futbol' :
+                                                    type.slug == 'cau-long' ? 'fas fa-feather-pointed' :
+                                                    type.slug == 'tennis' ? 'fas fa-table-tennis-paddle-ball' :
+                                                    type.slug == 'bong-ro' ? 'fas fa-basketball' :
+                                                    type.slug == 'boi-loi' ? 'fas fa-person-swimming' :
+                                                    type.slug == 'pickleball' ? 'fas fa-table-tennis-paddle-ball' :
+                                                    'far fa-star'}|"></i>
+                                <span th:text="${type.name}"></span>
+                            </button>
                         </div>
                     </div>
                 </div>
                 <div class="swiper top-fields-swiper">
                     <div class="swiper-wrapper" id="topFieldsWrapper">
-                        <!-- Slide 1 -->
-                        <div class="swiper-slide">
-                            <div class="card h-100">
-                                <div class="ratio ratio-16x9" style="background:#dc3545;"></div>
-                                <div class="card-body">
-                                    <h6 class="card-title mb-1">Sân A</h6>
-                                </div>
+                                <!-- Lặp qua fields -->
+                    <div class="swiper-slide" th:each="field : ${fields}">
+                        <div class="card h-100">
+                            <!-- Banner của sân hoặc ảnh mặc định -->
+                            <div class="ratio ratio-16x9 rounded-top bg-light"
+                                th:style="'background: url(' + (${field.banner} != null ? ${field.banner} : '/images/default-field.jpg') + ') center/cover no-repeat;'">
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title mb-1" th:text="${field.name}">Tên sân</h6>
+                                <small class="text-muted d-block">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <span th:text="${field.wardResponse.name}">Quận/Huyện</span>
+                                </small>
+                                <small class="text-muted d-block">
+                                    <i class="bi bi-clock"></i>
+                                    <span th:text="${field.openTime} + ' - ' + ${field.closeTime}">Giờ mở cửa</span>
+                                </small>
                             </div>
                         </div>
-                        <!-- Slide 2 -->
-                        <div class="swiper-slide">
-                            <div class="card h-100">
-                                <div class="ratio ratio-16x9" style="background:#0d6efd;"></div>
-                                <div class="card-body">
-                                    <h6 class="card-title mb-1">Sân B</h6>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 3 -->
-                        <div class="swiper-slide">
-                            <div class="card h-100">
-                                <div class="ratio ratio-16x9" style="background:#198754;"></div>
-                                <div class="card-body">
-                                    <h6 class="card-title mb-1">Sân C</h6>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 4 -->
-                        <div class="swiper-slide">
-                            <div class="card h-100">
-                                <div class="ratio ratio-16x9" style="background:#ffc107;"></div>
-                                <div class="card-body">
-                                    <h6 class="card-title mb-1">Sân D</h6>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 5 -->
-                        <div class="swiper-slide">
-                            <div class="card h-100">
-                                <div class="ratio ratio-16x9" style="background:#6f42c1;"></div>
-                                <div class="card-body">
-                                    <h6 class="card-title mb-1">Sân E</h6>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 6 -->
-                        <div class="swiper-slide">
-                            <div class="card h-100">
-                                <div class="ratio ratio-16x9" style="background:#fd7e14;"></div>
-                                <div class="card-body">
-                                    <h6 class="card-title mb-1">Sân F</h6>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                
+                    </div>           
                     <div class="swiper-pagination"></div>
                     <div class="swiper-button-prev"></div>
                     <div class="swiper-button-next"></div>
@@ -180,6 +162,7 @@
     <section layout:fragment="scripts">
         <script>
         $(document).ready(function() { // đảm bảo jQuery đã load
+            
 
         // 1️⃣ Init Swiper
         var heroSwiper = new Swiper('.hero-swiper', {
@@ -218,7 +201,7 @@
                 .done(function(res) {
                     const wards = Array.isArray(res) ? res : res.data || [];
                     if (wards.length > 0) {
-                        wards.forEach(w => $ward.append(`<option value="${w.name}">${w.name}</option>`));
+                        wards.forEach(w => $ward.append(`<option value="${w.id}" data-name="${w.slug}">${w.name}</option>`));
                         $ward.prop('disabled', false);
                     } else {
                         $ward.append('<option disabled>Không có phường/xã</option>');
@@ -243,42 +226,55 @@
             e.preventDefault();
             const slug = $('#fieldTypeSelect option:selected').data('slug');
             const qs = $.param({
-                city: $('#citySelect').value(),
-                ward: $('#wardSelect').value()
+                // city: $('#citySelect').find('option:selected').data('name'),
+                ward: $('#wardSelect').find('option:selected').data('name')
             });
             window.location.href = `${slug}${qs ? '?' + qs : ''}`;
         });
 
-        // 5️⃣ Load top fields từ backend
-        $.getJSON('/api/public/fields/top', { limit: 12 })
-            .done(function(items) {
-                if (!Array.isArray(items) || !items.length) return;
-                const $wrap = $('#topFieldsWrapper');
-                $wrap.empty();
-                items.forEach(function(item) {
-                    const slide = `
-                        <div class="swiper-slide">
-                            <a href="/fields/${item.slug || item.id}" class="card h-100 text-decoration-none text-reset">
-                                <div class="ratio ratio-16x9" style="background:#dc3545;"></div>
-                                <div class="card-body">
-                                    <h6 class="card-title mb-1">${item.name || 'Sân'}</h6>
-                                    <small class="text-muted">${item.addressShort || item.districtName || ''}</small>
-                                </div>
-                            </a>
-                        </div>
-                    `;
-                    $wrap.append(slide);
-                });
-                topFieldsSwiper.update(); // update Swiper sau khi append slide
-            })
-            .fail(function() {
-                console.error('Không thể tải top fields');
-            });
+        // Load from api
+            $('#topFieldTypeFilters').on('click', 'button', function() {
+            // active class
+            $('#topFieldTypeFilters button').removeClass('active');
+            $(this).addClass('active');
 
-        // 6️⃣ Init AOS
-        if (typeof AOS !== 'undefined') {
-            AOS.init({ duration: 800, once: true });
+            const typeId = $(this).data('id');
+            loadFields(typeId);
+        });
+
+        // ===============================
+        // Hàm gọi API
+        // ===============================
+        function loadFields(typeId) {
+            $('#fieldsGrid').html('<p class="text-center">Đang tải...</p>');
+
+            $.ajax({
+                url: '/api/v1/fields',
+                type: 'GET',
+                data: {
+                    typeId: typeId,
+                    status: 'active'
+                    // wardId, keyword, featureIds không truyền -> mặc định null
+                },
+                success: function(res) {
+                    let fields = res.data || []; // tùy response của bạn
+                    renderFields(fields);
+                },
+                error: function() {
+                    $('#fieldsGrid').html('<p class="text-center text-danger">Lỗi khi tải sân.</p>');
+                }
+            });
         }
+
+        // ===============================
+        // Hàm render danh sách fields
+        // ===============================
+        
+
+        // ===============================
+        // Load mặc định: tất cả
+        // ===============================
+        loadFields(null);
 
     });
         </script>

@@ -7,4 +7,5 @@ import java.util.List;
 public interface WardService {
 
     List<WardResponse> getAllWardsByCityId(long cityId);
+    WardResponse getWardBySlug(String slug);
 }
