@@ -5,6 +5,7 @@ import com.Fisport.dto.response.*;
 import com.Fisport.model.FieldServiceItem;
 import com.Fisport.service.FieldService;
 import com.Fisport.common.EFieldStatus;
+import com.Fisport.service.FieldServiceItemService;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -25,6 +26,7 @@ import java.util.Set;
 public class FieldApiController {
 
     private final FieldService fieldService;
+    private final FieldServiceItemService fieldServiceItemService;
 
     @GetMapping()
     public ResponseData<?> getAllFields(@RequestParam(required = false) Long wardId,
@@ -87,7 +89,7 @@ public class FieldApiController {
             fieldService.createFieldByOwnerId(fieldRequest, principal.getName());
             return new ResponseData<>(HttpStatus.CREATED.value(), "Create Field Success");
         } catch (Exception e) {
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Create Field Error", e.getMessage());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Create Field Error");
         }
     }
 
@@ -98,7 +100,7 @@ public class FieldApiController {
             fieldService.updateFieldByOwnerId(fieldRequest, fieldId, ownerId);
             return new ResponseData<>(HttpStatus.OK.value(), "Update Field Success");
         } catch (Exception e) {
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Update Field Error", e.getMessage());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update Field Error");
         }
     }
 
@@ -109,7 +111,7 @@ public class FieldApiController {
             fieldService.changeStatusFieldByAdmin(fieldId, fieldStatus);
             return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Update Field Status Success");
         } catch (Exception e) {
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Update Field Status Error", e.getMessage());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update Field Status Error");
         }
     }
 
@@ -120,7 +122,7 @@ public class FieldApiController {
             List<FieldResponse> responses = fieldService.getAllPendingFields();
             return new ResponseData<>(HttpStatus.OK.value(), "Get All Fields Success", responses);
         } catch (Exception e) {
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Get All Fields Error", e.getMessage());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get All Fields Error");
         }
     }
 
@@ -131,16 +133,17 @@ public class FieldApiController {
             List<FieldResponse> responses = fieldService.getAllPendingFieldsByOwner(principal.getName());
             return new ResponseData<>(HttpStatus.OK.value(), "Get All Fields Success", responses);
         } catch (Exception e) {
-            return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Get All Fields Error", e.getMessage());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get All Fields Error");
         }
     }
 
     @GetMapping("api/v1/fields/{fieldId}/service-items")
     public ResponseData<?> getServiceItems(@PathVariable Long fieldId) {
         try {
-            List<FieldServiceItemResponse> fiel
+            List<FieldServiceItemResponse> list = fieldServiceItemService.getAllByActive(fieldId);
+            return new ResponseData<>(HttpStatus.OK.value(), "Get Service Items Success", list);
         } catch (Exception e) {
-
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get Service Items Error");
         }
     }
 }

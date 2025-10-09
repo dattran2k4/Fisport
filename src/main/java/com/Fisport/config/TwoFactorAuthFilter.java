@@ -46,12 +46,12 @@ public class TwoFactorAuthFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private void writeJsonError(HttpServletResponse response, int status, String message) throws IOException {
-        response.setContentType("application/json");
-        response.setStatus(status);
-        response.getWriter().write(
-                String.format("{\"status\":%d,\"error\":\"%s\",\"message\":\"%s\"}",
-                        status, HttpStatus.valueOf(status).name(), message)
-        );
-    }
+//    private void writeJsonError(HttpServletResponse response, int status, String message) throws IOException {
+//        response.setContentType("application/json");
+//        response.setStatus(status);
+//        response.getWriter().write(
+//                String.format("{\"status\":%d,\"error\":\"%s\",\"message\":\"%s\"}",
+//                        status, HttpStatus.valueOf(status).name(), message)
+//        );
+//    }
 }

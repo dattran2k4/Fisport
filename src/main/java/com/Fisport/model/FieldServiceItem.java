@@ -21,7 +21,7 @@ public class FieldServiceItem extends AbstractEntity {
     private BigDecimal price;
 
     @Column(name = "quantity", nullable = false)
-    private int quantity;
+    private Integer quantity;
 
     @Column(name = "status", nullable = false)
     private EFieldServiceItem status;

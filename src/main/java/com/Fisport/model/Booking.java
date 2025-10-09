@@ -55,6 +55,9 @@ public class Booking extends AbstractEntity {
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookingServiceItem> bookingServiceItems = new HashSet<BookingServiceItem>();
 
+    @OneToMany(mappedBy = "booking")
+    private Set<Payment>  payments = new HashSet<>();
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

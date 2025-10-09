@@ -4,6 +4,6 @@ import com.Fisport.dto.response.FieldServiceItemResponse;
 
 import java.util.List;
 
-public interface FieldServiceItem {
+public interface FieldServiceItemService {
     List<FieldServiceItemResponse> getAllByActive(Long fieldId);
 }

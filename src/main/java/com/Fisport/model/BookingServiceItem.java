@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 public class BookingServiceItem extends AbstractEntity {
 
     @Column(name = "quantity",  nullable = false)
-    private int quantity;
+    private Integer quantity;
 
     @Column(name = "subtotal")
     private BigDecimal subTotal;
