@@ -1,5 +1,6 @@
 package com.Fisport.model;
 
+import com.Fisport.common.EFieldServiceItem;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,8 +17,14 @@ import java.util.Set;
 @Table(name = "field_service_item")
 public class FieldServiceItem extends AbstractEntity {
 
-    @Column(name = "price",  nullable = false)
+    @Column(name = "price", nullable = false)
     private BigDecimal price;
+
+    @Column(name = "quantity", nullable = false)
+    private int quantity;
+
+    @Column(name = "status", nullable = false)
+    private EFieldServiceItem status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "field_id")
@@ -27,6 +34,6 @@ public class FieldServiceItem extends AbstractEntity {
     @JoinColumn(name = "service_item_id")
     private ServiceItem serviceItem;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "fieldServiceItem",  cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "fieldServiceItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookingServiceItem> bookingServiceItems;
 }

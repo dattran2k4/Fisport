@@ -29,7 +29,7 @@ public class SubFieldApiController {
             @RequestParam(required = false) ESubFieldStatus status) {
         try {
             List<SubFieldResponse> responses = subFieldService.getAllSubFields(fieldId, status);
-            return new ResponseData<>(HttpStatus.OK.value(), "Get Fields Success",  responses);
+            return new ResponseData<>(HttpStatus.OK.value(), "Get Fields Success", responses);
         } catch (Exception e) {
             return new ResponseError(HttpStatus.NOT_FOUND.value(), "Get Fields Error");
         }
@@ -45,6 +45,7 @@ public class SubFieldApiController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Create SubField Error");
         }
     }
+
     @PreAuthorize("hasRole('OWNER')")
     @PutMapping("/{id}/update")
     public ResponseData<?> updateSubField(@Min(1) @PathVariable Long id, @Valid @RequestBody SubFieldRequest subFieldRequest, Principal principal) {
@@ -58,7 +59,7 @@ public class SubFieldApiController {
 
     @PreAuthorize("hasRole('OWNER')")
     @DeleteMapping("{id}/delete")
-    public ResponseData<?> deleteSubField(@Min(1) @PathVariable Long id,  Principal principal) {
+    public ResponseData<?> deleteSubField(@Min(1) @PathVariable Long id, Principal principal) {
         try {
             subFieldService.deleteSubField(id, principal.getName());
             return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Delete SubField Success");
@@ -66,4 +67,6 @@ public class SubFieldApiController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Delete SubField Error");
         }
     }
+
+
 }

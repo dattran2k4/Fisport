@@ -2,6 +2,7 @@ package com.Fisport.api;
 
 import com.Fisport.dto.request.FieldRequest;
 import com.Fisport.dto.response.*;
+import com.Fisport.model.FieldServiceItem;
 import com.Fisport.service.FieldService;
 import com.Fisport.common.EFieldStatus;
 import jakarta.annotation.Nullable;
@@ -77,7 +78,7 @@ public class FieldApiController {
 //            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get Feature By Owner Error");
 //        }
 //    }
-    
+
 
     @PreAuthorize("hasRole('OWNER')")
     @PostMapping("/add")
@@ -96,8 +97,7 @@ public class FieldApiController {
         try {
             fieldService.updateFieldByOwnerId(fieldRequest, fieldId, ownerId);
             return new ResponseData<>(HttpStatus.OK.value(), "Update Field Success");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Update Field Error", e.getMessage());
         }
     }
@@ -132,6 +132,15 @@ public class FieldApiController {
             return new ResponseData<>(HttpStatus.OK.value(), "Get All Fields Success", responses);
         } catch (Exception e) {
             return new ResponseData<>(HttpStatus.BAD_REQUEST.value(), "Get All Fields Error", e.getMessage());
+        }
+    }
+
+    @GetMapping("api/v1/fields/{fieldId}/service-items")
+    public ResponseData<?> getServiceItems(@PathVariable Long fieldId) {
+        try {
+            List<FieldServiceItemResponse> fiel
+        } catch (Exception e) {
+
         }
     }
 }

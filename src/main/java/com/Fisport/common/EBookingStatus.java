@@ -5,8 +5,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public enum EBookingStatus {
     @JsonProperty("pending")
     PENDING,
-    @JsonProperty("confirmed")
-    CONFIRMED,
+    @JsonProperty("paid")
+    PAID,
     @JsonProperty("cancelled")
-    CANCELLED,;
+    CANCELLED,
+    @JsonProperty("completed")
+    COMPLETED
 }

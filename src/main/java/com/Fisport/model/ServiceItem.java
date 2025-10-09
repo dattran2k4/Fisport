@@ -15,16 +15,13 @@ import java.util.Set;
 @Table(name = "service_item")
 public class ServiceItem extends AbstractEntity {
 
+    @Column(name = "name")
     private String name;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "brand_id")
-    private Brand brand;
-
-    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "service_id")
-    private Service  service;
+    private Service service;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "serviceItem",   cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "serviceItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FieldServiceItem> fieldServiceItems = new HashSet<FieldServiceItem>();
 }

@@ -25,13 +25,13 @@ public class Booking extends AbstractEntity {
     @Column(name = "booking_date")
     private LocalDate bookingDate;
 
-    @Column(name = "start_time",  nullable = false)
+    @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
-    @Column(name = "end_time",  nullable = false)
+    @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
 
-    @Column(name = "duration",  nullable = false)
+    @Column(name = "duration", nullable = false)
     private Integer duration;
 
     @Column(name = "total_price", nullable = false)
@@ -52,12 +52,18 @@ public class Booking extends AbstractEntity {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "booking")
     private Review review;
 
-    @OneToMany(mappedBy = "booking",  cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookingServiceItem> bookingServiceItems = new HashSet<BookingServiceItem>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "expired_at")
+    private LocalDateTime expiredAt;
+
+    @Column(name = "paid_at")
+    private LocalDateTime paidAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
