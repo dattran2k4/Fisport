@@ -4,6 +4,7 @@ import com.Fisport.common.EBookingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ public class Booking extends AbstractEntity {
     private LocalTime endTime;
 
     @Column(name = "duration",  nullable = false)
-    private int duration;
+    private Integer duration;
 
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
@@ -41,8 +42,8 @@ public class Booking extends AbstractEntity {
     private EBookingStatus bookingStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "field_time_slot_id")
-    private FieldHasTimeSlot fieldTimeSlot;
+    @JoinColumn(name = "subfield_id")
+    private SubField subfield;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -55,6 +56,10 @@ public class Booking extends AbstractEntity {
     private Set<BookingServiceItem> bookingServiceItems = new HashSet<BookingServiceItem>();
 
     @CreationTimestamp
-    @Column(name = "create_at", updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 }

@@ -27,7 +27,4 @@ public class FieldHasTimeSlot extends AbstractEntity {
     @Column(name = "price", nullable = false)
     private BigDecimal price;
 
-    @OneToMany(mappedBy = "fieldTimeSlot",  fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Booking> bookings =  new HashSet<>();
-
 }

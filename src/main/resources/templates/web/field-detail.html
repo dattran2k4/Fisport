@@ -1,65 +1,52 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/web/web}">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/web/web}">
+
 <body>
-<div layout:fragment="content">
-    <section class="field-detail container my-5">
-        <div class="row g-4">
-            <!-- Banner hình ảnh -->
-            <div class="col-lg-6">
-                <div class="card shadow-sm border-0">
-                    <div class="ratio ratio-16x9 rounded"
-                         th:style="'background: url(' + ${field.banner != null ? field.banner : '/images/default-field.jpg'} + ') center/cover no-repeat;'">
+    <div layout:fragment="content">
+        <section class="field-detail container my-5">
+            <div class="row g-4">
+                <!-- Banner hình ảnh -->
+                <div class="col-lg-6">
+                    <div class="card shadow-sm border-0">
+                        <div class="ratio ratio-16x9 rounded"
+                            th:style="'background: url(' + ${field.banner != null ? field.banner : '/images/default-field.jpg'} + ') center/cover no-repeat;'">
+                        </div>
                     </div>
                 </div>
-        
+
                 <!-- Thông tin chi tiết sân -->
                 <div class="col-lg-6">
                     <!-- Tên sân -->
                     <h2 class="fw-bold mb-2" th:text="${field.name}">Tên sân</h2>
-        
+
                     <!-- Loại sân -->
                     <p class="text-muted mb-3" th:text="${field.fieldTypeResponse.name}">Loại sân</p>
-        
-<!--                    &lt;!&ndash; Rating &ndash;&gt;-->
-<!--                    <div class="mb-3">-->
-<!--                        <span th:text="${field.rating} + ' ★'">4.5 ★</span>-->
-<!--                    </div>-->
-        
+
                     <!-- Giờ mở cửa -->
                     <div class="mb-3">
                         <i class="bi bi-clock me-2"></i>
                         <span th:text="${field.openTime} + ' - ' + ${field.closeTime}">06:00 - 22:00</span>
                     </div>
-        
+
                     <!-- Mô tả -->
                     <div class="mb-3">
                         <h6>Mô tả</h6>
                         <p th:text="${field.description}">Mô tả sân chi tiết...</p>
                     </div>
-        
-<!--                    &lt;!&ndash; Tiện ích &ndash;&gt;-->
-<!--                    <div class="mb-4">-->
-<!--                        <h6>Tiện ích</h6>-->
-<!--                        <div class="d-flex flex-wrap">-->
-<!--                            <span class="badge bg-light text-dark me-2 mb-2"-->
-<!--                                  th:each="f : ${field.features}" -->
-<!--                                  th:text="${f.name}">Wifi</span>-->
-<!--                        </div>-->
-<!--                    </div>-->
-        
-                    <!-- Nút đặt sân -->
-                    <a th:href="@{javascript:void(0)}" class="btn btn-primary btn-lg" id="btn-booking">
+
+                    <a href="javascript:void(0)" class="btn btn-primary btn-lg" id="btn-booking">
                         Đặt sân ngay
                     </a>
+
                     <!-- Modal đặt sân -->
                     <div class="modal fade" id="bookingModal" tabindex="-1" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-centered modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title">Chọn ngày và giờ</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <!-- Chọn ngày -->
@@ -84,105 +71,174 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </div> <!-- kết thúc col phải -->
+            </div> <!-- kết thúc row -->
         </section>
     </div>
 
     <section layout:fragment="scripts">
-        document.addEventListener("DOMContentLoaded", function() {
-        const btnBooking = document.getElementById("btn-booking");
-        const bookingModal = new bootstrap.Modal(document.getElementById("bookingModal"));
-        const datesContainer = document.getElementById("dates-container");
-        const timesContainer = document.getElementById("times-container");
-        const timeSelection = document.getElementById("time-selection");
+        <script>
+            $(document).ready(function () {
+                const days = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+                const $datesContainer = $("#dates-container");
 
-        const openTime = [[${#dates.format(field.openTime, 'HH')}]]; // ví dụ 6
-        const closeTime = [[${#dates.format(field.closeTime, 'HH')}]]; // ví dụ 22
+                // --- Render danh sách 9 ngày đầu + ô khác ---
+                function renderDates() {
+                    $datesContainer.empty();
+                    const today = new Date();
 
-        let selectedDate = null;
+                    for (let i = 0; i < 9; i++) {
+                        const date = new Date(today);
+                        date.setDate(today.getDate() + i);
+                        $datesContainer.append(createDateItem(date));
+                    }
 
-        // Render ngày (10 ngày đầu)
-        function renderDates(offset = 0) {
-        datesContainer.innerHTML = '';
-        const today = new Date();
-        for(let i=0; i<10; i++){
-        const date = new Date();
-        date.setDate(today.getDate() + i + offset);
-        const btn = document.createElement('button');
-        btn.className = 'btn btn-outline-primary date-btn';
-        btn.textContent = date.toLocaleDateString('vi-VN', {weekday:'short', day:'2-digit', month:'2-digit'});
-        btn.dataset.date = date.toISOString().split('T')[0];
-        datesContainer.appendChild(btn);
-        }
-        }
+                    // Ô "Chọn ngày khác"
+                    const $custom = $(`
+                        <div class="date-item border rounded text-center p-2 bg-light position-relative"
+                             style="min-width:100px; cursor:pointer;" id="custom-date-item">
+                            <i class="bi bi-calendar3" style="font-size:1.5rem;"></i><br>
+                            <span>Khác...</span>
+                        </div>
+                    `);
+                    $datesContainer.append($custom);
+                }
 
-        // Render giờ theo openTime - closeTime
-        function renderTimes() {
-        timesContainer.innerHTML = '';
-        for(let h=openTime; h< closeTime; h++){
-        const btn = document.createElement('button');
-        btn.className = 'btn btn-outline-success time-btn';
-        btn.textContent = (h<10?'0'+h:h) + ':00';
-        btn.dataset.time = (h<10?'0'+h:h) + ':00';
+                function createDateItem(date) {
+                    const dayName = days[date.getDay()];
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    return $(`
+                        <div class="date-item border rounded text-center p-2"
+                             style="min-width:100px; cursor:pointer;"
+                             data-date="${date.toISOString().split('T')[0]}">
+                            <strong>${dayName}</strong><br>
+                            <span>${day}/${month}</span>
+                        </div>
+                    `);
+                }
 
-        // TODO: Disable giờ nếu đã có booking từ BE
-        // Example:
-        // if(bookedHours.includes(btn.dataset.time)) btn.classList.add('disabled');
+                // --- Khi ấn "Đặt sân ngay" ---
+                $("#btn-booking").on("click", function () {
+                    renderDates();
+                    const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
+                    modal.show();
+                });
 
-        timesContainer.appendChild(btn);
-        }
-        timeSelection.style.display = 'block';
-        }
+                // --- Chọn ngày có sẵn ---
+                $(document).on("click", ".date-item", function (e) {
+                    e.stopPropagation();
+                    if ($(this).attr("id") === "custom-date-item") return;
 
-        // Hiển thị modal
-        btnBooking.addEventListener('click', function() {
-        renderDates();
-        timeSelection.style.display = 'none';
-        selectedDate = null;
-        bookingModal.show();
-        });
+                    $(".date-item").removeClass("bg-primary text-white");
+                    $(this).addClass("bg-primary text-white");
 
-        // Chọn ngày
-        datesContainer.addEventListener('click', function(e) {
-        if(e.target.classList.contains('date-btn')){
-        // highlight ngày
-        document.querySelectorAll('.date-btn').forEach(b=>b.classList.remove('active'));
-        e.target.classList.add('active');
-        selectedDate = e.target.dataset.date;
-        renderTimes();
-        }
-        });
+                    const selectedDate = $(this).data("date");
+                    console.log("Ngày được chọn:", selectedDate);
+                    $("#time-selection").show();
+                    $(".calendar-popup").remove();
+                });
 
-        // Chọn giờ
-        timesContainer.addEventListener('click', function(e){
-        if(e.target.classList.contains('time-btn') && !e.target.classList.contains('disabled')){
-        document.querySelectorAll('.time-btn').forEach(b=>b.classList.remove('active'));
-        e.target.classList.add('active');
-        }
-        });
+                // --- Popup lịch đầy đủ ---
+                $(document).on("click", "#custom-date-item", function (e) {
+                    e.stopPropagation();
+                    $(".calendar-popup").remove();
 
-        // Xác nhận booking
-        document.getElementById('confirm-booking').addEventListener('click', function(){
-        const selectedTime = document.querySelector('.time-btn.active')?.dataset.time;
-        if(!selectedDate || !selectedTime){
-        alert('Vui lòng chọn ngày và giờ');
-        return;
-        }
-        console.log('Booking:', selectedDate, selectedTime);
-        bookingModal.hide();
+                    const now = new Date();
+                    let month = now.getMonth();
+                    let year = now.getFullYear();
 
-        // TODO: Gửi AJAX lên BE
-        /*
-        fetch('/api/book', {
-        method:'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({fieldId: [[${field.id}]], date:selectedDate, time:selectedTime})
-        }).then(r=>r.json()).then(res=>console.log(res));
-        */
-        });
-        });
+                    const $popup = $(`
+                        <div class="calendar-popup border bg-white rounded shadow p-2 position-absolute"
+                             style="top:110%; left:0; z-index:2000; width:280px;">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <button class="btn btn-sm btn-outline-primary" id="prev-month">&lt;</button>
+                                <strong id="month-year"></strong>
+                                <button class="btn btn-sm btn-outline-primary" id="next-month">&gt;</button>
+                            </div>
+                            <div class="d-grid text-center" style="grid-template-columns:repeat(7,1fr);font-weight:600;">
+                                ${days.map(d => `<div>${d}</div>`).join('')}
+                            </div>
+                            <div id="calendar-days" class="d-grid text-center mt-1" style="grid-template-columns:repeat(7,1fr);gap:3px;"></div>
+                        </div>
+                    `);
+
+                    $(this).append($popup);
+
+                    function renderCalendar() {
+                        const $days = $popup.find("#calendar-days");
+                        $days.empty();
+
+                        const firstDay = new Date(year, month, 1);
+                        const lastDay = new Date(year, month + 1, 0);
+                        const today = new Date();
+
+                        $popup.find("#month-year").text(
+                            firstDay.toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' })
+                        );
+
+                        // padding đầu tháng
+                        for (let i = 0; i < firstDay.getDay(); i++) {
+                            $days.append(`<div></div>`);
+                        }
+
+                        for (let d = 1; d <= lastDay.getDate(); d++) {
+                            const date = new Date(year, month, d);
+                            const dateStr = date.toISOString().split('T')[0];
+                            const isPast = date < new Date(today.setHours(0, 0, 0, 0));
+
+                            const $cell = $(`<div class="p-2 rounded ${isPast ? 'text-muted' : 'date-cell'}" 
+                                            style="cursor:${isPast ? 'default' : 'pointer'};">${d}</div>`);
+
+                            if (!isPast) {
+                                $cell.on("click", function () {
+                                    const dayName = days[date.getDay()];
+                                    const day = String(d).padStart(2, '0');
+                                    const monthStr = String(month + 1).padStart(2, '0');
+
+                                    const $newItem = $(`
+                                        <div class="date-item border rounded text-center p-2 bg-primary text-white"
+                                             style="min-width:100px; cursor:pointer;"
+                                             data-date="${dateStr}">
+                                            <strong>${dayName}</strong><br>
+                                            <span>${day}/${monthStr}</span>
+                                        </div>
+                                    `);
+                                    $("#custom-date-item").replaceWith($newItem);
+                                    $(".calendar-popup").remove();
+                                    console.log("Ngày chọn (calendar):", dateStr);
+                                    $("#time-selection").show();
+                                });
+                            }
+
+                            $days.append($cell);
+                        }
+                    }
+
+                    renderCalendar();
+
+                    // next/prev month
+                    $popup.on("click", "#next-month", function (e) {
+                        e.stopPropagation();
+                        month++;
+                        if (month > 11) { month = 0; year++; }
+                        renderCalendar();
+                    });
+                    $popup.on("click", "#prev-month", function (e) {
+                        e.stopPropagation();
+                        month--;
+                        if (month < 0) { month = 11; year--; }
+                        renderCalendar();
+                    });
+                });
+
+                // Ẩn popup khi click ngoài
+                $(document).on("click", function () {
+                    $(".calendar-popup").remove();
+                });
+            });
+        </script>
     </section>
->>>>>>> bc0c8a9214ee968896566d03da9de20318cce086
 </body>
+
 </html>

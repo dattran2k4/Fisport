@@ -48,11 +48,4 @@ public class HomeController {
         return "web/index";
     }
 
-//    @GetMapping("/fields")
-//    public String fields(Model model) {
-//        List<FieldTypeResponse> list = fieldTypeService.findAll();
-//        model.addAttribute("fieldTypes", list);
-//        return "web/fields";
-//    }
-
 }

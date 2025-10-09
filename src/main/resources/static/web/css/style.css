@@ -2,83 +2,129 @@
 .btn-search {
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+
 .btn-search:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 18px rgba(13, 110, 253, 0.25);
 }
+
 .btn-search:active {
   transform: translateY(0);
   box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
 }
 
 /* Top fields: filter buttons spacing */
-#topFieldTypeFilters .btn { margin-right: 8px; padding: 0.4rem 0.65rem; font-size: 0.85rem; border-radius: 999px; }
-#topFieldTypeFilters .btn:last-child { margin-right: 0; }
-
-/* Swiper navigation: circular, smaller, shadowed */
-.top-fields-swiper .swiper-button-prev,
-.top-fields-swiper .swiper-button-next {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-  color: #0d6efd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 3;
+#topFieldTypeFilters .btn {
+  margin-right: 8px;
+  padding: 0.4rem 0.65rem;
+  font-size: 0.85rem;
+  border-radius: 999px;
 }
-.top-fields-swiper .swiper-button-prev:after,
-.top-fields-swiper .swiper-button-next:after {
-  font-size: 12px; /* center arrow glyph inside the smaller circle */
+
+#topFieldTypeFilters .btn:last-child {
+  margin-right: 0;
 }
-.top-fields-swiper .swiper-button-prev { left: -4px; }
-.top-fields-swiper .swiper-button-next { right: -4px; }
 
 
-    .field-detail .card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
 
-    .field-detail .card:hover {
-        transform: scale(1.02);
-        box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
-    }
 
-    .field-detail h2 {
-        font-size: 2rem;
-        color: #333;
-    }
+.field-detail .card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
 
-    .field-detail h6 {
-        font-weight: 600;
-    }
+.field-detail .card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
 
-    .field-detail .badge {
-        font-size: 0.85rem;
-        padding: 0.45em 0.75em;
-        border-radius: 0.5rem;
-        background-color: #f0f0f0;
-    }
+.field-detail h2 {
+  font-size: 2rem;
+  color: #333;
+}
 
-    .field-detail .btn-primary {
-        font-size: 1.1rem;
-        padding: 0.65em 1.2em;
-        border-radius: 0.5rem;
-        transition: all 0.3s ease;
-    }
+.field-detail h6 {
+  font-weight: 600;
+}
 
-    .field-detail .btn-primary:hover {
-        background-color: #0056b3;
-        transform: translateY(-2px);
-    }
+.field-detail .badge {
+  font-size: 0.85rem;
+  padding: 0.45em 0.75em;
+  border-radius: 0.5rem;
+  background-color: #f0f0f0;
+}
+
+.field-detail .btn-primary {
+  font-size: 1.1rem;
+  padding: 0.65em 1.2em;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.field-detail .btn-primary:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
 .swiper-slide {
-    opacity: 1;
-    transition: opacity 0.3s ease;
+  opacity: 1;
+  transition: opacity 0.3s ease;
 }
 
 .swiper-wrapper.loading .swiper-slide {
-    opacity: 0;
+  opacity: 0;
 }
 
+
+
+/* Prev thụt ra ngoài bên trái */
+.top-fields-swiper .swiper-button-prev {
+  left: -22px;
+  /* thụt ra ngoài 22px */
+}
+
+/* Next thụt ra ngoài bên phải */
+.top-fields-swiper .swiper-button-next {
+  right: -22px;
+  /* thụt ra ngoài 22px */
+}
+
+/* Hover hiệu ứng */
+.top-fields-swiper .swiper-button-prev:hover,
+.top-fields-swiper .swiper-button-next:hover {
+  background: rgba(255, 255, 255, 1);
+}
+
+.top-fields-prev,
+.top-fields-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-10%);
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-fields-prev {
+  left: -20px;
+}
+
+.top-fields-next {
+  right: -20px;
+}
+
+.date-item {
+  transition: all 0.2s ease;
+}
+.date-item:hover {
+  background-color: #e9ecef;
+}
+.date-item.bg-primary {
+  border-color: #0d6efd !important;
+}

@@ -7,6 +7,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.*;
 
 @Getter
 @Setter
@@ -26,6 +27,9 @@ public class SubField extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "field_id")
     private Field field;
+
+    @OneToMany(mappedBy = "subfield")
+    private Set<Booking> bookings = new HashSet<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
