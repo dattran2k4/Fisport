@@ -1,43 +1,43 @@
 <header th:fragment="header" xmlns:th="http://www.thymeleaf.org">
-        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top py-3">
-            <div class="container">
-                <!-- Logo -->
-                <a class="navbar-brand fw-bold text-primary" th:href="@{/}" style="font-size: 1.5rem;">
-                    <img th:src="@{/web/img/logo.png}" alt="Fisport" width="35" class="me-2">
-                    Fisport
-                </a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top py-3">
+        <div class="container">
+            <!-- Logo -->
+            <a class="navbar-brand fw-bold text-primary" style="font-size: 1.5rem;" th:href="@{/}">
+                <img alt="Fisport" class="me-2" th:src="@{/web/img/logo.png}" width="35">
+                Fisport
+            </a>
 
-                <!-- Nút toggle (mobile) -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <!-- Menu -->
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav mx-auto" id="mainNav">
-                        <li class="nav-item">
-                            <a class="nav-link active" th:href="@{/}">Trang chủ</a>
-                        </li>
-                        <li class="nav-item" th:each="t : ${fieldTypes}">
-                            <a class="nav-link d-flex align-items-center" th:href="@{${t.slug}}">
-                                <i th:class="'me-1 ' + (
+            <!-- Nút toggle (mobile) -->
+            <button class="navbar-toggler" data-bs-target="#navbarNav" data-bs-toggle="collapse" type="button">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            S
+            <!-- Menu -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto" id="mainNav">
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/}">Trang chủ</a>
+                    </li>
+                    <li class="nav-item" th:each="t : ${fieldTypes}">
+                        <a class="nav-link d-flex align-items-center" th:href="@{${t.slug}}">
+                            <i th:class="'me-1 ' + (
                                     ${t.slug} == 'bong-da'     ? 'fa-solid fa-futbol' : (
                                     ${t.slug} == 'cau-long'    ? 'fa-solid fa-feather-pointed' : (
                                     ${t.slug} == 'tennis'      ? 'fa-solid fa-table-tennis-paddle-ball' : (
                                     ${t.slug} == 'bong-ro'     ? 'fa-solid fa-basketball' : (
                                     ${t.slug} == 'boi-loi'     ? 'fa-solid fa-person-swimming' : (
                                     ${t.slug} == 'pickleball'  ? 'fa-solid fa-table-tennis-paddle-ball' : 'fa-regular fa-star'))))))"></i>
-                                <span th:text="${t.name}">Loại sân</span>
-                            </a>
-                        </li>
-                    </ul>
+                            <span th:text="${t.name}">Loại sân</span>
+                        </a>
+                    </li>
+                </ul>
 
-                    <!-- Nút đăng nhập / đăng ký -->
-                    <div class="d-flex align-items-center">
-                        <a th:href="@{/login}" class="btn btn-outline-primary me-2 px-3">Đăng nhập</a>
-                        <a th:href="@{/register}" class="btn btn-primary px-3">Đăng ký</a>
-                    </div>
+                <!-- Nút đăng nhập / đăng ký -->
+                <div class="d-flex align-items-center">
+                    <a class="btn btn-outline-primary me-2 px-3" th:href="@{/login}">Đăng nhập</a>
+                    <a class="btn btn-primary px-3" th:href="@{/register}">Đăng ký</a>
                 </div>
             </div>
-        </nav>
-    </header>
+        </div>
+    </nav>
+</header>

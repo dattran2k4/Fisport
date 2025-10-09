@@ -31,7 +31,7 @@ public class FieldController {
     private final WardService wardService;
 
     @GetMapping("/{slug}")
-    public String getFields(@PathVariable String slug, @RequestParam(required = false) String ward ,  Model model, HttpServletResponse response) {
+    public String getFields(@PathVariable String slug, @RequestParam(required = false) String ward, Model model, HttpServletResponse response) {
         List<FeatureResponse> featureResponses = featureService.getListFeatures();
 
         FieldTypeResponse fieldTypeResponse = fieldTypeService.findBySlug(slug);
