@@ -105,7 +105,7 @@ public class BookingServiceImpl implements BookingService {
         if (request.getBookingServiceItemRequest() != null && !request.getBookingServiceItemRequest().isEmpty()) {
             for (BookingServiceItemRequest requestItem : request.getBookingServiceItemRequest()) {
                 //field service item id check
-                FieldServiceItem fsi = fieldServiceItemRepository.findById(requestItem.getFieldServiceItemId()).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy item của sân này")))
+                FieldServiceItem fsi = fieldServiceItemRepository.findById(requestItem.getFieldServiceItemId()).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy item của sân này"));
 
                 //quantity check
                 if (requestItem.getQuantity() < 0 || requestItem.getQuantity() > fsi.getQuantity()) {

@@ -4,6 +4,7 @@ import com.Fisport.common.EPaymentMethod;
 import com.Fisport.common.EPaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -37,4 +38,8 @@ public class Payment extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
+
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private LocalDateTime createAt;
 }

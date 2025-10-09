@@ -23,6 +23,7 @@ public class FieldServiceItem extends AbstractEntity {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private EFieldServiceItem status;
 
