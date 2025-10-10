@@ -1,15 +1,17 @@
 package com.Fisport.service.impl;
 
 import com.Fisport.common.EBookingStatus;
+import com.Fisport.common.ESubFieldStatus;
 import com.Fisport.dto.request.BookingRequest;
 import com.Fisport.dto.request.BookingServiceItemRequest;
+import com.Fisport.dto.response.BookingDetailResponse;
+import com.Fisport.dto.response.BookingListResponse;
 import com.Fisport.dto.response.BookingTimeResponse;
+import com.Fisport.dto.response.PaymentResponse;
+import com.Fisport.exception.InvalidDataException;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.*;
-import com.Fisport.repository.BookingRepository;
-import com.Fisport.repository.FieldHasTimeSlotRepository;
-import com.Fisport.repository.FieldServiceItemRepository;
-import com.Fisport.repository.SubFieldRepository;
+import com.Fisport.repository.*;
 import com.Fisport.service.BookingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,6 +23,7 @@ import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +35,8 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final SubFieldRepository subFieldRepository;
     private final FieldServiceItemRepository fieldServiceItemRepository;
-    private final FieldHasTimeSlotRepository  fieldHasTimeSlotRepository;
+    private final FieldHasTimeSlotRepository fieldHasTimeSlotRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<BookingTimeResponse> getOccupiedSlots(Long subFieldId, LocalDate date) {
@@ -50,6 +54,10 @@ public class BookingServiceImpl implements BookingService {
     public void createBooking(BookingRequest request, Long userId) {
         //Valid subfield
         SubField subField = subFieldRepository.findById(request.getSubFieldId()).orElseThrow(() -> new ResourceNotFoundException("SubField not found"));
+
+        if (!subField.getStatus().equals(ESubFieldStatus.AVAILABLE)) {
+            throw new InvalidDataException("Subfield not available");
+        }
 
         //Valid date
         if (request.getDate().isBefore(LocalDate.now())) {
@@ -86,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
         //Valid occupied
         List<FieldHasTimeSlot> slots = fieldHasTimeSlotRepository.findSlotsForBooking(request.getSubFieldId(), request.getStartTime(), request.getEndTime());
         if (slots.isEmpty()) {
-            throw new  ResourceNotFoundException("Slot not found");
+            throw new ResourceNotFoundException("Slot not found");
         }
 
         Booking booking = Booking.builder()
@@ -130,4 +138,59 @@ public class BookingServiceImpl implements BookingService {
 
         bookingRepository.save(booking);
     }
+
+    @Override
+    public List<BookingListResponse> getAllBookings(String name) {
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        List<Booking> bookings = user.getBookings().stream().toList();
+        return bookings.stream().map(b -> BookingListResponse.builder()
+                .id(b.getId())
+                .start(b.getStartTime())
+                .end(b.getEndTime())
+                .duration(b.getDuration())
+                .total(b.getTotalPrice())
+                .status(b.getBookingStatus())
+                .fieldName(b.getSubfield().getField().getName())
+                .build()).toList();
+    }
+
+    @Override
+    public BookingDetailResponse getBooking(Long id, String name) {
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        Booking booking = bookingRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+
+        PaymentResponse response = null;
+        if (booking.getPayments() != null && !booking.getPayments().isEmpty()) {
+            Payment last = booking.getPayments().stream()
+                    .max(Comparator.comparing(Payment::getCreateAt))
+                    .orElse(null);
+            response.setStatus(last.getStatus());
+            response.setMethod(last.getMethod());
+            response.setPaymentAt(last.getPaymentTime());
+        }
+
+        return BookingDetailResponse.builder()
+                .id(booking.getId())
+                .date(booking.getBookingDate())
+                .start(booking.getStartTime())
+                .end(booking.getEndTime())
+                .duration(booking.getDuration())
+                .total(booking.getTotalPrice())
+                .payment(response)
+                .build();
+    }
+
+    @Override
+    public void cancelBooking(Long id, String name) {
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        Booking booking = bookingRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+
+        if (LocalDateTime.now().isAfter(LocalDateTime.of(booking.getBookingDate(), booking.getStartTime()))) {
+            return;
+        }
+
+        booking.setBookingStatus(EBookingStatus.CANCELLED);
+        bookingRepository.save(booking);
+    }
+
 }

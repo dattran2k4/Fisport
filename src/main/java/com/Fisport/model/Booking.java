@@ -56,7 +56,7 @@ public class Booking extends AbstractEntity {
     private Set<BookingServiceItem> bookingServiceItems = new HashSet<BookingServiceItem>();
 
     @OneToMany(mappedBy = "booking")
-    private Set<Payment>  payments = new HashSet<>();
+    private Set<Payment> payments = new HashSet<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -64,9 +64,6 @@ public class Booking extends AbstractEntity {
 
     @Column(name = "expired_at")
     private LocalDateTime expiredAt;
-
-    @Column(name = "paid_at")
-    private LocalDateTime paidAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")

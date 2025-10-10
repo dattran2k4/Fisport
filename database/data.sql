@@ -468,20 +468,35 @@ VALUES
 -- 📅 Booking cho user_id = 4 (ngày 5–6 ngày sau hôm nay)
 INSERT INTO booking (booking_date, start_time, end_time, duration, total_price, status, subfield_id, user_id, created_at)
 VALUES
-(DATE_ADD(CURDATE(), INTERVAL 6 DAY), '19:00:00', '20:00:00', 60, 120000.00, 'COMPLETED', 6, 4, NOW()),
-(DATE_ADD(CURDATE(), INTERVAL 5 DAY), '20:30:00', '22:00:00', 90, 220000.00, 'PENDING', 7, 4, NOW());
+(DATE_ADD(CURDATE(), INTERVAL 6 DAY), '19:00:00', '20:00:00', 60, 120000.00, 'COMPLETED', 26, 4, NOW()),
+(DATE_ADD(CURDATE(), INTERVAL 5 DAY), '20:30:00', '22:00:00', 90, 220000.00, 'PENDING', 27, 4, NOW());
 
+-- Booking 1 (PENDING): Chưa thanh toán hoặc đang chờ
 INSERT INTO payment (booking_id, method, status, amount, transaction_id, payment_time, created_at)
 VALUES
--- Booking 1: Thanh toán MoMo thành công
-(1, 'MOMO', 'SUCCESS', 150000, 'TXN-MOMO-001', NOW(), NOW()),
+    (1, 'MOMO', 'PENDING', 180000, 'TXN-MOMO-001', NULL, NOW());
 
--- Booking 2: Thanh toán VNPay đang chờ xử lý
-(2, 'VNPAY', 'PENDING', 200000, 'TXN-VNPAY-002', NULL, NOW()),
+-- Booking 2 (PAID): Đã thanh toán VNPay thành công
+INSERT INTO payment (booking_id, method, status, amount, transaction_id, payment_time, created_at)
+VALUES
+    (2, 'VNPAY', 'SUCCESS', 200000, 'TXN-VNPAY-002', NOW(), NOW());
 
--- Booking 3: Chuyển khoản ngân hàng thành công
-(3, 'BANK_TRANSFER', 'SUCCESS', 180000, 'TXN-BANK-003', NOW(), NOW()),
+-- Booking 3 (CANCELLED): Có thể đã thanh toán rồi và được hoàn tiền hoặc chưa thanh toán
+INSERT INTO payment (booking_id, method, status, amount, transaction_id, payment_time, created_at)
+VALUES
+    (3, 'BANK_TRANSFER', 'REFUNDED', 150000, 'TXN-BANK-003', NOW(), NOW());
 
--- Booking 4: Thanh toán MoMo thất bại
-(4, 'MOMO', 'FAILED', 220000, 'TXN-MOMO-004', NULL, NOW());
+-- Booking 4 (COMPLETED): Đã thanh toán xong
+INSERT INTO payment (booking_id, method, status, amount, transaction_id, payment_time, created_at)
+VALUES
+    (4, 'MOMO', 'SUCCESS', 120000, 'TXN-MOMO-004', NOW(), NOW());
 
+-- Booking 5 (PENDING): Chưa thanh toán
+INSERT INTO payment (booking_id, method, status, amount, transaction_id, payment_time, created_at)
+VALUES
+    (5, 'VNPAY', 'PENDING', 220000, 'TXN-VNPAY-005', NULL, NOW());
+-- Review cho booking 2 (user_id = 2, field_id giả định là 1)
+INSERT INTO review (rating, comment, user_id, field_id, booking_id, create_at, updated_at)
+VALUES
+    (5, 'Sân rất sạch, dịch vụ tốt, sẽ quay lại!', 2, 2, 2, NOW(), NOW()),
+    (4, 'Sân đẹp, ánh sáng tốt nhưng hơi trơn một chút.', 4, 27, 4, NOW(), NOW());

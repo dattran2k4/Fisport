@@ -1,11 +1,13 @@
 package com.Fisport.api;
 
+import com.Fisport.common.ESubFieldStatus;
 import com.Fisport.dto.request.FieldRequest;
 import com.Fisport.dto.response.*;
 import com.Fisport.model.FieldServiceItem;
 import com.Fisport.service.FieldService;
 import com.Fisport.common.EFieldStatus;
 import com.Fisport.service.FieldServiceItemService;
+import com.Fisport.service.SubFieldService;
 import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -27,6 +29,7 @@ public class FieldApiController {
 
     private final FieldService fieldService;
     private final FieldServiceItemService fieldServiceItemService;
+    private final SubFieldService subFieldService;
 
     @GetMapping()
     public ResponseData<?> getAllFields(@RequestParam(required = false) Long wardId,
@@ -40,7 +43,7 @@ public class FieldApiController {
             List<FieldResponse> fieldResponses = fieldService.getAllFields(wardId, typeId, status, keyword, username, featureIds);
             return new ResponseData<>(HttpStatus.OK.value(), "Get Fields Success", fieldResponses);
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.NOT_FOUND.value(), "Get Fields Failed");
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage());
         }
     }
 
@@ -56,7 +59,7 @@ public class FieldApiController {
             List<FieldHasTimeSlotResponse> responses = fieldService.getTimeSlotAndPriceByFieldId(id);
             return new ResponseData<>(HttpStatus.OK.value(), "Get Time Slots Success", responses);
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get Time Slots By Field Id Error");
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage());
         }
     }
 
@@ -66,7 +69,7 @@ public class FieldApiController {
             Set<FeatureResponse> responses = fieldService.getFeautresByField(id);
             return new ResponseData<>(HttpStatus.OK.value(), "Get Features By Field Success", responses);
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get Features By Field Id Error");
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage());
         }
     }
 
@@ -109,9 +112,9 @@ public class FieldApiController {
     public ResponseData<?> approveFieldStatusByAdmin(@PathVariable Long fieldId, @RequestParam EFieldStatus fieldStatus) {
         try {
             fieldService.changeStatusFieldByAdmin(fieldId, fieldStatus);
-            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Update Field Status Success");
+            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "success");
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update Field Status Error");
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
 
@@ -122,7 +125,7 @@ public class FieldApiController {
             List<FieldResponse> responses = fieldService.getAllPendingFields();
             return new ResponseData<>(HttpStatus.OK.value(), "Get All Fields Success", responses);
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get All Fields Error");
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage());
         }
     }
 
@@ -133,17 +136,28 @@ public class FieldApiController {
             List<FieldResponse> responses = fieldService.getAllPendingFieldsByOwner(principal.getName());
             return new ResponseData<>(HttpStatus.OK.value(), "Get All Fields Success", responses);
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get All Fields Error");
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage());
         }
     }
 
-    @GetMapping("api/v1/fields/{fieldId}/service-items")
-    public ResponseData<?> getServiceItems(@PathVariable Long fieldId) {
+    @GetMapping("/{fieldId}/service-items")
+    public ResponseData<?> getServiceItems(@Min(1) @PathVariable Long fieldId) {
         try {
             List<FieldServiceItemResponse> list = fieldServiceItemService.getAllByActive(fieldId);
             return new ResponseData<>(HttpStatus.OK.value(), "Get Service Items Success", list);
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get Service Items Error");
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage());
+        }
+    }
+
+    @GetMapping("/{id}/sub-fields")
+    public ResponseData<?> getSubFields(@Min(1) @PathVariable Long id) {
+        try {
+            List<SubFieldResponse> subFieldResponses = subFieldService.getAllSubFields(id, ESubFieldStatus.AVAILABLE);
+            return new ResponseData<>(HttpStatus.OK.value(), "Get Sub Fields Success", subFieldResponses);
+        } catch (Exception e) {
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage());
         }
     }
 }
+

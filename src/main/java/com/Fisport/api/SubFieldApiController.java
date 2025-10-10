@@ -67,6 +67,4 @@ public class SubFieldApiController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Delete SubField Error");
         }
     }
-
-
 }

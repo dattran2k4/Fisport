@@ -1,10 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/web/web}">
 <body>
+<div layout:fragment="content">
+    <div class="container mt-4">
 
+        <h2>Đặt sân: <span th:text="${field.name}"></span></h2>
+        <p>Địa chỉ: <span th:text="${field.address}"></span></p>
+        <p>Giá khung giờ: <span th:text="${field.pricePerHour}"></span> VNĐ</p>
+
+        <form th:action="@{/bookings}" th:object="${bookingRequest}" method="post">
+
+            <input type="hidden" th:field="*{userId}"/>
+
+            <!-- 8 ngày tiếp theo + date picker -->
+            <div class="d-flex mb-3 flex-wrap">
+                <button type="button" class="btn btn-outline-primary me-2 mb-2 day-btn"
+                        th:each="i : ${#numbers.sequence(0,7)}"
+                        th:data-date="${T(java.time.LocalDate).now().plusDays(i)}"
+                        th:text="${T(java.time.LocalDate).now().plusDays(i).dayOfWeek.toString()} + ' ' + T(java.time.LocalDate).now().plusDays(i).dayOfMonth + '/' + T(java.time.LocalDate).now().plusDays(i).monthValue}">
+                </button>
+                <input type="date" class="form-control" id="customDate" name="bookingDate"/>
+            </div>
+
+            <!-- Subfields -->
+            <div class="mb-3">
+                <label for="subfield">Chọn sân con:</label>
+                <select class="form-select" th:field="*{subfieldId}" id="subfield">
+                    <option th:each="sub : ${subField}" th:value="${sub.id}" th:text="${sub.name}"></option>
+                </select>
+            </div>
+
+            <!-- Khung giờ bắt đầu -->
+            <div class="mb-3">
+                <label for="startTime">Chọn giờ bắt đầu:</label>
+                <select class="form-select" th:field="*{startTime}" id="startTime"></select>
+            </div>
+
+            <!-- Duration -->
+            <div class="mb-3">
+                <label for="duration">Thời lượng:</label>
+                <select class="form-select" th:field="*{duration}" id="duration">
+                    <option th:each="d : ${field.durations}" th:value="${d}" th:text="${d + ' phút'}"></option>
+                </select>
+            </div>
+
+            <!-- Field Service Items -->
+            <div class="mb-3">
+                <label>Dịch vụ kèm theo:</label>
+                <div class="form-check" th:each="item : ${items}">
+                    <input class="form-check-input" type="checkbox" th:id="${'item-'+item.id}" th:value="${item.id}"
+                           name="serviceItemIds"/>
+                    <label class="form-check-label" th:for="${'item-'+item.id}"
+                           th:text="${item.name + ' - ' + item.price}"></label>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success"><i class="fa fa-check"></i> Đặt sân</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>

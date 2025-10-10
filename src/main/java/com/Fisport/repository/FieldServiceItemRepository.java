@@ -15,6 +15,6 @@ public interface FieldServiceItemRepository extends JpaRepository<FieldServiceIt
             "FROM FieldServiceItem fsi " +
             "JOIN fsi.serviceItem si " +
             "JOIN si.service s " +
-            "WHERE fsi.field.id = :fieldId AND fsi.status = ACTIVE")
+            "WHERE fsi.field.id = :fieldId AND fsi.status = 'ACTIVE'")
     List<FieldServiceItemResponse> findByActive(Long fieldId);
 }
