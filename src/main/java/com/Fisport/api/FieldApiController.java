@@ -32,19 +32,16 @@ public class FieldApiController {
     private final SubFieldService subFieldService;
 
     @GetMapping()
-    public ResponseData<?> getAllFields(@RequestParam(required = false) Long wardId,
-                                        @RequestParam(required = false) Long typeId,
-                                        @RequestParam(required = false) EFieldStatus status,
-                                        @RequestParam(required = false) String keyword,
-                                        Principal principal,
-                                        @RequestParam(required = false) Long... featureIds) {
-        try {
-            String username = (principal != null) ? principal.getName() : null;
-            List<FieldResponse> fieldResponses = fieldService.getAllFields(wardId, typeId, status, keyword, username, featureIds);
-            return new ResponseData<>(HttpStatus.OK.value(), "Get Fields Success", fieldResponses);
-        } catch (Exception e) {
-            return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage());
-        }
+    public ApiResponse<?> getAllFields(@RequestParam(required = false) Long wardId,
+                                       @RequestParam(required = false) Long typeId,
+                                       @RequestParam(required = false) EFieldStatus status,
+                                       @RequestParam(required = false) String keyword,
+                                       @RequestParam(required = false) Long... featureIds) {
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("fields")
+                .data(fieldService.getAllFields(wardId, typeId, status, keyword, featureIds))
+                .build();
     }
 
     @GetMapping("/{id}")

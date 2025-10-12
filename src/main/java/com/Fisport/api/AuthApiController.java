@@ -23,9 +23,9 @@ public class AuthApiController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseData<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpSession session) {
+    public ResponseData<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         try {
-            LoginResponse loginResponse = authService.login(loginRequestDTO, session);
+            LoginResponse loginResponse = authService.login(loginRequestDTO);
             return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng nhập thành công!", loginResponse);
         } catch (Exception e) {
             return new ResponseError(HttpStatus.NOT_FOUND.value(), "Đăng nhập thất bại");
@@ -35,8 +35,8 @@ public class AuthApiController {
     @PostMapping("/register")
     public ResponseData<?> register(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
         try {
-            RegisterResponseDTO registerResponseDTO = authService.register(registerRequestDTO);
-            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng ký thành công! Xác nhận email để kích hoạt tài khoản", registerResponseDTO);
+            authService.register(registerRequestDTO);
+            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng ký thành công! Xác nhận email để kích hoạt tài khoản");
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }

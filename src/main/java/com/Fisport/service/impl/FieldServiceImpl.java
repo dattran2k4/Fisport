@@ -29,8 +29,8 @@ public class FieldServiceImpl implements FieldService {
     private final FieldHasFeatureRepository fieldHasFeatureRepository;
 
     @Override
-    public List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, String username, Long... featureIds) {
-        Specification<Field> specification = FieldSpecification.filterFields(wardId, fieldTypeId, status, keyword, username, featureIds);
+    public List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, Long... featureIds) {
+        Specification<Field> specification = FieldSpecification.filterFields(wardId, fieldTypeId, status, keyword, featureIds);
         List<Field> fieds = fieldRepository.findAll(specification);
         return fieds.stream().map(this::toDto).toList();
     }
@@ -122,10 +122,10 @@ public class FieldServiceImpl implements FieldService {
         List<FieldHasTimeSlot> fieldHasTimeSlots = fieldHasTimeSlotRepository.findByFieldId(id);
         return fieldHasTimeSlots.stream()
                 .map(fieldHasTimeSlot -> FieldHasTimeSlotResponse.builder()
-                .id(fieldHasTimeSlot.getId())
-                .startTime(fieldHasTimeSlot.getTimeSlot().getStartTime())
-                .price(fieldHasTimeSlot.getPrice())
-                .build()).toList();
+                        .id(fieldHasTimeSlot.getId())
+                        .startTime(fieldHasTimeSlot.getTimeSlot().getStartTime())
+                        .price(fieldHasTimeSlot.getPrice())
+                        .build()).toList();
     }
 
     @Override
@@ -140,15 +140,15 @@ public class FieldServiceImpl implements FieldService {
 
     @Override
     public List<FieldResponse> getAllPendingFields() {
-        List<Field>  fields = fieldRepository.findByFieldStatus(EFieldStatus.PENDING);
+        List<Field> fields = fieldRepository.findByFieldStatus(EFieldStatus.PENDING);
         return fields.stream().map(this::toDto).toList();
     }
 
     @Override
     public List<FieldResponse> getAllPendingFieldsByOwner(String name) {
-        User user =  userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chủ sân"));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chủ sân"));
 
-        List<Field>  fields = fieldRepository.findByFieldStatusAndOwner_Username(EFieldStatus.PENDING, name);
+        List<Field> fields = fieldRepository.findByFieldStatusAndOwner_Username(EFieldStatus.PENDING, name);
         return fields.stream().map(this::toDto).toList();
     }
 
@@ -174,8 +174,6 @@ public class FieldServiceImpl implements FieldService {
                 .slug(ward.getSlug())
                 .build();
     }
-
-
 
 
     private FieldResponse toDto(Field f) {

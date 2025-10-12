@@ -5,12 +5,14 @@ import com.Fisport.common.EGender;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 
 @Getter
+@Setter
 public class RegisterRequestDTO implements Serializable {
 
     @NotBlank(message = "Tài khoản không được để trống")
@@ -37,12 +39,12 @@ public class RegisterRequestDTO implements Serializable {
     )
     private String phone;
 
-    @NotNull(message = "dateOfBirth must be not null")
+    @NotNull(message = "Ngày bạn đẻ đừng để trống mà!")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-    @JsonFormat(pattern = "dd/MM/yyyy")
+//    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthday;
 
-    @NotNull(message = "Vui lòng chọn giới tính")
+    @NotNull(message = "Vui lòng chọn giới tính (chỉ có 2)")
     @EnumValue(name = "gender", enumClass = EGender.class)
     private EGender gender;
 }

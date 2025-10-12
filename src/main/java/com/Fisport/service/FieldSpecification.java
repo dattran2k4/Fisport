@@ -8,9 +8,9 @@ import org.springframework.util.StringUtils;
 
 public class FieldSpecification {
 
-    public static Specification<Field> filterFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, String username, Long... featureIds) {
+    public static Specification<Field> filterFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, Long... featureIds) {
         return (Root<Field> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
-            Join<?, ?>  hasFeatureJoin = root.join("fieldHasFeatures");
+            Join<?, ?> hasFeatureJoin = root.join("fieldHasFeatures");
             Join<?, ?> featureJoin = hasFeatureJoin.join("feature");
 
             Predicate predicate = cb.conjunction();
@@ -35,16 +35,12 @@ public class FieldSpecification {
                         //sth
                 ));
             }
-
-            if (StringUtils.hasLength(username)) {
-                predicate = cb.and(predicate, cb.equal(root.get("owner").get("username"), username));
-            }
-
+            
             if (featureIds != null && featureIds.length > 0) {
-                    predicate = cb.and(predicate, featureJoin.get("id").in((Object[]) featureIds));
+                predicate = cb.and(predicate, featureJoin.get("id").in((Object[]) featureIds));
 
-                    query.groupBy(root.get("id"));
-                    query.having(cb.equal(cb.countDistinct(featureJoin.get("id")), featureIds.length));
+                query.groupBy(root.get("id"));
+                query.having(cb.equal(cb.countDistinct(featureJoin.get("id")), featureIds.length));
             }
 
             return predicate;

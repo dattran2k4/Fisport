@@ -22,7 +22,7 @@ public class TwoFactorAuthApiController {
     private final AuthService authService;
 
     @PostMapping("/enable")
-    public ResponseData<?> enable2Fa(@AuthenticationPrincipal User user, @RequestParam int code ) {
+    public ResponseData<?> enable2Fa(@AuthenticationPrincipal User user, @RequestParam int code) {
         twoFAService.enable2Fa(user, code);
         return ResponseData.builder()
                 .status(HttpStatus.ACCEPTED.value())
@@ -31,7 +31,7 @@ public class TwoFactorAuthApiController {
     }
 
     @PostMapping("/disable")
-    public ResponseData<?> disable2Fa(@AuthenticationPrincipal User user, @RequestParam int code ) {
+    public ResponseData<?> disable2Fa(@AuthenticationPrincipal User user, @RequestParam int code) {
         twoFAService.disable2Fa(user, code);
         return ResponseData.builder()
                 .status(HttpStatus.ACCEPTED.value())
@@ -42,10 +42,10 @@ public class TwoFactorAuthApiController {
     @PostMapping("/verify")
     public ResponseData<?> verify2FA(@RequestBody TwoFARequest twoFARequest, HttpSession session) {
         try {
-            boolean response = authService.verify2FA(twoFARequest, session);
-            return new ResponseData(HttpStatus.ACCEPTED.value(),"login success" , response);
+            boolean response = authService.verify2FA(twoFARequest);
+            return new ResponseData(HttpStatus.ACCEPTED.value(), "login success", response);
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(),e.getMessage());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
 }

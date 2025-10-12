@@ -4,6 +4,7 @@ import com.Fisport.dto.request.LoginRequestDTO;
 import com.Fisport.dto.request.TwoFARequest;
 import com.Fisport.dto.response.LoginResponse;
 import com.Fisport.service.AuthService;
+import com.Fisport.service.impl.SessionService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import javax.naming.AuthenticationException;
 public class LoginController {
 
     private final AuthService authService;
+    private final SessionService sessionService;
 
     @GetMapping("/login")
     public String getLoginPage(Model model) {
@@ -29,7 +31,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String doLogin(@Valid @ModelAttribute("login") LoginRequestDTO loginRequestDTO, BindingResult result, HttpSession session, RedirectAttributes redirect, Model model) {
+    public String doLogin(@Valid @ModelAttribute("login") LoginRequestDTO loginRequestDTO, BindingResult result, RedirectAttributes redirect, Model model) {
 
         if (result.hasErrors()) {
             model.addAttribute("error", result.getAllErrors().get(0).getDefaultMessage());
@@ -37,9 +39,8 @@ public class LoginController {
         }
 
         try {
-            LoginResponse response = authService.login(loginRequestDTO, session);
+            LoginResponse response = authService.login(loginRequestDTO);
             if (response.is2FAEnabled()) {
-//                redirect.addFlashAttribute("response", response);
                 return "redirect:/2fa/verify";
             }
         } catch (Exception ex) {
@@ -51,29 +52,24 @@ public class LoginController {
     }
 
     @GetMapping("/2fa/verify")
-    public String show2faVerifyPage(HttpSession session, Model model) {
-        String username = (String) session.getAttribute("PRE_AUTH_USER");
-        if (username == null) {
-            return "redirect:/login";
-        }
+    public String show2faVerifyPage(Model model) {
+        String username = sessionService.get("PRE_AUTH_USER", String.class);
         model.addAttribute("username", username);
-        TwoFARequest twoFARequest = new TwoFARequest();
-        twoFARequest.setUsername(username);
-        model.addAttribute("request", twoFARequest);
+        model.addAttribute("request", new TwoFARequest(username, null));
 
         return "2fa";
     }
 
     @PostMapping("/2fa/verify")
     public String verify2Fa(@Valid @ModelAttribute("request") TwoFARequest twoFARequest,
-                            BindingResult result, HttpSession session, Model model) {
+                            BindingResult result, Model model) {
 
         if (result.hasErrors()) {
             model.addAttribute("error", result.getAllErrors().get(0).getDefaultMessage());
             return "2fa";
         }
 
-        if (!authService.verify2FA(twoFARequest, session)) {
+        if (!authService.verify2FA(twoFARequest)) {
             model.addAttribute("errorCode", "Mã xác thực không đúng hoặc phiên đã hết hạn");
             return "2fa";
         }

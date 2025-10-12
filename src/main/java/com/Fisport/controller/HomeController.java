@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.view.RedirectView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -21,14 +19,8 @@ import java.util.List;
 @RequestMapping
 public class HomeController {
 
-    private final FieldTypeService fieldTypeService;
     private final CityService cityService;
     private final FieldService fieldService;
-
-//    @GetMapping("/")
-//    public RedirectView root() {
-//        return new RedirectView("/home");
-//    }
 
     @GetMapping("/favicon.ico")
     @ResponseBody
@@ -39,9 +31,9 @@ public class HomeController {
     @GetMapping("/")
     public String home(Model model) {
         List<CityResponse> cities = cityService.findAll();
-        List<FieldResponse> fields = fieldService.getAllFields(null, null, EFieldStatus.ACTIVE, null, null, null);
+//        List<FieldResponse> fields = fieldService.getAllFields(null, null, EFieldStatus.ACTIVE, null, null);
         model.addAttribute("cities", cities);
-        model.addAttribute("fields", fields);
+//        model.addAttribute("fields", fields);
 
         return "web/index";
     }

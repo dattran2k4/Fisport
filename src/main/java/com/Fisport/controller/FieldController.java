@@ -44,7 +44,7 @@ public class FieldController {
         WardResponse wardResponse = (ward != null) ? wardService.getWardBySlug(ward) : null;
         Long wardId = wardResponse != null ? wardResponse.getId() : null;
 
-        List<FieldResponse> responses = fieldService.getAllFields(wardId, fieldTypeResponse.getId(), EFieldStatus.ACTIVE, null, null, featureIds);
+        List<FieldResponse> responses = fieldService.getAllFields(wardId, fieldTypeResponse.getId(), EFieldStatus.ACTIVE, null, featureIds);
 
         model.addAttribute("fields", responses);
         model.addAttribute("features", featureResponses);
