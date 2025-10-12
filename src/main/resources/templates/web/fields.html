@@ -4,12 +4,12 @@
       layout:decorate="~{layout/web/web}">
 <body>
     <div layout:fragment="content">
-        <input type="hidden" id="fieldTypeId"
-        th:if="${#lists.isEmpty(fields) == false}"
-        th:value="${fields[0].fieldTypeResponse.id}" />
+<!--        <input type="hidden" id="fieldTypeId"-->
+<!--        th:if="${#lists.isEmpty(fields) == false}"-->
+<!--        th:value="${fields[0].fieldTypeResponse.id}" />-->
         <section class="py-4">
             <div class="container">
-        
+
                 <!-- Filter -->
                 <div class="row g-3 align-items-center mb-3">
                     <!-- Khoảng cách -->
@@ -24,14 +24,14 @@
                             </select>
                         </div>
                     </div>
-        
+
                     <!-- Tiện ích -->
                     <div class="col-12 col-md-4">
                         <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUtilities">
                             <i class="bi bi-sliders"></i> Tiện ích (mái che, bãi xe, ...)
                         </button>
                     </div>
-        
+
                     <!-- Sắp xếp -->
                     <div class="col-12 col-md-4">
                         <div class="input-group">
@@ -46,7 +46,7 @@
                         </div>
                     </div>
                 </div>
-        
+
                 <!-- Tiện ích collapse -->
                 <div class="collapse" id="collapseUtilities">
                     <div class="card card-body">
@@ -63,7 +63,7 @@
                         </div>
                     </div>
                 </div>
-        
+
                 <!-- Danh sách sân -->
                 <div class="row g-3" id="fieldsGrid">
                     <div class="col-12 col-sm-6 col-lg-4 col-xl-3" th:each="f : ${fields}">
@@ -86,7 +86,7 @@
                         </a>
                     </div>
                 </div>
-        
+
                 <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-4">
                     <nav aria-label="pagination">
@@ -167,7 +167,7 @@
                                             <small class="text-muted">
                                                 <i class="bi bi-clock"></i>
                                                 ${f.openTime} - ${f.closeTime}
-                                            </small> 
+                                            </small>
                                         </div>
                                         <h6 class="card-title mb-1 fw-semibold">${f.name}</h6>
                                         <small class="text-muted d-block">

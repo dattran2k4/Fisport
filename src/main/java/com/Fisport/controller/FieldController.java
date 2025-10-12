@@ -31,7 +31,8 @@ public class FieldController {
     private final WardService wardService;
 
     @GetMapping("/{slug}")
-    public String getFields(@PathVariable String slug, @RequestParam(required = false) String ward, Model model, HttpServletResponse response) {
+    public String getFields(Model model, @PathVariable String slug, @RequestParam(required = false) String ward,
+                            @RequestParam(required = false) Long... featureIds) {
         List<FeatureResponse> featureResponses = featureService.getListFeatures();
 
         FieldTypeResponse fieldTypeResponse = fieldTypeService.findBySlug(slug);
@@ -43,7 +44,7 @@ public class FieldController {
         WardResponse wardResponse = (ward != null) ? wardService.getWardBySlug(ward) : null;
         Long wardId = wardResponse != null ? wardResponse.getId() : null;
 
-        List<FieldResponse> responses = fieldService.getAllFields(wardId, fieldTypeResponse.getId(), EFieldStatus.ACTIVE, null, null, null);
+        List<FieldResponse> responses = fieldService.getAllFields(wardId, fieldTypeResponse.getId(), EFieldStatus.ACTIVE, null, null, featureIds);
 
         model.addAttribute("fields", responses);
         model.addAttribute("features", featureResponses);

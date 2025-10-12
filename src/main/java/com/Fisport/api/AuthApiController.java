@@ -25,7 +25,7 @@ public class AuthApiController {
     @PostMapping("/login")
     public ResponseData<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO, HttpSession session) {
         try {
-            LoginResponse loginResponse = authService.loginApi(loginRequestDTO, session);
+            LoginResponse loginResponse = authService.login(loginRequestDTO, session);
             return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng nhập thành công!", loginResponse);
         } catch (Exception e) {
             return new ResponseError(HttpStatus.NOT_FOUND.value(), "Đăng nhập thất bại");

@@ -32,6 +32,9 @@ public class FieldTypeServiceImpl implements FieldTypeService {
     @Override
     public FieldTypeResponse findBySlug(String slug) {
         FieldType fieldType = fieldTypeRepository.findBySlug(slug);
-        return FieldTypeResponse.builder().id(fieldType.getId()).name(fieldType.getName()).build();
+        return FieldTypeResponse.builder()
+                .id(fieldType.getId())
+                .name(fieldType.getName())
+                .build();
     }
 }

@@ -42,7 +42,7 @@ public class TwoFactorAuthApiController {
     @PostMapping("/verify")
     public ResponseData<?> verify2FA(@RequestBody TwoFARequest twoFARequest, HttpSession session) {
         try {
-            LoginResponse response = authService.verify2FA(twoFARequest, session);
+            boolean response = authService.verify2FA(twoFARequest, session);
             return new ResponseData(HttpStatus.ACCEPTED.value(),"login success" , response);
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(),e.getMessage());

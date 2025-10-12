@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -17,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Controller
+@RequestMapping
 public class HomeController {
 
     private final FieldTypeService fieldTypeService;
@@ -34,14 +36,10 @@ public class HomeController {
         // Không làm gì cả, chỉ để chặn request này
     }
 
-    @GetMapping("/home")
+    @GetMapping("/")
     public String home(Model model) {
-        List<FieldTypeResponse> types = fieldTypeService.findAll();
         List<CityResponse> cities = cityService.findAll();
-
         List<FieldResponse> fields = fieldService.getAllFields(null, null, EFieldStatus.ACTIVE, null, null, null);
-
-        model.addAttribute("fieldTypes", types);
         model.addAttribute("cities", cities);
         model.addAttribute("fields", fields);
 

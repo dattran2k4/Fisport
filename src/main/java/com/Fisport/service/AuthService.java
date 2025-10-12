@@ -13,10 +13,10 @@ import java.io.UnsupportedEncodingException;
 
 public interface AuthService {
     RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) throws MessagingException, UnsupportedEncodingException;
-    LoginResponse loginApi(LoginRequestDTO request, HttpSession session);
+    LoginResponse login(LoginRequestDTO request, HttpSession session);
 
     String confirmUser(String verifyCode);
-    LoginResponse verify2FA(TwoFARequest request, HttpSession session);
+    boolean verify2FA(TwoFARequest request, HttpSession session);
     String logout(HttpSession session);
     String forgotPassword(String email) throws MessagingException, UnsupportedEncodingException;
     void resetPassword(ResetPasswordRequest request, String verifyCode);

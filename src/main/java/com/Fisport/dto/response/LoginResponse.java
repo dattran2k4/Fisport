@@ -8,7 +8,6 @@ import java.time.LocalDate;
 @Builder
 @Getter
 public class LoginResponse {
-    private String sessionId;
     private Long userId;
     private String username;
     private String email;

@@ -72,7 +72,7 @@ public class SecurityConfig {
 //                        .requestMatchers("/api/owner/**").hasRole("OWNER")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(twoFactorAuthFilter, UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(twoFactorAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form.disable())
                 .exceptionHandling(ex -> ex.accessDeniedHandler(customAccessDeniedHandler))
                 .sessionManagement(session ->

@@ -94,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse loginApi(LoginRequestDTO request, HttpSession session) {
+    public LoginResponse login(LoginRequestDTO request, HttpSession session) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
@@ -142,18 +142,22 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse verify2FA(TwoFARequest request, HttpSession session) {
+    public boolean verify2FA(TwoFARequest request, HttpSession session) {
         String preAuthUser = (String) session.getAttribute("PRE_AUTH_USER");
         if (preAuthUser == null || !preAuthUser.equals(request.getUsername())) {
-            throw new RuntimeException("Session không hợp lệ hoặc đã hết hạn");
+//            throw new RuntimeException("Session không hợp lệ hoặc đã hết hạn");
+            return false;
         }
+
 
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
 
         if (!twoFAService.verifyCode(user.getTwoFASecret(), request.getCode())) {
-            throw new ResourceNotFoundException("Mã 2FA không hợp lệ");
+//            throw new ResourceNotFoundException("Mã 2FA không hợp lệ");
+            return false;
         }
+
 
         CustomUserDetails userDetails = new CustomUserDetails(user);
         Authentication authentication = new UsernamePasswordAuthenticationToken(
@@ -166,19 +170,20 @@ public class AuthServiceImpl implements AuthService {
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                 SecurityContextHolder.getContext());
 
-        return LoginResponse.builder()
-                .userId(userDetails.getUser().getId())
-                .username(userDetails.getUsername())
-                .birthDate(userDetails.getUser().getBirthday())
-                .phoneNumber(userDetails.getUser().getPhone())
-                .email(userDetails.getUser().getEmail())
-                .gender(String.valueOf(userDetails.getUser().getGender()))
-                .role(userDetails.getAuthorities().stream()
-                        .findFirst()
-                        .map(GrantedAuthority::getAuthority)
-                        .orElse(null))
-                .message("Đăng nhập thành công")
-                .build();
+//        return LoginResponse.builder()
+//                .userId(userDetails.getUser().getId())
+//                .username(userDetails.getUsername())
+//                .birthDate(userDetails.getUser().getBirthday())
+//                .phoneNumber(userDetails.getUser().getPhone())
+//                .email(userDetails.getUser().getEmail())
+//                .gender(String.valueOf(userDetails.getUser().getGender()))
+//                .role(userDetails.getAuthorities().stream()
+//                        .findFirst()
+//                        .map(GrantedAuthority::getAuthority)
+//                        .orElse(null))
+//                .message("Đăng nhập thành công")
+//                .build();
+        return true;
     }
 
     @Override
