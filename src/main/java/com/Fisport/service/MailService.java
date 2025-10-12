@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import java.net.URLEncoder;
+
 @RequiredArgsConstructor
 @Service
 public class MailService {
@@ -62,7 +64,7 @@ public class MailService {
         Context context =  new Context();
 
 
-        String confirmLink = String.format("%s?verifyCode=%s", endPointConfirmUser, verifyCode);
+        String confirmLink = String.format("%s?verifyCode=%s", endPointConfirmUser, URLEncoder.encode(verifyCode, StandardCharsets.UTF_8));
 
         Map<String, Object> properties = new HashMap<>();
         properties.put("confirmLink", confirmLink);

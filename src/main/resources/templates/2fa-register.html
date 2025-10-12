@@ -23,9 +23,9 @@
                         <h4 class="card-title mb-4 text-center">Xác thực 2FA</h4>
 
                         <!-- QR Code -->
-                        <div class="text-center mb-4" th:if="${qrUrl}">
+                        <div class="text-center mb-4" th:if="${qrCode}">
                             <p>Quét mã QR bằng Google Authenticator</p>
-                            <img th:src="${qrUrl}" alt="QR Code" class="img-fluid rounded shadow-sm">
+                            <img th:src="${qrCode}" alt="QR Code" class="img-fluid rounded shadow-sm">
                         </div>
 
                         <!-- Form nhập OTP -->

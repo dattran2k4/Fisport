@@ -158,9 +158,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void verify2FARegister(String username, int code) {
         User user = userRepository.findByUsername(username).orElse(null);
-
         twoFAService.verifyCode(user.getTwoFASecret(), code);
-
+        user.setStatus(EUserStatus.ACTIVE);
+        userRepository.save(user);
     }
 
 
@@ -179,7 +179,7 @@ public class AuthServiceImpl implements AuthService {
 
         //Set secret from GGAuthentication
         String secret = twoFAService.generateSecret();
-        user.setTwoFAEnable(false);
+        user.setTwoFAEnable(true);
         user.setTwoFASecret(secret);
 
 

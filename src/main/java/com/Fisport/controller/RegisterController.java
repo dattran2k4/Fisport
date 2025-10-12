@@ -60,6 +60,7 @@ public class RegisterController {
 
         //to-do the message
         if (qrUrl != null) {
+            model.addAttribute("success", "Xác nhận email thành công, thực hiện bước cuối để hoàn thành kích hoạt tài khoản");
             model.addAttribute("qrCode", qrCode);
             model.addAttribute("request", new TwoFARequest(username, null));
             return "2fa-register";
