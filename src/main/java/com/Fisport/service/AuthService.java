@@ -27,4 +27,6 @@ public interface AuthService {
     String forgotPassword(String email) throws MessagingException, UnsupportedEncodingException;
 
     void resetPassword(ResetPasswordRequest request, String verifyCode);
+
+    String generateQRCodeBase64(String otpAuthURL, int width, int height);
 }

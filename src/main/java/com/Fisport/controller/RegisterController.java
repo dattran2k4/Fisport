@@ -55,14 +55,16 @@ public class RegisterController {
     @GetMapping("/confirm")
     public String showConfirmPage(@NotBlank @RequestParam String verifyCode, Model model) {
         String qrUrl = authService.confirmUser(verifyCode);
+        String qrCode = authService.generateQRCodeBase64(qrUrl, 250, 250);
         String username = sessionService.get("username", String.class);
 
         //to-do the message
         if (qrUrl != null) {
-            model.addAttribute("qrUrl", qrUrl);
+            model.addAttribute("qrCode", qrCode);
             model.addAttribute("request", new TwoFARequest(username, null));
             return "2fa-register";
         }
+        
         return "2fa-register";
     }
 
@@ -75,7 +77,7 @@ public class RegisterController {
 
         authService.verify2FARegister(request.getUsername(), request.getCode());
         sessionService.remove("username");
-        redirectAttributes.addFlashAttribute("2FASuccess", "Xác thực 2FA thành công, đăng nhập lại để hiểu vấn đề");
+        redirectAttributes.addFlashAttribute("TwoFASuccess", "Xác thực 2FA thành công, đăng nhập lại để hiểu vấn đề");
         return "redirect:/login";
     }
 

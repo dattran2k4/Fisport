@@ -7,21 +7,35 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         body {
-        background-color: #f8f9fa;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
+
         .login-card {
-        width: 100%;
-        max-width: 400px;
-        min-height: 500px;
-        border-radius: 0.75rem;
+            width: 100%;
+            max-width: 400px;
+            min-height: 500px;
+            border-radius: 0.75rem;
         }
-        .card-body { display: flex; flex-direction: column; justify-content: center; height: 100%; }
-        .form-control:focus { box-shadow: none; }
-        .form-footer { margin-top: auto; text-align: center; }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+        }
+
+        .form-footer {
+            margin-top: auto;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -34,10 +48,12 @@
         <form th:action="@{/login}" th:object="${login}" method="POST" novalidate>
             <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
             <div th:if="${errorCode}" class="alert alert-danger" th:text="${errorCode}"></div>
+            <div th:if="${TwoFASuccess}" class="alert alert-danger" th:text="${TwoFASuccess}"></div>
             <div class="mb-3">
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-person"></i></span>
-                    <input type="text" th:field="*{username}" class="form-control" id="username" placeholder="Nhập username" required>
+                    <input type="text" th:field="*{username}" class="form-control" id="username"
+                           placeholder="Nhập username" required>
                 </div>
             </div>
 
@@ -45,7 +61,8 @@
             <div class="mb-3">
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                    <input type="password" th:field="*{password}" class="form-control" id="password" placeholder="Nhập mật khẩu" required>
+                    <input type="password" th:field="*{password}" class="form-control" id="password"
+                           placeholder="Nhập mật khẩu" required>
                 </div>
             </div>
 
