@@ -52,6 +52,6 @@ public class BookingController {
         }
 
         bookingService.createBooking(request, customUserDetails.getUser().getId());
-        return "redirect:/payment";
+        return "redirect:/";
     }
 }

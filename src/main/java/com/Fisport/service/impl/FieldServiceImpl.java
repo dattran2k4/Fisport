@@ -169,6 +169,7 @@ public class FieldServiceImpl implements FieldService {
                 .city(field.getWard().getCity().getName())
                 .ward(field.getWard().getName())
                 .type(field.getFieldType().getName())
+                .typeId(field.getFieldType().getId())
                 .features(features.stream().map(Feature::getName).collect(Collectors.toSet()))
                 .rating(rating)
                 .build();

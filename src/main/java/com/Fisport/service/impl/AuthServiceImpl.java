@@ -102,7 +102,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return null;
+            throw new ResourceNotFoundException("Sai mật khẩu");
         }
 
         if (user.isTwoFAEnable()) {

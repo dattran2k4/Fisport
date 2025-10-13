@@ -25,6 +25,7 @@ public class FieldDetailResponse {
     private String review;
     private String ward;
     private String city;
+    private Long typeId;
     private String type;
     private Set<String> features;
 }

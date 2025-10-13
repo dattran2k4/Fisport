@@ -23,13 +23,12 @@ public class AuthApiController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseData<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
-        try {
-            LoginResponse loginResponse = authService.login(loginRequestDTO);
-            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đăng nhập thành công!", loginResponse);
-        } catch (Exception e) {
-            return new ResponseError(HttpStatus.NOT_FOUND.value(), "Đăng nhập thất bại");
-        }
+    public ApiResponse<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
+        authService.login(loginRequestDTO);
+        return ApiResponse.builder()
+                .status(HttpStatus.ACCEPTED.value())
+                .message("Successfully logged in")
+                .build();
     }
 
     @PostMapping("/register")

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 import java.time.*;
+import java.util.HashSet;
 import java.util.Set;
 
 @Getter
@@ -21,5 +22,5 @@ public class BookingRequest {
     @NotNull
     private Long subFieldId;
     @Valid
-    private Set<BookingServiceItemRequest> bookingServiceItemRequest;
+    private Set<BookingServiceItemRequest> bookingServiceItemRequest = new HashSet<>();
 }

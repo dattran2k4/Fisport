@@ -27,6 +27,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -90,7 +91,12 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidParameterException("Duration not valid");
         }
 
-        if (!subField.getField().getFieldType().getFieldTypeBookDuration().contains(request.getDuration())) {
+        Set<FieldTypeBookDuration> durations = subField.getField().getFieldType().getFieldTypeBookDuration();
+        Set<Integer> validMinutes = durations.stream()
+                .map(fieldTypeBookDuration -> fieldTypeBookDuration.getDuration().getMinutes())
+                .collect(Collectors.toSet());
+
+        if (!validMinutes.contains(request.getDuration())) {
             throw new InvalidParameterException("Duration not valid");
         }
 
