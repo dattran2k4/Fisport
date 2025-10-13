@@ -153,9 +153,19 @@ public class FieldServiceImpl implements FieldService {
     }
 
     @Override
-    public FieldResponse findBySlug(String fieldNameSlug) {
+    public FieldDetailResponse findBySlug(String fieldNameSlug) {
         Field field = fieldRepository.findBySlug(fieldNameSlug);
-        return toDto(field);
+        return FieldDetailResponse.builder()
+                .id(field.getId())
+                .name(field.getName())
+                .slug(field.getSlug())
+                .openTime(field.getOpenTime())
+                .closeTime(field.getCloseTime())
+                .description(field.getDescription())
+                .city(field.getWard().getCity().getName())
+                .ward(field.getWard().getName())
+                .type(field.getFieldType().getName())
+                .build();
     }
 
 

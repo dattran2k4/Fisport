@@ -6,13 +6,17 @@ import com.Fisport.dto.response.BookingServiceItemResponse;
 import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.dto.response.FieldServiceItemResponse;
 import com.Fisport.dto.response.SubFieldResponse;
+import com.Fisport.security.CustomUserDetails;
 import com.Fisport.service.BookingService;
 import com.Fisport.service.FieldService;
 import com.Fisport.service.FieldServiceItemService;
 import com.Fisport.service.SubFieldService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,7 +31,7 @@ public class BookingController {
     private final FieldServiceItemService fieldServiceItemService;
 
     @GetMapping("{slug}/dat-san")
-    public String datSan(Model model, @PathVariable String slug) {
+    public String showBookingPage(Model model, @PathVariable String slug) {
         FieldResponse field = fieldService.findBySlug(slug);
         model.addAttribute("field", field);
 
@@ -37,8 +41,20 @@ public class BookingController {
         List<FieldServiceItemResponse> items = fieldServiceItemService.getAllByActive(field.getId());
         model.addAttribute("items", items);
 
-        model.addAttribute("bookingRequest", new BookingRequest());
+        model.addAttribute("booking", new BookingRequest());
 
         return "web/booking";
+    }
+
+    @PostMapping("/booking")
+    public String booking(@ModelAttribute("booking") BookingRequest request,
+                          @AuthenticationPrincipal CustomUserDetails customUserDetails,
+                          Model model, BindingResult result) {
+        if (result.hasErrors()) {
+            model.addAttribute("error", result.getAllErrors().get(0).getDefaultMessage());
+        }
+
+        bookingService.createBooking(request, customUserDetails.getUser().getId());
+        return "redirect:/payment";
     }
 }

@@ -35,7 +35,7 @@
                     <p th:text="${field.description}">Mô tả sân chi tiết...</p>
                 </div>
 
-                <a th:href="@{/${field.slug}/dat-san}" class="btn btn-primary btn-lg" id="btn-booking">
+                <a th:href="@{'/' + ${field.slug} + '/dat-san'}" class="btn btn-primary btn-lg" id="btn-booking">
                     Đặt sân ngay
                 </a>
             </div> <!-- kết thúc col phải -->

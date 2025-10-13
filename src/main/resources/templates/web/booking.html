@@ -7,20 +7,23 @@
 
         <h2>Đặt sân: <span th:text="${field.name}"></span></h2>
         <p>Địa chỉ: <span th:text="${field.address}"></span></p>
-        <p>Giá khung giờ: <span th:text="${field.pricePerHour}"></span> VNĐ</p>
+<!--        <p>Giá khung giờ: <span th:text="${field.pricePerHour}"></span> VNĐ</p>-->
 
-        <form th:action="@{/bookings}" th:object="${bookingRequest}" method="post">
+        <form th:action="@{/bookings}" th:object="${booking}" method="post">
 
-            <input type="hidden" th:field="*{userId}"/>
+<!--            <input type="hidden" th:field="*{userId}"/>-->
 
             <!-- 8 ngày tiếp theo + date picker -->
             <div class="d-flex mb-3 flex-wrap">
+                <!-- 8 ngày tiếp theo -->
                 <button type="button" class="btn btn-outline-primary me-2 mb-2 day-btn"
                         th:each="i : ${#numbers.sequence(0,7)}"
                         th:data-date="${T(java.time.LocalDate).now().plusDays(i)}"
-                        th:text="${T(java.time.LocalDate).now().plusDays(i).dayOfWeek.toString()} + ' ' + T(java.time.LocalDate).now().plusDays(i).dayOfMonth + '/' + T(java.time.LocalDate).now().plusDays(i).monthValue}">
+                        th:text="|${T(java.time.LocalDate).now().plusDays(i).dayOfWeek} ${T(java.time.LocalDate).now().plusDays(i).dayOfMonth}/${T(java.time.LocalDate).now().plusDays(i).monthValue}|">
                 </button>
-                <input type="date" class="form-control" id="customDate" name="bookingDate"/>
+
+                <!-- Calendar picker -->
+                <input type="date" class="form-control me-2 mb-2" id="customDate" name="bookingDate"/>
             </div>
 
             <!-- Subfields -->

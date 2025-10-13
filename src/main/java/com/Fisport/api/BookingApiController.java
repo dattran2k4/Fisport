@@ -2,6 +2,7 @@ package com.Fisport.api;
 
 import com.Fisport.common.EBookingStatus;
 import com.Fisport.dto.request.BookingRequest;
+import com.Fisport.dto.response.ApiResponse;
 import com.Fisport.dto.response.BookingTimeResponse;
 import com.Fisport.dto.response.ResponseData;
 import com.Fisport.dto.response.ResponseError;
@@ -30,22 +31,21 @@ public class BookingApiController {
     private final BookingService bookingService;
 
     @GetMapping("/occupied")
-    public ResponseData<?> getOccupiedSlots(@Min(1) Long subFieldId, LocalDate date) {
-        try {
-            return new ResponseData<>(HttpStatus.OK.value(), "occupied", bookingService.getOccupiedSlots(subFieldId, date));
-        } catch (Exception e) {
-            return new ResponseError(HttpStatus.NO_CONTENT.value(), "get occupied fail");
-        }
+    public ApiResponse<?> getOccupiedSlots(@Min(1) Long subFieldId, LocalDate date) {
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("occupied slots")
+                .data(bookingService.getOccupiedSlots(subFieldId, date))
+                .build();
     }
 
     @PostMapping("/create")
-    public ResponseData<?> createBooking(@Valid @RequestBody BookingRequest request, @AuthenticationPrincipal CustomUserDetails principal) {
-        try {
-            bookingService.createBooking(request, principal.getUser().getId());
-            return new ResponseData<>(HttpStatus.OK.value(), "booking created successfully");
-        } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "create booking fail");
-        }
+    public ApiResponse<?> createBooking(@Valid @RequestBody BookingRequest request, @AuthenticationPrincipal CustomUserDetails principal) {
+        bookingService.createBooking(request, principal.getUser().getId());
+        return ApiResponse.builder()
+                .status(HttpStatus.CREATED.value())
+                .message("booking created")
+                .build();
     }
 
     @GetMapping("/my")

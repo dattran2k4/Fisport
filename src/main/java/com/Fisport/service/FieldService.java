@@ -2,6 +2,7 @@ package com.Fisport.service;
 
 import com.Fisport.dto.request.FieldRequest;
 import com.Fisport.dto.response.FeatureResponse;
+import com.Fisport.dto.response.FieldDetailResponse;
 import com.Fisport.dto.response.FieldHasTimeSlotResponse;
 import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.common.EFieldStatus;
@@ -28,5 +29,7 @@ public interface FieldService {
 
     List<FieldResponse> getAllPendingFieldsByOwner(String name);
 
-    FieldResponse findBySlug(String fieldNameSlug);
+    FieldDetailResponse findBySlug(String fieldNameSlug);
+
+
 }

@@ -1,19 +1,17 @@
 package com.Fisport.dto.response;
 
-
 import com.Fisport.common.EFieldStatus;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
-@Builder
 @Setter
-@AllArgsConstructor
-public class FieldResponse {
+@Builder
+public class FieldDetailResponse {
     private Long id;
     private String name;
     private String address;
@@ -23,9 +21,10 @@ public class FieldResponse {
     private LocalTime openTime;
     private LocalTime closeTime;
     private EFieldStatus status;
-
     private Integer rating;
-
-    private WardResponse wardResponse;
-    private FieldTypeResponse fieldTypeResponse;
+    private String review;
+    private String ward;
+    private String city;
+    private String type;
+    private List<String> features;
 }

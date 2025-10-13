@@ -52,6 +52,9 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public void createBooking(BookingRequest request, Long userId) {
+
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
         //Valid subfield
         SubField subField = subFieldRepository.findById(request.getSubFieldId()).orElseThrow(() -> new ResourceNotFoundException("SubField not found"));
 
@@ -103,6 +106,7 @@ public class BookingServiceImpl implements BookingService {
                 .endTime(request.getEndTime())
                 .duration(request.getDuration())
                 .subfield(subField)
+                .user(user)
                 .bookingStatus(EBookingStatus.PENDING)
                 .expiredAt(LocalDateTime.now().plusMinutes(10))
                 .build();
