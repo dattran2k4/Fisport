@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalTime;
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,10 +21,10 @@ public class FieldDetailResponse {
     private LocalTime openTime;
     private LocalTime closeTime;
     private EFieldStatus status;
-    private Integer rating;
+    private Double rating;
     private String review;
     private String ward;
     private String city;
     private String type;
-    private List<String> features;
+    private Set<String> features;
 }

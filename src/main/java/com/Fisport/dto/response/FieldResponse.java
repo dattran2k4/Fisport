@@ -24,7 +24,7 @@ public class FieldResponse {
     private LocalTime closeTime;
     private EFieldStatus status;
 
-    private Integer rating;
+//    private Integer rating;
 
     private WardResponse wardResponse;
     private FieldTypeResponse fieldTypeResponse;

@@ -1,10 +1,7 @@
 package com.Fisport.controller;
 
 import com.Fisport.common.EFieldStatus;
-import com.Fisport.dto.response.FeatureResponse;
-import com.Fisport.dto.response.FieldResponse;
-import com.Fisport.dto.response.FieldTypeResponse;
-import com.Fisport.dto.response.WardResponse;
+import com.Fisport.dto.response.*;
 import com.Fisport.service.FeatureService;
 import com.Fisport.service.FieldService;
 import com.Fisport.service.FieldTypeService;
@@ -54,7 +51,7 @@ public class FieldController {
     @GetMapping("/{slug}/{fieldNameSlug}")
     public String getField(@PathVariable String slug, @PathVariable String fieldNameSlug, Model model) {
         FieldTypeResponse fieldTypeResponse = fieldTypeService.findBySlug(slug);
-        FieldResponse fieldResponse = fieldService.findBySlug(fieldNameSlug);
+        FieldDetailResponse fieldResponse = fieldService.findBySlug(fieldNameSlug);
         model.addAttribute("field", fieldResponse);
         return "web/field-detail";
     }

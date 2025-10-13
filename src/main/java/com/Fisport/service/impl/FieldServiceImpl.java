@@ -27,6 +27,7 @@ public class FieldServiceImpl implements FieldService {
     private final TimeSlotRepository timeSlotRepository;
     private final FieldHasTimeSlotRepository fieldHasTimeSlotRepository;
     private final FieldHasFeatureRepository fieldHasFeatureRepository;
+    private final ReviewRepository reviewRepository;
 
     @Override
     public List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, Long... featureIds) {
@@ -155,9 +156,12 @@ public class FieldServiceImpl implements FieldService {
     @Override
     public FieldDetailResponse findBySlug(String fieldNameSlug) {
         Field field = fieldRepository.findBySlug(fieldNameSlug);
+        Set<Feature> features = fieldHasFeatureRepository.findFeaturesByFieldId(field.getId());
+        Double rating = reviewRepository.findAverageByFieldId(field.getId());
         return FieldDetailResponse.builder()
                 .id(field.getId())
                 .name(field.getName())
+                .address(field.getAddress())
                 .slug(field.getSlug())
                 .openTime(field.getOpenTime())
                 .closeTime(field.getCloseTime())
@@ -165,6 +169,8 @@ public class FieldServiceImpl implements FieldService {
                 .city(field.getWard().getCity().getName())
                 .ward(field.getWard().getName())
                 .type(field.getFieldType().getName())
+                .features(features.stream().map(Feature::getName).collect(Collectors.toSet()))
+                .rating(rating)
                 .build();
     }
 

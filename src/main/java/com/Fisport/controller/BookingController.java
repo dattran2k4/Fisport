@@ -2,10 +2,7 @@ package com.Fisport.controller;
 
 import com.Fisport.common.ESubFieldStatus;
 import com.Fisport.dto.request.BookingRequest;
-import com.Fisport.dto.response.BookingServiceItemResponse;
-import com.Fisport.dto.response.FieldResponse;
-import com.Fisport.dto.response.FieldServiceItemResponse;
-import com.Fisport.dto.response.SubFieldResponse;
+import com.Fisport.dto.response.*;
 import com.Fisport.security.CustomUserDetails;
 import com.Fisport.service.BookingService;
 import com.Fisport.service.FieldService;
@@ -32,7 +29,7 @@ public class BookingController {
 
     @GetMapping("{slug}/dat-san")
     public String showBookingPage(Model model, @PathVariable String slug) {
-        FieldResponse field = fieldService.findBySlug(slug);
+        FieldDetailResponse field = fieldService.findBySlug(slug);
         model.addAttribute("field", field);
 
         List<SubFieldResponse> subField = subFieldService.getAllSubFields(field.getId(), ESubFieldStatus.AVAILABLE);

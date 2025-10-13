@@ -13,6 +13,7 @@ import com.Fisport.service.BookingService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -31,7 +32,7 @@ public class BookingApiController {
     private final BookingService bookingService;
 
     @GetMapping("/occupied")
-    public ApiResponse<?> getOccupiedSlots(@Min(1) Long subFieldId, LocalDate date) {
+    public ApiResponse<?> getOccupiedSlots(@RequestParam @Min(1) Long subFieldId, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())
                 .message("occupied slots")

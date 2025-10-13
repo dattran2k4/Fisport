@@ -40,7 +40,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingTimeResponse> getOccupiedSlots(Long subFieldId, LocalDate date) {
-        List<Booking> bookings = bookingRepository.findOccupiedSlots(subFieldId, date, List.of(EBookingStatus.PENDING, EBookingStatus.PAID, EBookingStatus.COMPLETED)
+        List<Booking> bookings = bookingRepository.findOccupiedSlots(subFieldId, date, List.of(EBookingStatus.PENDING, EBookingStatus.PAID)
         );
         return bookings.stream().map(b -> BookingTimeResponse.builder()
                 .startTime(b.getStartTime())

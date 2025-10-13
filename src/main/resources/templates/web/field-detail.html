@@ -5,211 +5,101 @@
 <body>
 <div layout:fragment="content">
     <section class="field-detail container my-5">
-        <div class="row g-4">
+        <div class="row g-4 align-items-center">
             <!-- Banner hình ảnh -->
             <div class="col-lg-6">
-                <div class="card shadow-sm border-0">
-                    <div class="ratio ratio-16x9 rounded"
-                         th:style="'background: url(' + ${field.banner != null ? field.banner : '/images/default-field.jpg'} + ') center/cover no-repeat;'">
+                <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                    <div class="ratio ratio-16x9">
+                        <div class="w-100 h-100"
+                             th:style="'background: url(' + ${field.banner != null ? field.banner : '/images/default-field.jpg'} + ') center/cover no-repeat;'">
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Thông tin chi tiết sân -->
             <div class="col-lg-6">
-                <!-- Tên sân -->
-                <h2 class="fw-bold mb-2" th:text="${field.name}">Tên sân</h2>
+                <div class="card border-0 shadow p-4 rounded-4">
+                    <!-- Tên sân -->
+                    <h2 class="fw-bold mb-2 d-flex align-items-center">
+                        <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+                        <span th:text="${field.name}">Tên sân</span>
+                    </h2>
 
-                <!-- Loại sân -->
-                <p class="text-muted mb-3" th:text="${field.fieldTypeResponse.name}">Loại sân</p>
+                    <!-- Loại sân -->
+                    <p class="text-muted mb-2">
+                        <i class="bi bi-tags me-2"></i>
+                        <span th:text="${field.type}">Loại sân</span>
+                    </p>
 
-                <!-- Giờ mở cửa -->
-                <div class="mb-3">
-                    <i class="bi bi-clock me-2"></i>
-                    <span th:text="${field.openTime} + ' - ' + ${field.closeTime}">06:00 - 22:00</span>
+                    <!-- Địa chỉ -->
+                    <p class="text-muted mb-3">
+                        <i class="bi bi-geo-alt text-danger me-2"></i>
+                        <span th:text="${field.address + ', ' + field.ward + ', ' + field.city}">
+                            123 Nguyễn Văn Cừ, Phường An Hòa, Cần Thơ
+                        </span>
+                    </p>
+
+                    <!-- Rating -->
+                    <div class="mb-3">
+                        <i class="bi bi-star-fill text-warning me-1"></i>
+                        <span class="fw-semibold" th:text="${#numbers.formatDecimal(field.rating, 1, 1)}">4.5</span>
+                        <span class="text-muted">/ 5.0</span>
+                    </div>
+
+                    <!-- Giờ mở cửa -->
+                    <div class="mb-3">
+                        <i class="bi bi-clock me-2 text-primary"></i>
+                        <span th:text="${field.openTime} + ' - ' + ${field.closeTime}">06:00 - 22:00</span>
+                    </div>
+
+                    <!-- Mô tả -->
+                    <div class="mb-4">
+                        <h6 class="fw-semibold mb-1">
+                            <i class="bi bi-info-circle me-2 text-secondary"></i>Mô tả
+                        </h6>
+                        <p class="text-secondary" th:text="${field.description}">
+                            Mô tả sân chi tiết...
+                        </p>
+                    </div>
+
+                    <!-- Tiện ích -->
+                    <div class="mb-4">
+                        <h6 class="fw-semibold mb-2">
+                            <i class="bi bi-check2-circle text-success me-2"></i>Tiện ích
+                        </h6>
+
+                        <!-- Nếu có danh sách features -->
+                        <div th:if="${field.features != null and !field.features.isEmpty()}">
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-light text-dark border rounded-pill px-3 py-2 d-flex align-items-center"
+                                      th:each="feature : ${field.features}">
+                                    <i class="bi bi-dot text-success me-1"></i>
+                                    <span th:text="${feature}">Wifi miễn phí</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Nếu không có tiện ích -->
+                        <p class="text-muted fst-italic" th:if="${field.features == null or field.features.isEmpty()}">
+                            Không có tiện ích được liệt kê.
+                        </p>
+                    </div>
+
+                    <!-- Nút đặt sân -->
+                    <a th:href="@{'/' + ${field.slug} + '/dat-san'}"
+                       class="btn btn-lg btn-primary d-flex align-items-center justify-content-center gap-2 rounded-3 shadow-sm"
+                       id="btn-booking">
+                        <i class="bi bi-calendar-check"></i> Đặt sân ngay
+                    </a>
                 </div>
-
-                <!-- Mô tả -->
-                <div class="mb-3">
-                    <h6>Mô tả</h6>
-                    <p th:text="${field.description}">Mô tả sân chi tiết...</p>
-                </div>
-
-                <a th:href="@{'/' + ${field.slug} + '/dat-san'}" class="btn btn-primary btn-lg" id="btn-booking">
-                    Đặt sân ngay
-                </a>
-            </div> <!-- kết thúc col phải -->
-        </div> <!-- kết thúc row -->
+            </div>
+        </div>
     </section>
 </div>
 
 <section layout:fragment="scripts">
     <script>
-        $(document).ready(function () {
-            const days = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-            const $datesContainer = $("#dates-container");
-
-            // --- Render danh sách 9 ngày đầu + ô khác ---
-            function renderDates() {
-                $datesContainer.empty();
-                const today = new Date();
-
-                for (let i = 0; i < 9; i++) {
-                    const date = new Date(today);
-                    date.setDate(today.getDate() + i);
-                    $datesContainer.append(createDateItem(date));
-                }
-
-                // Ô "Chọn ngày khác"
-                const $custom = $(`
-                        <div class="date-item border rounded text-center p-2 bg-light position-relative"
-                             style="min-width:100px; cursor:pointer;" id="custom-date-item">
-                            <i class="bi bi-calendar3" style="font-size:1.5rem;"></i><br>
-                            <span>Khác...</span>
-                        </div>
-                    `);
-                $datesContainer.append($custom);
-            }
-
-            function createDateItem(date) {
-                const dayName = days[date.getDay()];
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                return $(`
-                        <div class="date-item border rounded text-center p-2"
-                             style="min-width:100px; cursor:pointer;"
-                             data-date="${date.toISOString().split('T')[0]}">
-                            <strong>${dayName}</strong><br>
-                            <span>${day}/${month}</span>
-                        </div>
-                    `);
-            }
-
-            // --- Khi ấn "Đặt sân ngay" ---
-            $("#btn-booking").on("click", function () {
-                renderDates();
-                const modal = new bootstrap.Modal(document.getElementById('bookingModal'));
-                modal.show();
-            });
-
-            // --- Chọn ngày có sẵn ---
-            $(document).on("click", ".date-item", function (e) {
-                e.stopPropagation();
-                if ($(this).attr("id") === "custom-date-item") return;
-
-                $(".date-item").removeClass("bg-primary text-white");
-                $(this).addClass("bg-primary text-white");
-
-                const selectedDate = $(this).data("date");
-                console.log("Ngày được chọn:", selectedDate);
-                $("#time-selection").show();
-                $(".calendar-popup").remove();
-            });
-
-            // --- Popup lịch đầy đủ ---
-            $(document).on("click", "#custom-date-item", function (e) {
-                e.stopPropagation();
-                $(".calendar-popup").remove();
-
-                const now = new Date();
-                let month = now.getMonth();
-                let year = now.getFullYear();
-
-                const $popup = $(`
-                        <div class="calendar-popup border bg-white rounded shadow p-2 position-absolute"
-                             style="top:110%; left:0; z-index:2000; width:280px;">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <button class="btn btn-sm btn-outline-primary" id="prev-month">&lt;</button>
-                                <strong id="month-year"></strong>
-                                <button class="btn btn-sm btn-outline-primary" id="next-month">&gt;</button>
-                            </div>
-                            <div class="d-grid text-center" style="grid-template-columns:repeat(7,1fr);font-weight:600;">
-                                ${days.map(d => `<div>${d}</div>`).join('')}
-                            </div>
-                            <div id="calendar-days" class="d-grid text-center mt-1" style="grid-template-columns:repeat(7,1fr);gap:3px;"></div>
-                        </div>
-                    `);
-
-                $(this).append($popup);
-
-                function renderCalendar() {
-                    const $days = $popup.find("#calendar-days");
-                    $days.empty();
-
-                    const firstDay = new Date(year, month, 1);
-                    const lastDay = new Date(year, month + 1, 0);
-                    const today = new Date();
-
-                    $popup.find("#month-year").text(
-                        firstDay.toLocaleDateString('vi-VN', {month: 'long', year: 'numeric'})
-                    );
-
-                    // padding đầu tháng
-                    for (let i = 0; i < firstDay.getDay(); i++) {
-                        $days.append(`<div></div>`);
-                    }
-
-                    for (let d = 1; d <= lastDay.getDate(); d++) {
-                        const date = new Date(year, month, d);
-                        const dateStr = date.toISOString().split('T')[0];
-                        const isPast = date < new Date(today.setHours(0, 0, 0, 0));
-
-                        const $cell = $(`<div class="p-2 rounded ${isPast ? 'text-muted' : 'date-cell'}"
-                                            style="cursor:${isPast ? 'default' : 'pointer'};">${d}</div>`);
-
-                        if (!isPast) {
-                            $cell.on("click", function () {
-                                const dayName = days[date.getDay()];
-                                const day = String(d).padStart(2, '0');
-                                const monthStr = String(month + 1).padStart(2, '0');
-
-                                const $newItem = $(`
-                                        <div class="date-item border rounded text-center p-2 bg-primary text-white"
-                                             style="min-width:100px; cursor:pointer;"
-                                             data-date="${dateStr}">
-                                            <strong>${dayName}</strong><br>
-                                            <span>${day}/${monthStr}</span>
-                                        </div>
-                                    `);
-                                $("#custom-date-item").replaceWith($newItem);
-                                $(".calendar-popup").remove();
-                                console.log("Ngày chọn (calendar):", dateStr);
-                                $("#time-selection").show();
-                            });
-                        }
-
-                        $days.append($cell);
-                    }
-                }
-
-                renderCalendar();
-
-                // next/prev month
-                $popup.on("click", "#next-month", function (e) {
-                    e.stopPropagation();
-                    month++;
-                    if (month > 11) {
-                        month = 0;
-                        year++;
-                    }
-                    renderCalendar();
-                });
-                $popup.on("click", "#prev-month", function (e) {
-                    e.stopPropagation();
-                    month--;
-                    if (month < 0) {
-                        month = 11;
-                        year--;
-                    }
-                    renderCalendar();
-                });
-            });
-
-            // Ẩn popup khi click ngoài
-            $(document).on("click", function () {
-                $(".calendar-popup").remove();
-            });
-        });
     </script>
 </section>
 </body>

@@ -6,56 +6,62 @@
     <div class="container mt-4">
 
         <h2>Đặt sân: <span th:text="${field.name}"></span></h2>
-        <p>Địa chỉ: <span th:text="${field.address}"></span></p>
-<!--        <p>Giá khung giờ: <span th:text="${field.pricePerHour}"></span> VNĐ</p>-->
+        <p>Địa chỉ: <span th:text="${field.address + ', ' + field.ward + ', ' + field.city}"></span></p>
 
         <form th:action="@{/bookings}" th:object="${booking}" method="post">
 
-<!--            <input type="hidden" th:field="*{userId}"/>-->
-
-            <!-- 8 ngày tiếp theo + date picker -->
-            <div class="d-flex mb-3 flex-wrap">
-                <!-- 8 ngày tiếp theo -->
-                <button type="button" class="btn btn-outline-primary me-2 mb-2 day-btn"
-                        th:each="i : ${#numbers.sequence(0,7)}"
-                        th:data-date="${T(java.time.LocalDate).now().plusDays(i)}"
-                        th:text="|${T(java.time.LocalDate).now().plusDays(i).dayOfWeek} ${T(java.time.LocalDate).now().plusDays(i).dayOfMonth}/${T(java.time.LocalDate).now().plusDays(i).monthValue}|">
-                </button>
-
-                <!-- Calendar picker -->
-                <input type="date" class="form-control me-2 mb-2" id="customDate" name="bookingDate"/>
+            <!-- 8 ngày + calendar picker -->
+            <div class="d-flex flex-wrap mb-3" id="day-container"></div>
+            <div class="mb-3">
+                <input type="date" class="form-control" id="customDate">
             </div>
 
             <!-- Subfields -->
             <div class="mb-3">
-                <label for="subfield">Chọn sân con:</label>
-                <select class="form-select" th:field="*{subfieldId}" id="subfield">
-                    <option th:each="sub : ${subField}" th:value="${sub.id}" th:text="${sub.name}"></option>
-                </select>
+                <label class="form-label fw-semibold mb-2">Chọn sân con:</label>
+
+                <div class="list-group">
+                    <label class="list-group-item d-flex justify-content-between align-items-center border rounded-3 mb-2"
+                           th:each="sub : ${subField}">
+                        <!-- Tên sân -->
+                        <span th:text="${sub.name}" class="fw-medium text-dark">Sân bóng đá số 100</span>
+
+                        <!-- Nút chọn radio -->
+                        <input class="form-check-input" type="radio" th:field="*{subFieldId}" th:value="${sub.id}"/>
+                    </label>
+                </div>
             </div>
 
             <!-- Khung giờ bắt đầu -->
             <div class="mb-3">
-                <label for="startTime">Chọn giờ bắt đầu:</label>
-                <select class="form-select" th:field="*{startTime}" id="startTime"></select>
-            </div>
+                <label>Các khung giờ có thể chọn:</label>
+                <div class="d-flex flex-wrap" id="hours-container">
+                    <!-- Các button giờ sẽ được render bằng JS -->
 
-            <!-- Duration -->
-            <div class="mb-3">
-                <label for="duration">Thời lượng:</label>
-                <select class="form-select" th:field="*{duration}" id="duration">
-                    <option th:each="d : ${field.durations}" th:value="${d}" th:text="${d + ' phút'}"></option>
-                </select>
+                </div>
             </div>
 
             <!-- Field Service Items -->
             <div class="mb-3">
-                <label>Dịch vụ kèm theo:</label>
-                <div class="form-check" th:each="item : ${items}">
-                    <input class="form-check-input" type="checkbox" th:id="${'item-'+item.id}" th:value="${item.id}"
-                           name="serviceItemIds"/>
-                    <label class="form-check-label" th:for="${'item-'+item.id}"
-                           th:text="${item.name + ' - ' + item.price}"></label>
+                <label class="form-label fw-semibold">Dịch vụ kèm theo:</label>
+                <div class="list-group">
+                    <div class="list-group-item d-flex align-items-center justify-content-between"
+                         th:each="item : ${items}">
+                        <div>
+                            <input class="form-check-input me-2" type="checkbox"
+                                   th:id="${'item-' + item.id}"
+                                   th:value="${item.serviceItemId}"
+                                   name="serviceItemIds"/>
+                            <label class="form-check-label" th:for="${'item-' + item.id}">
+                                <span th:text="${item.serviceItemName}"></span>
+                                <small class="text-muted" th:text="'(' + ${item.serviceName} + ')'"></small>
+                            </label>
+                        </div>
+                        <div class="text-end">
+                            <span class="text-success fw-bold"
+                                  th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -63,5 +69,101 @@
         </form>
     </div>
 </div>
+<section layout:fragment="scripts">
+    <script>
+        $(document).ready(function () {
+            const dayContainer = $('#day-container');
+            const hoursContainer = $('#hours-container');
+            let selectedDate = null;
+            let selectedSubFieldId = null;
+
+            const openTime = /*[[${field.openTime}]]*/ '06:00';
+            const closeTime = /*[[${field.closeTime}]]*/ '18:00';
+
+            // Render 8 ngày
+            for (let i = 0; i < 8; i++) {
+                let date = new Date();
+                date.setDate(date.getDate() + i);
+
+                let btn = $('<button>')
+                    .attr('type', 'button')
+                    .addClass('btn btn-outline-primary me-2 mb-2 day-btn')
+                    .data('date', date.toISOString().slice(0, 10))
+                    .text(`${date.toLocaleDateString('vi-VN', {weekday: 'short'})} ${date.getDate()}/${date.getMonth() + 1}`);
+                dayContainer.append(btn);
+            }
+
+            // Khi click chọn ngày
+            $(document).on('click', '.day-btn', function () {
+                $('.day-btn').removeClass('active');
+                $(this).addClass('active');
+
+                selectedDate = $(this).data('date');
+                if (selectedSubFieldId) renderHours(selectedDate, selectedSubFieldId);
+            });
+
+            // Khi chọn ngày bằng calendar picker
+            $('#customDate').on('change', function () {
+                const selectedDate = $(this).val();
+                renderHours(selectedDate, selectedSubFieldId);
+            });
+
+            // Khi chọn sân con
+            $(document).on('change', 'input[name="subFieldId"]', function () {
+                selectedSubFieldId = $(this).val();
+                if (selectedDate) renderHours(selectedDate, selectedSubFieldId);
+            });
+
+
+            /**
+             * Render các khung giờ và disable các giờ đã được đặt
+             * @param {string} date (yyyy-MM-dd)
+             * @param {number} subFieldId
+             */
+            function renderHours(date, subFieldId) {
+                const container = $('#hourContainer');
+                container.empty().append('<div class="text-muted">Đang tải giờ...</div>');
+
+                // Gọi API lấy danh sách giờ bị đặt
+                $.getJSON(`${API_BASE}?subFieldId=${subFieldId}&date=${date}`)
+                    .done(function (bookedHours) {
+                        container.empty();
+
+                        const openHour = 6;   // Giờ mở cửa
+                        const closeHour = 22; // Giờ đóng cửa
+
+                        // Tạo nút giờ (mỗi giờ 1 button)
+                        for (let hour = openHour; hour < closeHour; hour++) {
+                            const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+
+                            // Kiểm tra giờ này có bị đặt không
+                            const isBooked = bookedHours.includes(timeStr);
+
+                            // Tạo button
+                            const btn = $('<button>')
+                                .attr('type', 'button')
+                                .addClass('btn btn-outline-primary hour-btn px-3 py-2')
+                                .text(timeStr)
+                                .prop('disabled', isBooked) // disable nếu bị đặt
+                                .toggleClass('btn-secondary', isBooked)
+                                .toggleClass('text-muted', isBooked)
+                                .toggleClass('text-decoration-line-through', isBooked);
+
+                            container.append(btn);
+                        }
+
+                        if (bookedHours.length === 0) {
+                            console.log('Tất cả giờ trống.');
+                        } else {
+                            console.log('Giờ bị đặt:', bookedHours);
+                        }
+                    })
+                    .fail(function () {
+                        container.empty().append('<div class="text-danger">Không thể tải dữ liệu giờ.</div>');
+                    });
+            }
+        });
+    </script>
+</section>
 </body>
 </html>
