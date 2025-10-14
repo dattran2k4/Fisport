@@ -459,6 +459,14 @@ VALUES
 ('TEST20', 'Voucher giảm 20%', 20, 'ACTIVE', 50, '2025-10-01', '2025-12-31', NOW(), NOW()),
 ('TEST30', 'Voucher giảm 30%', 30, 'ACTIVE', 10, '2025-10-01', '2025-12-31', NOW(), NOW());
 
+INSERT INTO user_voucher(user_id, voucher_id)
+VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(4, 1),
+(4, 2);
+
 INSERT INTO booking (booking_date, start_time, end_time, duration, total_price, status, subfield_id, user_id, created_at)
 VALUES
 (DATE_ADD(CURDATE(), INTERVAL 5 DAY), '07:00:00', '08:30:00', 90, 180000.00, 'PENDING', 3, 2, NOW()),

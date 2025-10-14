@@ -2,14 +2,15 @@ package com.Fisport.api;
 
 import com.Fisport.dto.request.ChangePasswordRequest;
 import com.Fisport.dto.request.UpdateProfileRequest;
-import com.Fisport.dto.response.ResponseData;
-import com.Fisport.dto.response.ResponseError;
-import com.Fisport.dto.response.UserResponse;
+import com.Fisport.dto.response.*;
+import com.Fisport.security.CustomUserDetails;
 import com.Fisport.service.UserService;
 import com.Fisport.common.ERole;
 import com.Fisport.common.EUserStatus;
+import com.Fisport.service.VoucherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -20,6 +21,7 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 public class UserApiController {
     private final UserService userService;
+    private final VoucherService voucherService;
 
     @GetMapping("/")
     public ResponseData<?> getProfile(Principal principal) {
@@ -78,5 +80,17 @@ public class UserApiController {
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Assign role failed");
         }
+    }
+
+    @GetMapping("/vouchers")
+    public ApiResponse<?> getVouchersForBooking(@AuthenticationPrincipal CustomUserDetails principal) {
+        List<VoucherResponse> response = voucherService.getVouchersByUserId(principal.getUser().getId());
+
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .data(response)
+                .message("get vouchers successfully")
+                .build();
+
     }
 }
