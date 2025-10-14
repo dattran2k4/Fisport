@@ -21,6 +21,8 @@ public class FieldDetailResponse {
     private LocalTime openTime;
     private LocalTime closeTime;
     private EFieldStatus status;
+    private Double latitude;
+    private Double longitude;
     private Double rating;
     private String review;
     private String ward;

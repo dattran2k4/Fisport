@@ -24,22 +24,21 @@ public class UserApiController {
     private final VoucherService voucherService;
 
     @GetMapping("/")
-    public ResponseData<?> getProfile(Principal principal) {
-        try {
-            return new ResponseData<>(HttpStatus.OK.value(), "Get profile successfully", userService.getUserByUserName(principal.getName()));
-        } catch (Exception e) {
-            return new ResponseError(HttpStatus.NOT_FOUND.value(), "Get profile failed");
-        }
+    public ApiResponse<?> getProfile(Principal principal) {
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("Get profile successfully")
+                .data(userService.getUserByUserName(principal.getName()))
+                .build();
     }
 
     @PutMapping("/update")
-    public ResponseData<?> updateProfile(@RequestBody UpdateProfileRequest request, Principal principal) {
-        try {
-            userService.updateUserByUserName(request, principal.getName());
-            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Update profile successfully");
-        } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Update profile failed");
-        }
+    public ApiResponse<?> updateProfile(@RequestBody UpdateProfileRequest request, Principal principal) {
+        userService.updateUserByUserName(request, principal.getName());
+        return ApiResponse.builder()
+                .status(HttpStatus.ACCEPTED.value())
+                .message("Update profile successfully")
+                .build();
     }
 
     @PatchMapping("/change-password")
@@ -67,7 +66,7 @@ public class UserApiController {
         try {
             userService.changeStatus(id, status);
             return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Change status successfully");
-        } catch(Exception e) {
+        } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Change status failed");
         }
     }

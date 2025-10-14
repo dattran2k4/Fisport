@@ -156,5 +156,15 @@ public class FieldApiController {
             return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage());
         }
     }
+
+    @GetMapping("/nearby")
+    public ApiResponse<?> getFieldNearyBy(@RequestParam Double lat, @RequestParam Double lng, @RequestParam Double radius) {
+        List<FieldDetailResponse> response = fieldService.getFieldsNearBy(lat, lng, radius);
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("Get Fields Near By Success")
+                .data(response)
+                .build();
+    }
 }
 

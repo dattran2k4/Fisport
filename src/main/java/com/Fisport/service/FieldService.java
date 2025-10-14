@@ -31,5 +31,5 @@ public interface FieldService {
 
     FieldDetailResponse findBySlug(String fieldNameSlug);
 
-
+    List<FieldDetailResponse> getFieldsNearBy(Double lat, Double lng, Double radius);
 }
