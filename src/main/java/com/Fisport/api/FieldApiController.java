@@ -3,12 +3,12 @@ package com.Fisport.api;
 import com.Fisport.common.ESubFieldStatus;
 import com.Fisport.dto.request.FieldRequest;
 import com.Fisport.dto.response.*;
-import com.Fisport.model.FieldServiceItem;
+import com.Fisport.repository.FieldHasTimeSlotRepository;
+import com.Fisport.service.FieldHasTimeSlotService;
 import com.Fisport.service.FieldService;
 import com.Fisport.common.EFieldStatus;
 import com.Fisport.service.FieldServiceItemService;
 import com.Fisport.service.SubFieldService;
-import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
 
@@ -30,6 +31,7 @@ public class FieldApiController {
     private final FieldService fieldService;
     private final FieldServiceItemService fieldServiceItemService;
     private final SubFieldService subFieldService;
+    private final FieldHasTimeSlotService fieldHasTimeSlotService;
 
     @GetMapping()
     public ApiResponse<?> getAllFields(@RequestParam(required = false) Long wardId,
@@ -37,6 +39,7 @@ public class FieldApiController {
                                        @RequestParam(required = false) EFieldStatus status,
                                        @RequestParam(required = false) String keyword,
                                        @RequestParam(required = false) Long... featureIds) {
+
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())
                 .message("fields")
@@ -45,19 +48,33 @@ public class FieldApiController {
     }
 
     @GetMapping("/{id}")
-    public ResponseData<?> getFieldById(@Min(1) @PathVariable Long id) {
-        FieldResponse fieldResponse = fieldService.getField(id);
-        return new ResponseData<>(HttpStatus.OK.value(), "Get Field Success", fieldResponse);
+    public ApiResponse<?> getFieldById(@Min(1) @PathVariable Long id) {
+
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("fields")
+                .data(fieldService.getField(id))
+                .build();
     }
 
     @GetMapping("/{id}/timeslots")
-    public ResponseData<?> getTimeSlotsByField(@Min(1) @PathVariable Long id) {
-        try {
-            List<FieldHasTimeSlotResponse> responses = fieldService.getTimeSlotAndPriceByFieldId(id);
-            return new ResponseData<>(HttpStatus.OK.value(), "Get Time Slots Success", responses);
-        } catch (Exception e) {
-            return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage());
-        }
+    public ApiResponse<?> getTimeSlotsByField(@Min(1) @PathVariable Long id) {
+
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("Get Time Slots Success")
+                .data(fieldHasTimeSlotService.getTimeSlotAndPriceByFieldId(id))
+                .build();
+    }
+
+    @GetMapping("{id}/bookingtime-price")
+    public ApiResponse<?> getPriceInRangeBooking(@Min(1) @PathVariable Long id, LocalTime startTime, LocalTime endTime) {
+
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("Get Price In Range Success")
+                .data(fieldHasTimeSlotService.getTotalPriceSlotBooking(id, startTime, endTime))
+                .build();
     }
 
     @GetMapping("/{id}/features")

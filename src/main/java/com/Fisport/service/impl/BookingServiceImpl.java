@@ -13,16 +13,19 @@ import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.*;
 import com.Fisport.repository.*;
 import com.Fisport.service.BookingService;
+import com.Fisport.service.FieldHasTimeSlotService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.security.InvalidParameterException;
 import java.security.Principal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +41,7 @@ public class BookingServiceImpl implements BookingService {
     private final FieldServiceItemRepository fieldServiceItemRepository;
     private final FieldHasTimeSlotRepository fieldHasTimeSlotRepository;
     private final UserRepository userRepository;
+    private final FieldHasTimeSlotService fieldHasTimeSlotService;
 
     @Override
     public List<BookingTimeResponse> getOccupiedSlots(Long subFieldId, LocalDate date) {
@@ -75,15 +79,15 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (request.getStartTime().isAfter(request.getEndTime())) {
-            throw new InvalidParameterException("Start time must be after end time");
+            throw new InvalidParameterException("Start time must be before end time");
         }
 
         if (request.getStartTime().isBefore(subField.getField().getOpenTime())) {
-            throw new InvalidParameterException("Start time must after open time");
+            throw new InvalidParameterException("Start time must be after open time");
         }
 
         if (request.getEndTime().isAfter(subField.getField().getCloseTime())) {
-            throw new InvalidParameterException("End time must before close time");
+            throw new InvalidParameterException("End time must be before close time");
         }
 
         //Valid duration must be in field type
@@ -101,7 +105,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         //Valid occupied
-        List<FieldHasTimeSlot> slots = fieldHasTimeSlotRepository.findSlotsForBooking(request.getSubFieldId(), request.getStartTime(), request.getEndTime());
+        List<FieldHasTimeSlot> slots = fieldHasTimeSlotRepository.findSlotsForBooking(subField.getField().getId(), request.getStartTime(), request.getEndTime());
         if (slots.isEmpty()) {
             throw new ResourceNotFoundException("Slot not found");
         }
@@ -141,7 +145,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         //
-        BigDecimal totalSlotPrice = slots.stream().map(FieldHasTimeSlot::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalSlotPrice = fieldHasTimeSlotService.calculateDynamicPrice(slots, request.getStartTime(), request.getEndTime());
         BigDecimal totalServiceItem = bookingServiceItems.stream().map(BookingServiceItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal total = totalSlotPrice.add(totalServiceItem);
         booking.setTotalPrice(total);

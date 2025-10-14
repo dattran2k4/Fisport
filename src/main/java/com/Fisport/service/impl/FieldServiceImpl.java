@@ -118,18 +118,6 @@ public class FieldServiceImpl implements FieldService {
     }
 
     @Override
-    public List<FieldHasTimeSlotResponse> getTimeSlotAndPriceByFieldId(Long id) {
-        Field field = getFieldByid(id);
-        List<FieldHasTimeSlot> fieldHasTimeSlots = fieldHasTimeSlotRepository.findByFieldId(id);
-        return fieldHasTimeSlots.stream()
-                .map(fieldHasTimeSlot -> FieldHasTimeSlotResponse.builder()
-                        .id(fieldHasTimeSlot.getId())
-                        .startTime(fieldHasTimeSlot.getTimeSlot().getStartTime())
-                        .price(fieldHasTimeSlot.getPrice())
-                        .build()).toList();
-    }
-
-    @Override
     public Set<FeatureResponse> getFeautresByField(Long id) {
         Set<Feature> feature = fieldHasFeatureRepository.findFeaturesByFieldId(id);
         return feature.stream().map(f -> FeatureResponse.builder()

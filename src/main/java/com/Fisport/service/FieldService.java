@@ -21,8 +21,6 @@ public interface FieldService {
 
     FieldResponse getField(Long fieldId);
 
-    List<FieldHasTimeSlotResponse> getTimeSlotAndPriceByFieldId(Long id);
-
     Set<FeatureResponse> getFeautresByField(Long id);
 
     List<FieldResponse> getAllPendingFields();

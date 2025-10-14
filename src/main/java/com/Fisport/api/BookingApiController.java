@@ -1,13 +1,9 @@
 package com.Fisport.api;
 
-import com.Fisport.common.EBookingStatus;
 import com.Fisport.dto.request.BookingRequest;
 import com.Fisport.dto.response.ApiResponse;
-import com.Fisport.dto.response.BookingTimeResponse;
 import com.Fisport.dto.response.ResponseData;
 import com.Fisport.dto.response.ResponseError;
-import com.Fisport.model.Booking;
-import com.Fisport.repository.BookingRepository;
 import com.Fisport.security.CustomUserDetails;
 import com.Fisport.service.BookingService;
 import jakarta.validation.Valid;
@@ -19,9 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.time.LocalDate;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Validated
