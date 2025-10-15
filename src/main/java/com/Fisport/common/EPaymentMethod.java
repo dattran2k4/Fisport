@@ -9,4 +9,6 @@ public enum EPaymentMethod {
     VNPAY,
     @JsonProperty("bank_transfer")
     BANK_TRANSFER,
+    @JsonProperty("zalopay")
+    ZALOPAY
 }

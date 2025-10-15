@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -58,6 +59,9 @@ public class Booking extends AbstractEntity {
     @OneToMany(mappedBy = "booking")
     private Set<Payment> payments = new HashSet<>();
 
+    @Column(name = "payment_token")
+    private String paymentToken;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
@@ -68,4 +72,9 @@ public class Booking extends AbstractEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @PrePersist
+    public void prePersist() {
+        paymentToken = UUID.randomUUID().toString();
+    }
 }

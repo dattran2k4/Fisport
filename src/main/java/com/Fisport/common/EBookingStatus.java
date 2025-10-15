@@ -7,6 +7,8 @@ public enum EBookingStatus {
     PENDING,
     @JsonProperty("paid")
     PAID,
+    @JsonProperty("failed")
+    FAILED,
     @JsonProperty("cancelled")
     CANCELLED,
     @JsonProperty("completed")
