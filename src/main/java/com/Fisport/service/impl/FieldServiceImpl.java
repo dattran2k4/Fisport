@@ -149,6 +149,8 @@ public class FieldServiceImpl implements FieldService {
         return FieldDetailResponse.builder()
                 .id(field.getId())
                 .name(field.getName())
+                .latitude(field.getLatitude())
+                .longitude(field.getLongitude())
                 .address(field.getAddress())
                 .slug(field.getSlug())
                 .openTime(field.getOpenTime())
@@ -161,6 +163,11 @@ public class FieldServiceImpl implements FieldService {
                 .features(features.stream().map(Feature::getName).collect(Collectors.toSet()))
                 .rating(rating)
                 .build();
+    }
+
+    @Override
+    public List<FieldDetailResponse> getFieldsNearBy(Double lat, Double lng, Double radius) {
+        
     }
 
 
