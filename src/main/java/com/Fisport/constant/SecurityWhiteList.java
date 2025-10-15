@@ -9,5 +9,5 @@ public class SecurityWhiteList {
             "/san-bong-da-1/**",
             "/login/**", "/2fa/**", "/",
             "/api/v1/bookings/**",
-            "/bong-da/**", "/san-bong-da-2/**", "/api/v1/users/**", "/api/payment/**"); //test
+            "/bong-da/**", "/san-bong-da-2/**", "/api/v1/users/**", "/api/payment/**", "/vnpay-return**"); //test
 }

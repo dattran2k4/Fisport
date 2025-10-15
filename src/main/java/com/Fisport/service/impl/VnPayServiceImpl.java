@@ -3,18 +3,14 @@ package com.Fisport.service.impl;
 import com.Fisport.config.VnPayConfig;
 import com.Fisport.model.Booking;
 import com.Fisport.service.VnPayService;
+import com.Fisport.util.VnPayUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -33,9 +29,15 @@ public class VnPayServiceImpl implements VnPayService {
             vnpParams.put("vnp_TmnCode", vnPayConfig.getVnpTmnCode());
             vnpParams.put("vnp_Amount", booking.getTotalPrice().multiply(BigDecimal.valueOf(100)).toBigInteger().toString());
             vnpParams.put("vnp_CurrCode", "VND");
-            vnpParams.put("vnp_TxnRef", booking.getId().toString());
+
+            String prefix = "BK";
+            Long bookingId = booking.getId();
+            Long timestamp = System.currentTimeMillis();
+            // Dùng String.format
+            String txnRef = String.format("%s%d-%d", prefix, bookingId, timestamp);
+            vnpParams.put("vnp_TxnRef", txnRef);
             //Secure paymentToken
-            vnpParams.put("vnp_OrderInfo", "Thanh toan booking: " + Base64.getEncoder().encodeToString(booking.getPaymentToken().getBytes(StandardCharsets.US_ASCII)));
+            vnpParams.put("vnp_OrderInfo", "Thanh toan booking: " + txnRef);
             vnpParams.put("vnp_OrderType", "other");
             vnpParams.put("vnp_Locale", "vn");
             vnpParams.put("vnp_ReturnUrl", buildReturnUrl(httpServletRequest));
@@ -45,30 +47,16 @@ public class VnPayServiceImpl implements VnPayService {
             // sắp xếp key alphabetically
             Map<String, String> sortedParams = new TreeMap<>(vnpParams);
 
-            // tạo query string & hash
-            StringBuilder query = new StringBuilder();
-            StringBuilder hashData = new StringBuilder();
-            for (Map.Entry<String, String> entry : sortedParams.entrySet()) {
-                query.append(URLEncoder.encode(entry.getKey(), StandardCharsets.US_ASCII))
-                        .append("=")
-                        .append(URLEncoder.encode(entry.getValue(), StandardCharsets.US_ASCII))
-                        .append("&");
+            Map<String, String> result = VnPayUtils.buildHashAndQuery(sortedParams);
 
-                hashData.append(entry.getKey())
-                        .append("=")
-                        .append(entry.getValue())
-                        .append("&");
-            }
-
-            // remove trailing &
-            if (query.length() > 0) query.deleteCharAt(query.length() - 1);
-            if (hashData.length() > 0) hashData.deleteCharAt(hashData.length() - 1);
+            String hashData = result.get("hashData");
+            String query = result.get("query");
 
             //Chữ ký
-            String vnpSecureHash = hmacSHA512(vnPayConfig.getVnpHashSecret(), hashData.toString());
+            String vnpSecureHash = VnPayUtils.hmacSHA512(vnPayConfig.getVnpHashSecret(), hashData);
 
             //Ghép url
-            String paymentUrl = vnPayConfig.getVnpPayUrl() + "?" + query.toString() + "&vnp_SecureHash=" + vnpSecureHash;
+            String paymentUrl = vnPayConfig.getVnpPayUrl() + "?" + query + "&vnp_SecureHash=" + vnpSecureHash;
 
             return paymentUrl;
 
@@ -93,16 +81,11 @@ public class VnPayServiceImpl implements VnPayService {
             // sắp xếp key
             Map<String, String> sorted = new TreeMap<>(clone);
 
-            StringBuilder hashData = new StringBuilder();
-            for (Map.Entry<String, String> entry : sorted.entrySet()) {
-                hashData.append(entry.getKey())
-                        .append("=")
-                        .append(entry.getValue())
-                        .append("&");
-            }
-            if (hashData.length() > 0) hashData.deleteCharAt(hashData.length() - 1);
+            Map<String, String> result = VnPayUtils.buildHashAndQuery(sorted);
+            String hashData = result.get("hashData");
 
-            String calculatedHash = hmacSHA512(vnPayConfig.getVnpHashSecret(), hashData.toString());
+
+            String calculatedHash = VnPayUtils.hmacSHA512(vnPayConfig.getVnpHashSecret(), hashData);
             return vnpSecureHash.equals(calculatedHash);
         } catch (Exception e) {
             return false;
@@ -111,7 +94,9 @@ public class VnPayServiceImpl implements VnPayService {
 
     @Override
     public Long extractBookingId(Map<String, String> params) {
-        return Long.valueOf(params.get("vnp_TxnRef"));
+        String txnRef = params.get("vnp_TxnRef");
+        String withoutPrefix = txnRef.substring(2);
+        return Long.parseLong(withoutPrefix.split("-")[0]);
     }
 
     /**
@@ -133,22 +118,7 @@ public class VnPayServiceImpl implements VnPayService {
         return context + vnPayConfig.getVnpReturnUrl();
     }
 
-    /**
-     * Tạo HMAC SHA512
-     */
-    private String hmacSHA512(String key, String data) throws Exception {
-        Mac hmac = Mac.getInstance("HmacSHA512");
-        SecretKeySpec secretKey = new SecretKeySpec(key.getBytes(StandardCharsets.US_ASCII), "HmacSHA512");
-        hmac.init(secretKey);
-        byte[] bytes = hmac.doFinal(data.getBytes(StandardCharsets.US_ASCII));
-        StringBuilder hash = new StringBuilder();
-        for (byte b : bytes) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) hash.append('0');
-            hash.append(hex);
-        }
-        return hash.toString();
-    }
+
 
     private String getClientIp(HttpServletRequest request) {
         String ipAddress = request.getHeader("X-FORWARDED-FOR"); // check proxy/nginx

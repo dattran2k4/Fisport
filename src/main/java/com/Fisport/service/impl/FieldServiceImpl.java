@@ -167,7 +167,7 @@ public class FieldServiceImpl implements FieldService {
 
     @Override
     public List<FieldDetailResponse> getFieldsNearBy(Double lat, Double lng, Double radius) {
-        
+        return null;
     }
 
 

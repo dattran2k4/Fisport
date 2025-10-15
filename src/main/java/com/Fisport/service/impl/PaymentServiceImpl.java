@@ -4,6 +4,7 @@ import com.Fisport.common.EBookingStatus;
 import com.Fisport.common.EPaymentMethod;
 import com.Fisport.common.EPaymentStatus;
 import com.Fisport.dto.request.PaymentRequest;
+import com.Fisport.dto.response.PaymentResponse;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.Booking;
 import com.Fisport.model.Payment;
@@ -44,11 +45,13 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void handleVnpayReturn(Map<String, String> params) {
+    public PaymentResponse handleVnpayReturn(Map<String, String> params) {
         boolean valid = vnPayService.validatePayment(params);
         if (!valid) {
             throw new RuntimeException("Invalid VNPay callback");
         }
+
+        String transactionNo = params.get("vnp_TransactionNo");
 
         Long bookingId = vnPayService.extractBookingId(params);
         Booking booking = bookingRepository.findById(bookingId)
@@ -59,6 +62,7 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setAmount(booking.getTotalPrice());
         payment.setMethod(EPaymentMethod.VNPAY);
         payment.setStatus(EPaymentStatus.PENDING);
+        payment.setTransactionId(transactionNo);
 
         String response = params.get("vnp_ResponseCode");
         if ("00".equals(response)) {
@@ -73,6 +77,13 @@ public class PaymentServiceImpl implements PaymentService {
         bookingRepository.save(booking);
         paymentRepository.save(payment);
 
+        return PaymentResponse.builder()
+                .status(payment.getStatus())
+                .amount(payment.getAmount())
+                .method(payment.getMethod())
+                .transactionId(payment.getTransactionId())
+                .paymentAt(payment.getPaymentTime())
+                .build();
     }
 
     @Override
