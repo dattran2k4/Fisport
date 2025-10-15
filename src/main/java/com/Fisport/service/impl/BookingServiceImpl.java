@@ -121,8 +121,6 @@ public class BookingServiceImpl implements BookingService {
                 .expiredAt(LocalDateTime.now().plusMinutes(10))
                 .build();
 
-        Set<BookingServiceItem> bookingServiceItems = new HashSet<>();
-
         //BookingServiceItem
         if (request.getBookingServiceItemRequest() != null && !request.getBookingServiceItemRequest().isEmpty()) {
             for (BookingServiceItemRequest requestItem : request.getBookingServiceItemRequest()) {
@@ -140,13 +138,14 @@ public class BookingServiceImpl implements BookingService {
                         .booking(booking)
                         .subTotal(fsi.getPrice().multiply(BigDecimal.valueOf(requestItem.getQuantity())))
                         .build();
-                bookingServiceItems.add(bookingServiceItem);
+                //Set each booking service item for booking
+                booking.getBookingServiceItems().add(bookingServiceItem);
             }
         }
 
         //
         BigDecimal totalSlotPrice = fieldHasTimeSlotService.calculateDynamicPrice(slots, request.getStartTime(), request.getEndTime());
-        BigDecimal totalServiceItem = bookingServiceItems.stream().map(BookingServiceItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalServiceItem = booking.getBookingServiceItems().stream().map(BookingServiceItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal total = totalSlotPrice.add(totalServiceItem);
         booking.setTotalPrice(total);
 

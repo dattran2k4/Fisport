@@ -53,8 +53,9 @@ public class Booking extends AbstractEntity {
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "booking")
     private Review review;
 
+    @Builder.Default
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookingServiceItem> bookingServiceItems = new HashSet<BookingServiceItem>();
+    private Set<BookingServiceItem> bookingServiceItems = new HashSet<>();
 
     @OneToMany(mappedBy = "booking")
     private Set<Payment> payments = new HashSet<>();
