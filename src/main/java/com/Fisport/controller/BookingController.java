@@ -51,7 +51,7 @@ public class BookingController {
             model.addAttribute("error", result.getAllErrors().get(0).getDefaultMessage());
         }
 
-        bookingService.createBooking(request, customUserDetails.getUser().getId());
-        return "redirect:/";
+        String token = bookingService.createBooking(request, customUserDetails.getUser().getId());
+        return "redirect:/thanh-toan?token=" + token;
     }
 }

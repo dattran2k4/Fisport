@@ -14,7 +14,7 @@ public interface BookingService {
 
     List<BookingTimeResponse> getOccupiedSlots(Long subFieldId, LocalDate date);
 
-    void createBooking(BookingRequest request, Long userId);
+    String createBooking(BookingRequest request, Long userId);
 
     List<BookingListResponse> getAllBookings(String name);
 

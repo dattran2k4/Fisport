@@ -56,7 +56,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional
     @Override
-    public void createBooking(BookingRequest request, Long userId) {
+    public String createBooking(BookingRequest request, Long userId) {
 
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -151,6 +151,8 @@ public class BookingServiceImpl implements BookingService {
         booking.setTotalPrice(total);
 
         bookingRepository.save(booking);
+
+        return booking.getPaymentToken();
     }
 
     @Override

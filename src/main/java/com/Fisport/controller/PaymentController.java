@@ -1,5 +1,6 @@
 package com.Fisport.controller;
 
+import com.Fisport.common.EPaymentMethod;
 import com.Fisport.common.EPaymentStatus;
 import com.Fisport.dto.response.PaymentResponse;
 import com.Fisport.service.PaymentService;
@@ -18,6 +19,14 @@ import java.util.Map;
 public class PaymentController {
 
     private final PaymentService paymentService;
+
+    @GetMapping("/thanh-toan")
+    public String showMethodPayment(@RequestParam("token") String paymentToken, Model model) {
+        model.addAttribute("paymentToken", paymentToken);
+        model.addAttribute("methods", EPaymentMethod.values());
+
+        return "web/payment";
+    }
 
     @GetMapping("/vnpay-return")
     public String showPaymentStatus(@RequestParam Map<String, String> params, Model model) {
