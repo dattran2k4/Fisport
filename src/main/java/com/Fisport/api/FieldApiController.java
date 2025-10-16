@@ -175,7 +175,7 @@ public class FieldApiController {
     }
 
     @GetMapping("/nearby")
-    public ApiResponse<?> getFieldNearyBy(@RequestParam Double lat, @RequestParam Double lng, @RequestParam Double radius) {
+    public ApiResponse<?> getFieldNearyBy(@RequestParam Double lat, @RequestParam Double lng, @RequestParam(defaultValue = "2") Double radius) {
         List<FieldDetailResponse> response = fieldService.getFieldsNearBy(lat, lng, radius);
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())

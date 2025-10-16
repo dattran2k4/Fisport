@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -68,6 +69,12 @@ public class Field extends AbstractEntity {
 
     @OneToMany(mappedBy = "field")
     private Set<FieldHasFeature> fieldHasFeatures = new HashSet<>();
+
+    public Set<Feature> getFeatures() {
+        return fieldHasFeatures.stream()
+                .map(FieldHasFeature::getFeature)
+                .collect(Collectors.toSet());
+    }
 
     @OneToMany(mappedBy = "field",  cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FieldServiceItem> fieldServiceItems = new HashSet<>();

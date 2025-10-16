@@ -55,19 +55,20 @@
         <h2>Thanh toán thất bại!</h2>
         <p>Giao dịch không thành công. Vui lòng thử lại hoặc liên hệ hỗ trợ.</p>
 
-        <a href="/" class="button">Quay về trang chủ</a>
+        <a href="/" class="button" id="back-to-home">Quay về trang chủ</a>
     </div>
     <script>
-        // Kiểm tra xem cửa sổ cha còn tồn tại
-        if (window.opener) {
-            // Reload lại trang chính
-            window.opener.location.href = '/'; // hoặc window.opener.location.reload();
-            // Đóng popup
-            window.close();
-        } else {
-            // Nếu không có popup, chuyển hướng thẳng
-            window.location.href = '/';
-        }
+        document.getElementById('back-to-home').addEventListener('click', function () {
+            if (window.opener) {
+                // Điều hướng cửa sổ chính về trang chủ
+                window.opener.location.href = '/'; // hoặc trang bạn muốn
+                // Đóng popup
+                window.close();
+            } else {
+                // Nếu không có cửa sổ gốc, điều hướng chính nó
+                window.location.href = '/';
+            }
+        });
     </script>
 </body>
 

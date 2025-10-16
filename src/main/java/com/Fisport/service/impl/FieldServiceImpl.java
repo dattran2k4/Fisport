@@ -23,9 +23,6 @@ public class FieldServiceImpl implements FieldService {
     private final FieldRepository fieldRepository;
     private final WardRepository wardRepository;
     private final UserRepository userRepository;
-    private final FieldTypeRepository fieldTypeRepository;
-    private final TimeSlotRepository timeSlotRepository;
-    private final FieldHasTimeSlotRepository fieldHasTimeSlotRepository;
     private final FieldHasFeatureRepository fieldHasFeatureRepository;
     private final ReviewRepository reviewRepository;
 
@@ -167,7 +164,35 @@ public class FieldServiceImpl implements FieldService {
 
     @Override
     public List<FieldDetailResponse> getFieldsNearBy(Double lat, Double lng, Double radius) {
-        return null;
+        // 1° latitude ≈ 111 km
+        Double latDistance = radius / 111.0;
+        Double lngDistance = radius / (111.0 * Math.cos(Math.toRadians(lat)));
+
+        Double minLat = lat - latDistance;
+        Double maxLat = lat + latDistance;
+        Double minLng = lng - lngDistance;
+        Double maxLng = lng + lngDistance;
+
+        //Bounding box radius
+        List<Field> fields = fieldRepository.findFieldWithinRadius(lat, lng, minLat, maxLat, minLng, maxLng, radius);
+
+        return fields.stream().map(f -> FieldDetailResponse.builder()
+                .id(f.getId())
+                .name(f.getName())
+                .slug(f.getSlug())
+                .city(f.getWard().getCity().getName())
+                .ward(f.getWard().getName())
+                .type(f.getFieldType().getName())
+                .typeId(f.getFieldType().getId())
+                .address(f.getAddress())
+                .description(f.getDescription())
+                .latitude(f.getLatitude())
+                .longitude(f.getLongitude())
+                .banner(f.getBanner())
+                .openTime(f.getOpenTime())
+                .closeTime(f.getCloseTime())
+                .features(f.getFeatures().stream().map(Feature::getName).collect(Collectors.toSet()))
+                .build()).toList();
     }
 
 
