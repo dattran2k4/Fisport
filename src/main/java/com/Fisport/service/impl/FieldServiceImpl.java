@@ -134,7 +134,7 @@ public class FieldServiceImpl implements FieldService {
     public List<FieldResponse> getAllPendingFieldsByOwner(String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chủ sân"));
 
-        List<Field> fields = fieldRepository.findByFieldStatusAndOwner_Username(EFieldStatus.PENDING, name);
+        List<Field> fields = fieldRepository.findByFieldStatusAndOwner_Username(EFieldStatus.PENDING, user.getUsername());
         return fields.stream().map(this::toDto).toList();
     }
 
@@ -153,6 +153,7 @@ public class FieldServiceImpl implements FieldService {
                 .openTime(field.getOpenTime())
                 .closeTime(field.getCloseTime())
                 .description(field.getDescription())
+                .typeSlug(field.getFieldType().getSlug())
                 .city(field.getWard().getCity().getName())
                 .ward(field.getWard().getName())
                 .type(field.getFieldType().getName())
@@ -188,7 +189,9 @@ public class FieldServiceImpl implements FieldService {
                 .description(f.getDescription())
                 .latitude(f.getLatitude())
                 .longitude(f.getLongitude())
+                .typeSlug(f.getFieldType().getSlug())
                 .banner(f.getBanner())
+                .rating(reviewRepository.findAverageByFieldId(f.getId()))
                 .openTime(f.getOpenTime())
                 .closeTime(f.getCloseTime())
                 .features(f.getFeatures().stream().map(Feature::getName).collect(Collectors.toSet()))
@@ -214,26 +217,18 @@ public class FieldServiceImpl implements FieldService {
 
 
     private FieldResponse toDto(Field f) {
-        return new FieldResponse(
-                f.getId(),
-                f.getName(),
-                f.getAddress(),
-                f.getBanner(),
-                f.getSlug(),
-                f.getDescription(),
-                f.getOpenTime(),
-                f.getCloseTime(),
-                f.getFieldStatus(),
-                new WardResponse(
-                        f.getWard().getId(),
-                        f.getWard().getName(),
-                        f.getWard().getSlug()
-                ),
-                new FieldTypeResponse(
-                        f.getFieldType().getId(),
-                        f.getFieldType().getName(),
-                        f.getFieldType().getSlug()
-                )
-        );
+        return FieldResponse.builder()
+                .id(f.getId())
+                .name(f.getName())
+                .address(f.getAddress())
+                .banner(f.getBanner())
+                .slug(f.getSlug())
+                .openTime(f.getOpenTime())
+                .closeTime(f.getCloseTime())
+                .status(f.getFieldStatus())
+                .rating(reviewRepository.findAverageByFieldId(f.getId()))
+                .wardResponse(toWardDto(f.getWard()))
+                .fieldTypeResponse(toFieldTypeResponseDto(f.getFieldType()))
+                .build();
     }
 }

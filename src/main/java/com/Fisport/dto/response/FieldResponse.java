@@ -19,13 +19,10 @@ public class FieldResponse {
     private String address;
     private String banner;
     private String slug;
-    private String description;
     private LocalTime openTime;
     private LocalTime closeTime;
     private EFieldStatus status;
-
-//    private Integer rating;
-
+    private Double rating;
     private WardResponse wardResponse;
     private FieldTypeResponse fieldTypeResponse;
 }

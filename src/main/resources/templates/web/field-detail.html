@@ -96,10 +96,173 @@
             </div>
         </div>
     </section>
+    <!-- Bản đồ mini hiển thị vị trí sân -->
+    <section class="container my-5">
+        <h4 class="fw-semibold mb-3">
+            <i class="bi bi-map text-primary me-2"></i> Vị trí & các sân lân cận
+        </h4>
+        <div id="field-map" style="height: 400px;" class="rounded-4 shadow-sm"></div>
+    </section>
 </div>
 
 <section layout:fragment="scripts">
-    <script>
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            const fieldLat = /*[[${field.latitude}]]*/ 10.035;
+            const fieldLng = /*[[${field.longitude}]]*/ 105.785;
+            const fieldName = /*[[${field.name}]]*/ 'Sân bóng đá A';
+            const fieldSlug = /*[[${field.slug}]]*/ 'san-bong-da-a';
+            const fieldId = /*[[${field.id}]]*/ 0;
+
+            // Tạo bản đồ Leaflet
+            const map = L.map('field-map', {scrollWheelZoom: false}).setView([fieldLat, fieldLng], 15);
+
+            // Gọi bản đồ nền miễn phí (OpenStreetMap)
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            const fieldIcons = {
+                "BONG-DA": L.icon({
+                    iconUrl: '/web/img/field/icons/football.png',
+                    iconSize: [35, 35],
+                    iconAnchor: [17, 34],
+                    popupAnchor: [0, -30]
+                }),
+                "CAU-LONG": L.icon({
+                    iconUrl: '/web/img/field/icons/badminton.png',
+                    iconSize: [35, 35],
+                    iconAnchor: [17, 34],
+                    popupAnchor: [0, -30]
+                }),
+                "TENNIS": L.icon({
+                    iconUrl: '/web/img/field/icons/tennis.png',
+                    iconSize: [35, 35],
+                    iconAnchor: [17, 34],
+                    popupAnchor: [0, -30]
+                }),
+                "PICKLEBALL": L.icon({
+                    iconUrl: '/web/img/field/icons/pickleball.png',
+                    iconSize: [35, 35],
+                    iconAnchor: [17, 34],
+                    popupAnchor: [0, -30]
+                }),
+                "BOI-LOI": L.icon({
+                    iconUrl: '/web/img/field/icons/swimming.png',
+                    iconSize: [35, 35],
+                    iconAnchor: [17, 34],
+                    popupAnchor: [0, -30]
+                }),
+                "BONG-RO": L.icon({
+                    iconUrl: '/web/img/field/icons/basketball.png',
+                    iconSize: [35, 35],
+                    iconAnchor: [17, 34],
+                    popupAnchor: [0, -30]
+                }),
+                "DEFAULT": L.icon({
+                    iconUrl: '/web/img/field/icons/default.png',
+                    iconSize: [30, 30]
+                })
+            };
+
+            // Ghim sân hiện tại
+            const mainMarker = L.marker([fieldLat, fieldLng], {icon: mainIcon}).addTo(map);
+            mainMarker.bindPopup(`<b>${fieldName}</b><br><a href='/${fieldSlug}'>Xem chi tiết</a>`).openPopup();
+
+            // Vẽ vùng bán kính 2km quanh sân
+            L.circle([fieldLat, fieldLng], {
+                color: '#007bff',
+                fillColor: '#cce5ff',
+                fillOpacity: 0.25,
+                radius: 2000
+            }).addTo(map);
+
+            // Gọi API lấy các sân gần
+            $.ajax({
+                url: `/api/v1/fields/nearby`,
+                method: 'GET',
+                data: {lat: fieldLat, lng: fieldLng},
+                success: function (data) {
+                    if (!data || data.length === 0) {
+                        console.log("Không có sân gần đó.");
+                        return;
+                    }
+
+                    const icon = fieldIcons[field.typeSlug?.toUpperCase()] || fieldIcons.DEFAULT;
+
+                    data.data.forEach(function (f) {
+                        if (f.id === fieldId) return; // bỏ sân hiện tại
+
+                        const tooltipHtml = `
+                <div style="text-align:center;">
+                    <img src="${f.banner}" style="width:100px;height:60px;object-fit:cover;border-radius:8px;"><br>
+                    <strong>${f.name}</strong><br>
+                    ⭐ ${f.rating ?? 0}
+                </div>
+            `;
+
+                        const popupHtml = `
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="width: 250px;">
+        <!-- Banner -->
+        <div class="ratio ratio-16x9">
+            <div class="w-100 h-100"
+                 style="background: url('${field.banner ?? '/web/img/default-field.jpg'}') center/cover no-repeat;">
+            </div>
+        </div>
+
+        <!-- Nội dung -->
+        <div class="card-body p-3">
+            <h6 class="fw-bold mb-1 text-primary d-flex align-items-center">
+                <i class="bi bi-geo-alt-fill me-2"></i>${field.name}
+            </h6>
+
+            <p class="mb-1 text-muted small">
+                <i class="bi bi-tags me-1"></i>${field.type ?? 'Không xác định'}
+            </p>
+
+            <p class="mb-1 text-muted small d-flex align-items-center">
+                <i class="bi bi-geo-alt me-1 text-danger"></i>${field.address}
+            </p>
+
+            <p class="mb-1">
+                <i class="bi bi-star-fill text-warning me-1"></i>
+                <span class="fw-semibold">${field.rating ? field.rating.toFixed(1) : '0.0'}</span>
+                <span class="text-muted">/ 5.0</span>
+            </p>
+
+            <p class="mb-3 text-muted small">
+                <i class="bi bi-clock me-1 text-primary"></i>
+                ${field.openTime ?? '07:00'} - ${field.closeTime ?? '21:00'}
+            </p>
+
+            <a href="/${field.slug}/dat-san"
+               class="btn btn-sm btn-primary w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                <i class="bi bi-calendar-check"></i> Đặt sân ngay
+            </a>
+        </div>
+    </div>
+`;
+                        const marker = L.marker([field.lat, field.lng], {icon: icon})
+                            .addTo(map)
+                            .bindTooltip(tooltipHtml)
+                            .bindPopup(popupHtml);
+
+                        // Hiệu ứng popup hover
+                        // marker.on('mouseover', () => marker.openPopup());
+                        // marker.on('mouseout', () => marker.closePopup());
+                    });
+                },
+                error: function (xhr) {
+                    console.error("Lỗi khi gọi API nearby:", xhr);
+                }
+            });
+
+            // Hiệu ứng zoom nhẹ khi map load xong
+            setTimeout(() => {
+                map.flyTo([fieldLat, fieldLng], 15, {duration: 2});
+            }, 500);
+        });
     </script>
 </section>
 </body>
