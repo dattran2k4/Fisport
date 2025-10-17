@@ -15,6 +15,7 @@ public class BookingForUserResponse {
     private LocalTime endTime;
     private LocalDate date;
     private BigDecimal totalPrice;
+    private String fieldBanner;
     private String fieldName;
     private String subFieldName;
     private String status;

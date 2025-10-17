@@ -192,14 +192,20 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public void cancelBooking(Long id, String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        Booking booking = bookingRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+
+        Booking booking = bookingRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
         if (LocalDateTime.now().isAfter(LocalDateTime.of(booking.getBookingDate(), booking.getStartTime()))) {
-            return;
+            throw new IllegalStateException("Cannot cancel a booking that has already started or passed.");
         }
 
-        booking.setBookingStatus(EBookingStatus.CANCELLED);
-        bookingRepository.save(booking);
+        if (EBookingStatus.PENDING.equals(booking.getBookingStatus()) || EBookingStatus.PAID.equals(booking.getBookingStatus())) {
+            booking.setBookingStatus(EBookingStatus.CANCELLED);
+            bookingRepository.save(booking);
+        } else {
+            throw new IllegalStateException("Cannot cancel booking with status: " + booking.getBookingStatus());
+        }
     }
 
     @Override
@@ -211,6 +217,8 @@ public class BookingServiceImpl implements BookingService {
                 .id(b.getId())
                 .date(b.getBookingDate())
                 .fieldName(b.getSubfield().getField().getName())
+                .startTime(b.getStartTime())
+                .endTime(b.getEndTime())
                 .paymentMethod(b.getPayments().stream().map(Payment::getMethod).map(Object::toString).collect(Collectors.joining(",")))
                 .status(String.valueOf(b.getBookingStatus()))
                 .cancel(b.getBookingStatus() == EBookingStatus.PENDING || b.getBookingStatus() == EBookingStatus.PAID)
@@ -224,14 +232,17 @@ public class BookingServiceImpl implements BookingService {
 
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Booking booking = Optional.ofNullable(bookingRepository.findByIdAndUser(id, user))
+        Booking booking = bookingRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
         return BookingForUserResponse.builder()
                 .id(booking.getId())
                 .startTime(booking.getStartTime())
                 .endTime(booking.getEndTime())
+                .fieldBanner(booking.getSubfield().getField().getBanner())
+                .fieldName(booking.getSubfield().getField().getName())
                 .subFieldName(booking.getSubfield().getName())
+                .status(String.valueOf(booking.getBookingStatus()))
                 .price(booking.getBookingServiceItems().stream().map(BookingServiceItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add))
                 .serviceItemName(
                         booking.getBookingServiceItems().stream()

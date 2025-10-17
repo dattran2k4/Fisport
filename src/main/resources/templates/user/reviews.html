@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layout/user/user}">
+<head>
+    <meta charset="UTF-8">
+    <title>Reviews</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .review-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .review-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        .review-banner {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        .star-rating i {
+            font-size: 1rem;
+        }
+        .review-comment {
+            max-height: 4.5rem; /* 3 lines */
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="container py-4">
+            <h3 class="mb-4">Your Reviews</h3>
+
+            <div th:if="${#lists.isEmpty(reviews)}">
+                <div class="alert alert-info">You haven't reviewed any field yet.</div>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-md-6 col-lg-4" th:each="review : ${reviews}">
+                    <div class="card review-card p-3 h-100">
+                        <div class="d-flex align-items-start">
+                            <img th:src="${review.fieldBanner != null ? review.fieldBanner : '/web/img/field/default-field.jpg'}"
+                                 class="review-banner me-3" alt="Field image">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1" th:text="${review.fieldName}">Field Name</h6>
+                                <div class="star-rating mb-1">
+                            <span th:each="i : ${#numbers.sequence(1,5)}">
+                                <i class="bi" th:classappend="${i <= review.rating} ? 'bi-star-fill text-warning' : 'bi-star text-muted'"></i>
+                            </span>
+                                </div>
+                                <p class="review-comment mb-1" th:text="${review.comment}">This field is great...</p>
+                                <small class="text-muted" th:text="${#temporals.format(review.createdAt,'dd/MM/yyyy HH:mm')}">17/10/2025 14:00</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>

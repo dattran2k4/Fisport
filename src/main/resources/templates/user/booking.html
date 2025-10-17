@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{/layout/user/user}">
 
 <head>
@@ -33,23 +33,25 @@
                             <td th:text="${iterStat.count}">1</td>
                             <td th:text="${booking.fieldName}">Field A</td>
                             <td th:text="${#temporals.format(booking.date, 'dd/MM/yyyy')}">01/10/2025</td>
-                            <td th:text="${booking.startTime} + ' - ' + ${booking.endTime}">08:00 - 10:00</td>
-                            <td th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 2, 'POINT')}">$0.00
+                            <td th:text="${booking.startTime + ' - ' + booking.endTime}">08:00 - 10:00</td>
+                            <td th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT')}">$0.00
                             </td>
                             <td th:text="${booking.paymentMethod}">Credit Card</td>
 
                             <!-- Booking status badge -->
                             <td>
-                                <span th:class="${booking.status == 'FAILED' ? 'badge bg-danger' : booking.canReview ? 'badge bg-success' : booking.cancel ? 'badge bg-primary' : 'badge bg-secondary'}"
-                                      th:text="${booking.status == 'FAILED' ? 'Failed' : booking.canReview ? 'Can Review' : booking.cancel ? 'Cancelable' : 'Completed'}">Badge
+                                <span th:class="${booking.status == 'FAILED' ? 'badge bg-danger' :
+                                                 booking.status == 'PENDING' ? 'badge bg-warning text-dark' :
+                                                 booking.status == 'PAID' ? 'badge bg-info text-dark' :
+                                                 booking.status == 'COMPLETED' ? 'badge bg-success' :
+                                                 'badge bg-secondary'}" th:text="${booking.status}">Status
                                 </span>
                             </td>
 
                             <!-- Day Status badge -->
                             <td>
                                 <span th:class="${booking.status == 'FAILED' ? 'badge bg-danger' : booking.date.isAfter(T(java.time.LocalDate).now()) ? 'badge bg-info' : booking.date.isEqual(T(java.time.LocalDate).now()) ? 'badge bg-warning text-dark' :
-                                                 'badge bg-secondary'}"
-                                      th:text="${booking.status == 'FAILED' ? 'Failed' :
+                                                 'badge bg-secondary'}" th:text="${booking.status == 'FAILED' ? 'Failed' :
                                     booking.date.isAfter(T(java.time.LocalDate).now()) ? 'Upcoming' :
                                     booking.date.isEqual(T(java.time.LocalDate).now()) ? 'Today' :
                                     'Past'}">Upcoming
@@ -64,7 +66,7 @@
                                 </button>
 
                                 <a th:if="${booking.canReview}"
-                                    th:href="@{/user/bookings/review/{id}(id=${booking.encodedId})}"
+                                    th:href="@{/user/bookings/review/{id}(id=${booking.id})}"
                                     class="btn btn-sm btn-success" title="Review">
                                     <i class="bi bi-star-fill"></i>
                                 </a>
@@ -85,6 +87,18 @@
             </div>
         </div>
     </div>
+
+    <section layout:fragment="scripts">
+        <script th:inline="javascript" th:if="${review}">
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: /*[[${review}]]*/,
+                timer: 2500,
+                showConfirmButton: false
+            });
+        </script>
+    </section>
 </body>
 
 </html>

@@ -9,6 +9,7 @@ import com.Fisport.repository.UserRepository;
 import com.Fisport.service.UserService;
 import com.Fisport.common.ERole;
 import com.Fisport.common.EUserStatus;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,7 @@ public class IUserService implements UserService {
         userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public void changePasswordByUserName(ChangePasswordRequest request, String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));

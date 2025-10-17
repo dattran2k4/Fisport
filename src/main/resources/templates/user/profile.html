@@ -1,12 +1,115 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{/layout/user/user}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{/layout/user/user}">
+
 <head>
     <meta charset="UTF-8">
     <title>Profile</title>
-</head>
-<body>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 2rem 1rem;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
 
+        h2 {
+            text-align: center;
+            font-weight: 600;
+            color: #343a40;
+        }
+
+        .profile-form .form-control,
+        .profile-form .form-select {
+            border-radius: 8px;
+            padding: 0.6rem 1rem;
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .profile-form .form-control:focus,
+        .profile-form .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+        }
+
+        .profile-form .btn-primary {
+            width: 100%;
+            border-radius: 8px;
+            padding: 0.7rem;
+            font-size: 1rem;
+            transition: background-color 0.2s ease;
+        }
+
+        .profile-form .btn-primary:hover {
+            background-color: #0b5ed7;
+        }
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="container mt-4">
+            <h2 class="mb-4">Cập nhật hồ sơ cá nhân</h2>
+
+            <form th:action="@{/user/profile/update}" th:object="${profile}" method="POST"
+                class="profile-form needs-validation" novalidate>
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" th:field="*{email}" class="form-control" id="email"
+                        placeholder="example@gmail.com" required>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Invalid
+                        email</div>
+                </div>
+
+                <!-- Phone -->
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Số điện thoại</label>
+                    <input type="text" th:field="*{phone}" class="form-control" id="phone" placeholder="+84 123 456 789"
+                        required>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Invalid
+                        phone</div>
+                </div>
+
+                <!-- Gender -->
+                <div class="mb-3">
+                    <label class="form-label">Giới tính</label>
+                    <select th:field="*{gender}" class="form-select" required>
+                        <option value="" disabled>Chọn giới tính</option>
+                        <option th:value="MALE">Nam</option>
+                        <option th:value="FEMALE">Nữ</option>
+                        <option th:value="OTHER">Khác</option>
+                    </select>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}">Chọn giới
+                        tính</div>
+                </div>
+
+                <!-- Birthday -->
+                <div class="mb-3">
+                    <label for="birthday" class="form-label">Ngày sinh</label>
+                    <input type="date" th:field="*{birthday}" class="form-control" id="birthday" required>
+                    <div class="invalid-feedback" th:if="${#fields.hasErrors('birthday')}" th:errors="*{birthday}">Chọn
+                        ngày sinh hợp lệ</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Cập nhật</button>
+            </form>
+        </div>
+    </div>
+    <section layout:fragment="scripts">
+        <script th:inline="javascript" th:if="${successMessage != null}">
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: [[${ successMessage }]],
+                timer: 2000,
+                showConfirmButton: false
+            });
+        </script>
+    </section>
 </body>
+
 </html>
