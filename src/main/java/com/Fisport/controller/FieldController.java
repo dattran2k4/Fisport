@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/{slug}")
 @Controller
 public class FieldController {
 
@@ -27,7 +27,7 @@ public class FieldController {
     private final FeatureService featureService;
     private final WardService wardService;
 
-    @GetMapping("/{slug}")
+    @GetMapping()
     public String getFields(Model model, @PathVariable String slug, @RequestParam(required = false) String ward,
                             @RequestParam(required = false) Long... featureIds) {
         List<FeatureResponse> featureResponses = featureService.getListFeatures();
@@ -48,7 +48,7 @@ public class FieldController {
         return "web/fields";
     }
 
-    @GetMapping("/{slug}/{fieldNameSlug}")
+    @GetMapping("/{fieldNameSlug}")
     public String getField(@PathVariable String slug, @PathVariable String fieldNameSlug, Model model) {
         FieldTypeResponse fieldTypeResponse = fieldTypeService.findBySlug(slug);
         FieldDetailResponse fieldResponse = fieldService.findBySlug(fieldNameSlug);

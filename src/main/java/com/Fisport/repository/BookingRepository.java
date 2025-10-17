@@ -22,4 +22,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("SELECT b FROM Booking b WHERE b.paymentToken = :token " +
             "AND b.bookingStatus IN :status")
     Optional<Booking> findByPaymentTokenAndBookingStatus(@Param("token") String paymentToken, @Param("status") List<EBookingStatus> bookingStatuses);
+
+    List<Booking> findByUserId(Long userId);
 }

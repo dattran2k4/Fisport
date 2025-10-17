@@ -27,9 +27,9 @@ public class BookingController {
     private final SubFieldService subFieldService;
     private final FieldServiceItemService fieldServiceItemService;
 
-    @GetMapping("{slug}/dat-san")
-    public String showBookingPage(Model model, @PathVariable String slug) {
-        FieldDetailResponse field = fieldService.findBySlug(slug);
+    @GetMapping("/{fieldTypeSlug}/{fieldNameSlug}/dat-san")
+    public String showBookingPage(Model model, @PathVariable String fieldNameSlug) {
+        FieldDetailResponse field = fieldService.findBySlug(fieldNameSlug);
         model.addAttribute("field", field);
 
         List<SubFieldResponse> subField = subFieldService.getAllSubFields(field.getId(), ESubFieldStatus.AVAILABLE);

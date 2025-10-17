@@ -52,9 +52,9 @@ public class AuthApiController {
     }
 
     @PostMapping("/logout")
-    public ResponseData<?> logout(HttpSession session) {
+    public ResponseData<?> logout() {
         try {
-            String message = authService.logout(session);
+            String message = authService.logout();
             return new ResponseData<>(HttpStatus.OK.value(), "Logout successfully", message);
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Logout failed");

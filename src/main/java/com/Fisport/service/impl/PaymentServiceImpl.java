@@ -57,32 +57,46 @@ public class PaymentServiceImpl implements PaymentService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        Payment payment = new Payment();
-        payment.setBooking(booking);
-        payment.setAmount(booking.getTotalPrice());
-        payment.setMethod(EPaymentMethod.VNPAY);
-        payment.setStatus(EPaymentStatus.PENDING);
-        payment.setTransactionId(transactionNo);
+//        Payment payment = new Payment();
+//        payment.setBooking(booking);
+//        payment.setAmount(booking.getTotalPrice());
+//        payment.setMethod(EPaymentMethod.VNPAY);
+//        payment.setStatus(EPaymentStatus.PENDING);
+//        payment.setTransactionId(transactionNo);
+
+        EPaymentStatus paymentStatus = EPaymentStatus.PENDING;
 
         String response = params.get("vnp_ResponseCode");
         if ("00".equals(response)) {
-            payment.setStatus(EPaymentStatus.SUCCESS);
-            payment.setPaymentTime(LocalDateTime.now());
+            paymentStatus = EPaymentStatus.SUCCESS;
+
+            Payment payment = Payment.builder()
+                    .booking(booking)
+                    .amount(booking.getTotalPrice())
+                    .method(EPaymentMethod.VNPAY)
+                    .status(EPaymentStatus.SUCCESS)
+                    .transactionId(transactionNo)
+                    .paymentTime(LocalDateTime.now())
+                    .build();
+
             booking.setBookingStatus(EBookingStatus.PAID);
-        } else {
-            payment.setStatus(EPaymentStatus.FAILED);
+            paymentRepository.save(payment);
+        } else if("99".equals(response)) {
+            paymentStatus =  EPaymentStatus.FAILED;
             booking.setBookingStatus(EBookingStatus.FAILED);
+        } else if ("24".equals(response)) {
+            paymentStatus =  EPaymentStatus.FAILED;
+            booking.setBookingStatus(EBookingStatus.CANCELLED);
         }
 
         bookingRepository.save(booking);
-        paymentRepository.save(payment);
 
         return PaymentResponse.builder()
-                .status(payment.getStatus())
-                .amount(payment.getAmount())
-                .method(payment.getMethod())
-                .transactionId(payment.getTransactionId())
-                .paymentAt(payment.getPaymentTime())
+                .status(paymentStatus)
+                .amount(booking.getTotalPrice())
+                .method(EPaymentMethod.VNPAY)
+                .transactionId(transactionNo)
+                .paymentAt(paymentStatus == EPaymentStatus.SUCCESS ? LocalDateTime.now() : null)
                 .build();
     }
 

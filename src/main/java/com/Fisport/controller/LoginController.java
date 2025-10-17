@@ -70,6 +70,7 @@ public class LoginController {
         }
 
         if (!authService.verify2FA(twoFARequest)) {
+            model.addAttribute("username", sessionService.get("PRE_AUTH_USER", String.class));
             model.addAttribute("errorCode", "Mã xác thực không đúng hoặc phiên đã hết hạn");
             return "2fa";
         }

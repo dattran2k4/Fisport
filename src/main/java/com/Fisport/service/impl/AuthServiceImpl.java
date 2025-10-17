@@ -139,7 +139,9 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
 
-        if (!twoFAService.verifyCode(user.getTwoFASecret(), request.getCode())) {
+        int code = Integer.parseInt(request.getCode());
+
+        if (!twoFAService.verifyCode(user.getTwoFASecret(), code)) {
 //            throw new ResourceNotFoundException("Mã 2FA không hợp lệ");
             return false;
         }
@@ -156,9 +158,10 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public void verify2FARegister(String username, int code) {
+    public void verify2FARegister(String username, String code) {
+        int c = Integer.parseInt(code);
         User user = userRepository.findByUsername(username).orElse(null);
-        twoFAService.verifyCode(user.getTwoFASecret(), code);
+        twoFAService.verifyCode(user.getTwoFASecret(), c);
         user.setStatus(EUserStatus.ACTIVE);
         userRepository.save(user);
     }
@@ -192,16 +195,9 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String logout(HttpSession session) {
-        if (session != null) {
-            List<String> attrsToRemove = List.of(
-                    "PRE_AUTH_USER",       // 2FA
-                    "SPRING_SECURITY_CONTEXT"
-            );
-            attrsToRemove.forEach(session::removeAttribute);
-            session.invalidate();
-        }
-        SecurityContextHolder.clearContext();
+    public String logout() {
+        securityContextService.clear();
+
         return "Đăng xuất thành công!";
     }
 

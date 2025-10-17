@@ -18,11 +18,11 @@ public interface AuthService {
 
     boolean verify2FA(TwoFARequest request);
 
-    void verify2FARegister(String username, int code);
+    void verify2FARegister(String username, String code);
 
     String confirmUser(String verifyCode);
 
-    String logout(HttpSession session);
+    String logout();
 
     String forgotPassword(String email) throws MessagingException, UnsupportedEncodingException;
 

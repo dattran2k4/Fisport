@@ -33,7 +33,7 @@ public class PaymentController {
         PaymentResponse response = paymentService.handleVnpayReturn(params);
         model.addAttribute("response", response);
         if (response.getStatus().equals(EPaymentStatus.FAILED)) {
-            return "payment-failed";
+            return "payment-fail";
         }
         return "payment-success";
     }

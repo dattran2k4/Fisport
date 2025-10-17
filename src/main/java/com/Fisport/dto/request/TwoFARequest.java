@@ -15,6 +15,6 @@ import java.io.Serializable;
 public class TwoFARequest implements Serializable {
     private String username;
 
-    @NotNull(message = "Mã 2FA không được để trống")
-    private Integer code;
+    @NotBlank(message = "Mã 2FA không được để trống")
+    private String code;
 }

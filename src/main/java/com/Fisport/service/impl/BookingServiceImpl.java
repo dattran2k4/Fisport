@@ -4,10 +4,7 @@ import com.Fisport.common.EBookingStatus;
 import com.Fisport.common.ESubFieldStatus;
 import com.Fisport.dto.request.BookingRequest;
 import com.Fisport.dto.request.BookingServiceItemRequest;
-import com.Fisport.dto.response.BookingDetailResponse;
-import com.Fisport.dto.response.BookingListResponse;
-import com.Fisport.dto.response.BookingTimeResponse;
-import com.Fisport.dto.response.PaymentResponse;
+import com.Fisport.dto.response.*;
 import com.Fisport.exception.InvalidDataException;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.*;
@@ -206,6 +203,22 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setBookingStatus(EBookingStatus.CANCELLED);
         bookingRepository.save(booking);
+    }
+
+    @Override
+    public List<BookingForUserResponse> getBookingsForUser(String name) {
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        List<Booking> bookings = user.getBookings().stream().toList();
+
+        return bookings.stream().map(b -> BookingForUserResponse.builder()
+                .date(b.getBookingDate())
+                .fieldName(b.getSubfield().getField().getName())
+                .paymentMethod(b.getPayments().stream().map(Payment::getMethod).map(Object::toString).collect(Collectors.joining(",")))
+                .status(String.valueOf(b.getBookingStatus()))
+                .cancel(b.getBookingStatus() == EBookingStatus.PENDING || b.getBookingStatus() == EBookingStatus.PAID)
+                .canReview(b.getBookingStatus() == EBookingStatus.COMPLETED)
+                .totalPrice(b.getTotalPrice())
+                .build()).toList();
     }
 
 }

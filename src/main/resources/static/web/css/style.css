@@ -76,47 +76,82 @@
 
 
 
-/* Prev thụt ra ngoài bên trái */
-.top-fields-swiper .swiper-button-prev {
-  left: -22px;
-  /* thụt ra ngoài 22px */
+.top-fields-swiper {
+    padding: 11x 0;
 }
 
-/* Next thụt ra ngoài bên phải */
-.top-fields-swiper .swiper-button-next {
-  right: -22px;
-  /* thụt ra ngoài 22px */
+/* Bọc 2 nút */
+.custom-swiper-nav-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    pointer-events: none; /* wrapper không chặn click */
+    padding: 0 5px; /* cách ra 2 bên */
 }
 
-/* Hover hiệu ứng */
-.top-fields-swiper .swiper-button-prev:hover,
-.top-fields-swiper .swiper-button-next:hover {
-  background: rgba(255, 255, 255, 1);
+/* Nút prev/next */
+.custom-swiper-nav {
+    pointer-events: all; /* cho nút nhận click */
+    width: 36px;
+    height: 36px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
 }
 
-.top-fields-prev,
-.top-fields-next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-10%);
-  width: 30px;
-  height: 30px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 50%;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  z-index: 10;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.custom-swiper-nav:hover {
+    background-color: #1e90ff; /* màu hover xanh */
 }
 
-.top-fields-prev {
-  left: -20px;
+/* Swiper slide card */
+.top-fields-swiper .swiper-slide {
+    width: 250px;
+    height: auto;
 }
 
-.top-fields-next {
-  right: -20px;
+.top-fields-swiper .card {
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.custom-swiper-nav-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none; /* để không chặn slide swipe */
+}
+
+.custom-swiper-nav {
+    width: 36px;
+    height: 36px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    pointer-events: all; /* bật lại cho nút */
+}
+
+.custom-swiper-nav img {
+    width: 16px;
+    height: 16px;
+}
+
+.custom-swiper-nav:hover {
+    background-color: #1e90ff; /* hover xanh */
 }
 
 .date-item {
