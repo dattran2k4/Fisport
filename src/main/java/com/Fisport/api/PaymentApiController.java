@@ -3,6 +3,7 @@ package com.Fisport.api;
 import com.Fisport.dto.request.PaymentRequest;
 import com.Fisport.dto.response.ApiResponse;
 import com.Fisport.model.Payment;
+import com.Fisport.service.PayOSService;
 import com.Fisport.service.PaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class PaymentApiController {
 
     private final PaymentService paymentService;
+    private final PayOSService payOSService;
 
     @PostMapping("/create-payment")
     public ApiResponse<?> createPaymentUrl(@Valid @RequestBody PaymentRequest request, HttpServletRequest httpServletRequest) {
@@ -28,6 +30,16 @@ public class PaymentApiController {
         return ApiResponse.builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Payment created successfully")
+                .data(paymentUrl)
+                .build();
+    }
+
+    @PostMapping("/payos-create")
+    public ApiResponse<?> createPayOSUrl() {
+        String paymentUrl = payOSService.createPaymentLink();
+        return ApiResponse.builder()
+                .status(HttpStatus.CREATED.value())
+                .message("PayOS created successfully")
                 .data(paymentUrl)
                 .build();
     }
