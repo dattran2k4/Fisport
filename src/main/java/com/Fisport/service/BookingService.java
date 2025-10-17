@@ -25,5 +25,5 @@ public interface BookingService {
 
     List<BookingForUserResponse> getBookingsForUser(String name);
 
-
+    BookingForUserResponse getBookingForUser(Long id, String name);
 }

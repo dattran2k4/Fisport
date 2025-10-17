@@ -16,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -28,7 +29,11 @@ public class BookingController {
     private final FieldServiceItemService fieldServiceItemService;
 
     @GetMapping("/{fieldTypeSlug}/{fieldNameSlug}/dat-san")
-    public String showBookingPage(Model model, @PathVariable String fieldNameSlug) {
+    public String showBookingPage(Model model, @PathVariable String fieldTypeSlug, @PathVariable String fieldNameSlug, Principal principal) {
+        if (principal == null) {
+            return String.format("redirect:/login?backLink=/%s/%s/dat-san", fieldTypeSlug, fieldNameSlug);
+        }
+
         FieldDetailResponse field = fieldService.findBySlug(fieldNameSlug);
         model.addAttribute("field", field);
 

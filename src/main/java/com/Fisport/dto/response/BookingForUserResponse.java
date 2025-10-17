@@ -10,7 +10,7 @@ import java.time.*;
 @Getter
 @Builder
 public class BookingForUserResponse {
-
+    private Long id;
     private LocalTime startTime;
     private LocalTime endTime;
     private LocalDate date;
@@ -22,5 +22,7 @@ public class BookingForUserResponse {
     private boolean cancel;
     private boolean canReview;
     private String paymentMethod;
-
+    private String serviceItemName;
+    private BigDecimal subPrice;
+    private BigDecimal price;
 }

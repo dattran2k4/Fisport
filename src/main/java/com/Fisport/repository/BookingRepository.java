@@ -2,6 +2,7 @@ package com.Fisport.repository;
 
 import com.Fisport.common.EBookingStatus;
 import com.Fisport.model.Booking;
+import com.Fisport.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,4 +25,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Optional<Booking> findByPaymentTokenAndBookingStatus(@Param("token") String paymentToken, @Param("status") List<EBookingStatus> bookingStatuses);
 
     List<Booking> findByUserId(Long userId);
+
+    Booking findByIdAndUser(Long id, User user);
 }

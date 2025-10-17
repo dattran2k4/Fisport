@@ -31,7 +31,11 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String doLogin(@Valid @ModelAttribute("login") LoginRequestDTO loginRequestDTO, BindingResult result, RedirectAttributes redirect, Model model) {
+    public String doLogin(@Valid @ModelAttribute("login") LoginRequestDTO loginRequestDTO,
+                          @RequestParam(required = false) String backLink,
+                          BindingResult result,
+                          RedirectAttributes redirect,
+                          Model model) {
 
         if (result.hasErrors()) {
             model.addAttribute("error", result.getAllErrors().get(0).getDefaultMessage());
@@ -41,14 +45,14 @@ public class LoginController {
         try {
             LoginResponse response = authService.login(loginRequestDTO);
             if (response.is2FAEnabled()) {
-                return "redirect:/2fa/verify";
+                return String.format("redirect:/2fa/verify?backLink=%s", backLink);
             }
         } catch (Exception ex) {
             model.addAttribute("error", "Username hoặc password không đúng");
             return "login";
         }
 
-        return "redirect:/";
+        return "redirect:" + (backLink != null ? backLink : "/");
     }
 
     @GetMapping("/2fa/verify")
@@ -62,6 +66,7 @@ public class LoginController {
 
     @PostMapping("/2fa/verify")
     public String verify2Fa(@Valid @ModelAttribute("request") TwoFARequest twoFARequest,
+                            @RequestParam(required = false) String backLink,
                             BindingResult result, Model model) {
 
         if (result.hasErrors()) {
@@ -75,6 +80,6 @@ public class LoginController {
             return "2fa";
         }
 
-        return "redirect:/";
+        return "redirect:" + (backLink != null ? backLink : "/");
     }
 }

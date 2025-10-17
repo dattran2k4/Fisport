@@ -23,10 +23,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -211,6 +208,7 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings = user.getBookings().stream().toList();
 
         return bookings.stream().map(b -> BookingForUserResponse.builder()
+                .id(b.getId())
                 .date(b.getBookingDate())
                 .fieldName(b.getSubfield().getField().getName())
                 .paymentMethod(b.getPayments().stream().map(Payment::getMethod).map(Object::toString).collect(Collectors.joining(",")))
@@ -219,6 +217,31 @@ public class BookingServiceImpl implements BookingService {
                 .canReview(b.getBookingStatus() == EBookingStatus.COMPLETED)
                 .totalPrice(b.getTotalPrice())
                 .build()).toList();
+    }
+
+    @Override
+    public BookingForUserResponse getBookingForUser(Long id, String name) {
+
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Booking booking = Optional.ofNullable(bookingRepository.findByIdAndUser(id, user))
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+
+        return BookingForUserResponse.builder()
+                .id(booking.getId())
+                .startTime(booking.getStartTime())
+                .endTime(booking.getEndTime())
+                .subFieldName(booking.getSubfield().getName())
+                .price(booking.getBookingServiceItems().stream().map(BookingServiceItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add))
+                .serviceItemName(
+                        booking.getBookingServiceItems().stream()
+                                .map(bsi -> Optional.ofNullable(bsi.getFieldServiceItem())
+                                        .map(FieldServiceItem::getServiceItem)
+                                        .map(ServiceItem::getName)
+                                        .orElse("Không có dịch vụ kèm theo"))
+                                .collect(Collectors.joining(", "))
+                )
+                .build();
     }
 
 }
