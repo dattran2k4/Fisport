@@ -1,5 +1,6 @@
 package com.Fisport.service.impl;
 
+import com.Fisport.dto.request.FieldCreateRequest;
 import com.Fisport.dto.request.FieldRequest;
 import com.Fisport.dto.response.*;
 import com.Fisport.exception.ResourceNotFoundException;
@@ -9,6 +10,7 @@ import com.Fisport.service.FieldService;
 import com.Fisport.common.EFieldStatus;
 import com.Fisport.service.FieldSpecification;
 import com.Fisport.util.SlugUtils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class FieldServiceImpl implements FieldService {
     private final UserRepository userRepository;
     private final FieldHasFeatureRepository fieldHasFeatureRepository;
     private final ReviewRepository reviewRepository;
+    private final FeatureRepository featureRepository;
 
     @Override
     public List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, Long... featureIds) {
@@ -98,6 +101,59 @@ public class FieldServiceImpl implements FieldService {
     }
 
     @Override
+    @Transactional
+    public void createFieldByOwner(FieldCreateRequest fieldCreateRequest, String name) {
+        User user = userRepository.findByUsername(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+
+        Ward ward = wardRepository.findById(Long.parseLong(fieldCreateRequest.getWard()))
+                .orElseThrow(() -> new ResourceNotFoundException("Ward not found"));
+
+        FieldType fieldType = fieldRepository.findById(Long.parseLong(fieldCreateRequest.getField_type()))
+                .orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
+
+
+        if (!fieldCreateRequest.getOpeningTime().isBefore(fieldCreateRequest.getClosingTime())) {
+            throw new IllegalArgumentException("Giờ mở cửa phải sớm hơn giờ đóng cửa");
+        }
+        String slug = SlugUtils.slugify(fieldCreateRequest.getName());
+        Field field = Field.builder()
+                .name(fieldCreateRequest.getName())
+                .banner(fieldCreateRequest.getBanner())
+                .address(fieldCreateRequest.getAddress())
+                .slug(slug)
+                .openTime(fieldCreateRequest.getOpeningTime())
+                .closeTime(fieldCreateRequest.getClosingTime())
+                .fieldStatus(EFieldStatus.INACTIVE)
+                .ward(ward)
+                .longitude(Double.parseDouble(fieldCreateRequest.getLongitude()))
+                .latitude(Double.parseDouble(fieldCreateRequest.getLatitude()))
+                .owner(user)
+                .fieldType(fieldType)
+                .description(fieldCreateRequest.getDescription())
+                .build();
+        fieldRepository.save(field);
+        if (fieldCreateRequest.getFeatures() != null && !fieldCreateRequest.getFeatures().isEmpty()) {
+
+            List<Long> featureIds = fieldCreateRequest.getFeatures()
+                    .stream()
+                    .map(Long::parseLong)
+                    .toList();
+
+            List<Feature> features = featureRepository.findAllById(featureIds);
+            List<FieldHasFeature> fieldFeatures = features.stream()
+                    .map(feature -> FieldHasFeature.builder()
+                            .feature(feature)
+                            .field(field)
+                            .build())
+                    .toList();
+
+            fieldHasFeatureRepository.saveAll(fieldFeatures);
+        }
+    }
+
+
+    @Override
     public void changeStatusFieldByAdmin(Long fieldId, EFieldStatus fieldStatus) {
         Field field = getFieldByid(fieldId);
         field.setFieldStatus(fieldStatus);
@@ -112,6 +168,14 @@ public class FieldServiceImpl implements FieldService {
     public FieldResponse getField(Long fieldId) {
         Field field = fieldRepository.findById(fieldId).orElseThrow(() -> new ResourceNotFoundException("Field not found"));
         return toDto(field);
+    }
+
+    @Override
+    public List<FieldResponse> getMyOwnerFields(String name) {
+        User user = userRepository.findByUsername(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        List<Field> fields = fieldRepository.findByOwner(user);
+        return fields.stream().map(this::toDto).toList();
     }
 
     @Override

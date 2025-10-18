@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+<div class="create-section">
+    <!-- Header -->
+    <div class="section-header">
+        <h2>Create New Voucher</h2>
+    </div>
+
+    <!-- Form -->
+    <div class="form-container">
+        <form th:action="@{/owner/vouchers/save}" method="post" class="form">
+            <div class="form-grid">
+                <!-- Basic Information -->
+                <div class="form-group-section">
+                    <h3>Voucher Details</h3>
+
+                    <div class="form-group">
+                        <label>Voucher Name *</label>
+                        <input type="text" name="name" required placeholder="e.g., Summer Discount">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Voucher Code *</label>
+                        <div class="input-with-button">
+                            <input type="text" name="code" required placeholder="SUMMER20" maxlength="20">
+                            <button type="button" class="btn btn-secondary" onclick="generateCode()">
+                                Generate
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description" rows="3" placeholder="Voucher description"></textarea>
+                    </div>
+                </div>
+
+                <!-- Discount Information -->
+                <div class="form-group-section">
+                    <h3>Discount Settings</h3>
+
+                    <div class="form-group">
+                        <label>Discount Type *</label>
+                        <div class="radio-group">
+                            <div class="radio">
+                                <input type="radio" name="discountType" value="percentage" id="percentage" checked onchange="updateDiscountLabel()">
+                                <label for="percentage">Percentage (%)</label>
+                            </div>
+                            <div class="radio">
+                                <input type="radio" name="discountType" value="fixed" id="fixed" onchange="updateDiscountLabel()">
+                                <label for="fixed">Fixed Amount ($)</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label id="discountLabel">Discount Value (%)*</label>
+                            <input type="number" name="discountValue" required min="0" step="0.01" placeholder="20">
+                        </div>
+                        <div class="form-group">
+                            <label>Minimum Booking Amount ($)</label>
+                            <input type="number" name="minAmount" min="0" step="0.01" placeholder="50">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Maximum Discount Amount ($)</label>
+                        <input type="number" name="maxDiscount" min="0" step="0.01" placeholder="Leave empty for unlimited">
+                    </div>
+                </div>
+
+                <!-- Validity -->
+                <div class="form-group-section">
+                    <h3>Validity Period</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Start Date *</label>
+                            <input type="date" name="startDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>End Date *</label>
+                            <input type="date" name="endDate" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Usage Limit -->
+                <div class="form-group-section">
+                    <h3>Usage Limits</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Maximum Uses</label>
+                            <input type="number" name="maxUses" min="1" placeholder="Leave empty for unlimited">
+                        </div>
+                        <div class="form-group">
+                            <label>Uses Per Customer</label>
+                            <input type="number" name="usesPerCustomer" min="1" placeholder="1">
+                        </div>
+                    </div>
+
+                    <div class="checkbox">
+                        <input type="checkbox" name="applicableFields" id="applicableFields">
+                        <label for="applicableFields">Limit to specific fields</label>
+                    </div>
+
+                    <div id="fieldSelector" style="display: none; margin-top: 15px;">
+                        <label>Select Fields:</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox">
+                                <input type="checkbox" name="fields" value="1">
+                                <label>Field 1 - Premium Court</label>
+                            </div>
+                            <div class="checkbox">
+                                <input type="checkbox" name="fields" value="2">
+                                <label>Field 2 - Standard Court</label>
+                            </div>
+                            <div class="checkbox">
+                                <input type="checkbox" name="fields" value="3">
+                                <label>Field 3 - VIP Court</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <div class="form-group-section">
+                    <h3>Status</h3>
+
+                    <div class="radio-group">
+                        <div class="radio">
+                            <input type="radio" name="status" value="active" id="active" checked>
+                            <label for="active">Active</label>
+                        </div>
+                        <div class="radio">
+                            <input type="radio" name="status" value="disabled" id="disabled">
+                            <label for="disabled">Disabled</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Create Voucher
+                </button>
+                <a href="/owner/vouchers" class="btn btn-secondary">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function generateCode() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let code = '';
+        for (let i = 0; i < 10; i++) {
+            code += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        document.querySelector('input[name="code"]').value = code;
+    }
+
+    function updateDiscountLabel() {
+        const label = document.getElementById('discountLabel');
+        const isPercentage = document.getElementById('percentage').checked;
+        label.textContent = isPercentage ? 'Discount Value (%)' : 'Discount Value ($)';
+    }
+
+    document.getElementById('applicableFields').addEventListener('change', function() {
+        document.getElementById('fieldSelector').style.display = this.checked ? 'block' : 'none';
+    });
+</script>
