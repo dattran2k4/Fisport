@@ -19,5 +19,5 @@ public class TimeSlot extends AbstractEntity {
     private LocalTime startTime;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER,  orphanRemoval = true, mappedBy = "timeSlot")
-    private List<FieldTimeSlot> fieldTimeSlots;
+    private List<FieldHasTimeSlot> fieldTimeSlots;
 }

@@ -2,9 +2,92 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Login</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 400px;
+            min-height: 500px;
+            border-radius: 0.75rem;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+        }
+
+        .form-footer {
+            margin-top: auto;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
+<div class="card login-card shadow-sm">
+    <div class="card-body p-4 d-flex flex-column">
+        <div class="text-center mb-4">
+            <i class="bi bi-person-circle" style="font-size:2rem; color:#0d6efd;"></i>
+            <h4 class="mt-2">Đăng nhập</h4>
+        </div>
+        <form th:action="@{/login}" th:object="${login}" method="POST" novalidate>
+            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+            <div th:if="${errorCode}" class="alert alert-danger" th:text="${errorCode}"></div>
+            <div th:if="${TwoFASuccess}" class="alert alert-danger" th:text="${TwoFASuccess}"></div>
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-person"></i></span>
+                    <input type="text" th:field="*{username}" class="form-control" id="username"
+                           placeholder="Nhập username" required>
+                </div>
+            </div>
 
+
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                    <input type="password" th:field="*{password}" class="form-control" id="password"
+                           placeholder="Nhập mật khẩu" required>
+                </div>
+            </div>
+
+
+            <div class="d-grid mt-3">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Đăng nhập
+                </button>
+            </div>
+
+
+            <div class="d-flex justify-content-between mt-3">
+                <a th:href="@{/forgot-password}" class="link-primary">Quên mật khẩu?</a>
+                <a th:href="@{/register}" class="link-success">Đăng ký</a>
+            </div>
+
+
+            <div class="form-footer mt-4">
+                <a th:href="@{/}" class="btn btn-outline-secondary">Trở về trang chủ</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

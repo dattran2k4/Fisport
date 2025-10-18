@@ -1,13 +1,16 @@
 package com.Fisport.model;
 
+import com.Fisport.common.EFieldStatus;
+import com.Fisport.util.SlugUtils;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -33,6 +36,22 @@ public class Field extends AbstractEntity {
     @Column(name = "slug", nullable = false,  unique = true)
     private String slug;
 
+    @Column(name = "open_time", nullable = false)
+    private LocalTime openTime;
+
+    @Column(name = "close_time", nullable = false)
+    private LocalTime closeTime;
+
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private EFieldStatus fieldStatus;
+
+    @Column(name = "latitude", nullable = false)
+    private Double latitude;
+
+    @Column(name = "longitude", nullable = false)
+    private Double longitude;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User owner;
@@ -42,7 +61,7 @@ public class Field extends AbstractEntity {
     private Ward ward;
 
     @OneToMany(mappedBy = "field",  fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<FieldTimeSlot> fieldTimeSlots = new HashSet<>();
+    private Set<FieldHasTimeSlot> fieldTimeSlots = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "field_type_id")
@@ -51,8 +70,17 @@ public class Field extends AbstractEntity {
     @OneToMany(mappedBy = "field")
     private Set<FieldHasFeature> fieldHasFeatures = new HashSet<>();
 
+    public Set<Feature> getFeatures() {
+        return fieldHasFeatures.stream()
+                .map(FieldHasFeature::getFeature)
+                .collect(Collectors.toSet());
+    }
+
     @OneToMany(mappedBy = "field",  cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FieldServiceItem> fieldServiceItems = new HashSet<>();
+
+    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Review>  reviews = new HashSet<>();
 
     @CreationTimestamp
     @Column(name = "created_at")

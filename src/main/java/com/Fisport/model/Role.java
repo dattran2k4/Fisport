@@ -1,6 +1,6 @@
 package com.Fisport.model;
 
-import com.Fisport.util.ERole;
+import com.Fisport.common.ERole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,0 +1,10 @@
+package com.Fisport.service;
+
+import com.Fisport.dto.response.VoucherResponse;
+import com.Fisport.model.Voucher;
+
+import java.util.List;
+
+public interface VoucherService {
+    List<VoucherResponse> getVouchersByUserId(Long userId);
+}

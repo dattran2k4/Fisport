@@ -1,7 +1,7 @@
 package com.Fisport.security;
 
 import com.Fisport.model.User;
-import com.Fisport.util.EUserStatus;
+import com.Fisport.common.EUserStatus;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -49,6 +49,6 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return user.getStatus() == EUserStatus.ACTIVE;
+        return EUserStatus.ACTIVE.equals(user.getStatus());
     }
 }

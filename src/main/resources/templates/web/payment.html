@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/web/web}">
+
+<body>
+    <div layout:fragment="content">
+        <div class="payment-wrap">
+            <div class="payment-container">
+                <h2>Select payment method</h2>
+
+                <div id="methods">
+                    <div th:each="method : ${methods}" class="payment-method" th:data-method="${method.name().toLowerCase()}">
+                        <img th:src="|/web/img/payment/${method.name().toLowerCase()}.png|" alt="" />
+                        <span th:text="'Pay with ' + ${method}"></span>
+                    </div>
+                </div>
+
+                <div class="btn-container">
+                    <button class="btn btn-secondary" onclick="window.history.back()">Go Back</button>
+                    <button class="btn btn-primary" id="continueBtn">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <section layout:fragment="scripts">
+        <script th:inline="javascript">
+            $(document).ready(function () {
+                const paymentToken = /*[[${paymentToken}]]*/ 'dummyToken';
+                let selectedMethod = null;
+
+                // Chọn phương thức
+                $('.payment-method').click(function () {
+                    $('.payment-method').removeClass('selected');
+                    $(this).addClass('selected');
+                    selectedMethod = $(this).data('method');
+                });
+
+                // Continue
+                $('#continueBtn').click(function () {
+                    if (!selectedMethod) {
+                        alert("Please select a payment method");
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '/api/payment/create-payment',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            paymentToken: paymentToken,
+                            paymentMethod: selectedMethod
+                        }),
+                        success: function (res) {
+                            const paymentUrl = res.data; // API trả trực tiếp URL
+                            window.open(paymentUrl, 'Thanh toán', 'width=500,height=700');
+                        },
+                        error: function (xhr) {
+                            alert("Có lỗi xảy ra: " + (xhr.responseJSON?.message || xhr.statusText));
+                        }
+                    });
+                });
+            });
+        </script>
+    </section>
+</body>
+</html>

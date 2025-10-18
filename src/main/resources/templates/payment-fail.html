@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Thanh toán thất bại</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff6f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            border: 1px solid #ff4d4f;
+            border-radius: 10px;
+            background-color: #fff0f0;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+        }
+
+        .status-icon {
+            font-size: 60px;
+            color: #ff4d4f;
+        }
+
+        h2 {
+            color: #ff4d4f;
+        }
+
+
+        a.button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ff4d4f;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        a.button:hover {
+            background-color: #ff7875;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="status-icon">&#10060;</div> <!-- Icon X đỏ -->
+        <h2>Thanh toán thất bại!</h2>
+        <p>Giao dịch không thành công. Vui lòng thử lại hoặc liên hệ hỗ trợ.</p>
+
+        <a href="/" class="button" id="back-to-home">Quay về trang chủ</a>
+    </div>
+    <script>
+        document.getElementById('back-to-home').addEventListener('click', function () {
+            if (window.opener) {
+                // Điều hướng cửa sổ chính về trang chủ
+                window.opener.location.href = '/'; // hoặc trang bạn muốn
+                // Đóng popup
+                window.close();
+            } else {
+                // Nếu không có cửa sổ gốc, điều hướng chính nó
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+
+</html>

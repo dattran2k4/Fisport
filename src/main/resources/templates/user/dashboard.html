@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vn" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layout/user/user}">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div class="content" layout:fragment="content">
+        <!-- Dashboard Overview luôn hiển thị -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center p-3 bg-primary text-white">
+                    <i class="bi bi-cash-stack fs-3 mb-2"></i>
+                    <h6>Total Spent</h6>
+                    <h4 th:text="${response.totalSpent}">$0</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3 bg-warning text-dark">
+                    <i class="bi bi-clock-history fs-3 mb-2"></i>
+                    <h6>Pending</h6>
+                    <h4 th:text="${response.pendingCount}">0</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3 bg-success text-white">
+                    <i class="bi bi-check-circle-fill fs-3 mb-2"></i>
+                    <h6>Completed</h6>
+                    <h4 th:text="${response.completedCount}">0</h4>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center p-3 bg-info text-white">
+                    <i class="bi bi-ticket-perforated-fill fs-3 mb-2"></i>
+                    <h6>Vouchers</h6>
+                    <h4 th:text="${response.voucherCount}">0</h4>
+                </div>
+            </div>
+        </div>
+        <!-- Chart Booking theo tháng -->
+        <div class="card mb-4 p-3">
+            <canvas id="bookingChart"></canvas>
+        </div>
+    </div>
+    <section layout:fragment="scripts">
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            const ctx = document.getElementById('bookingChart').getContext('2d');
+            const bookingData = /*[[${response.monthlyBookings}]]*/ [0,0,0,0,0,0,0,0,0,0,0,0]; // fallback
+            const bookingChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Bookings per Month',
+                        data: bookingData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: true }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+            /*]]>*/
+        </script>
+    </section>
+
+</body>
+</html>

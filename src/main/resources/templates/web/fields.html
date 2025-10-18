@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/web/web}">
+<body>
+    <div layout:fragment="content">
+<!--        <input type="hidden" id="fieldTypeId"-->
+<!--        th:if="${#lists.isEmpty(fields) == false}"-->
+<!--        th:value="${fields[0].fieldTypeResponse.id}" />-->
+        <section class="py-4">
+            <div class="container">
+
+                <!-- Filter -->
+                <div class="row g-3 align-items-center mb-3">
+                    <!-- Khoảng cách -->
+                    <div class="col-12 col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            <select class="form-select" id="distanceSelect">
+                                <option value="">Khoảng cách</option>
+                                <option value="3">Dưới 3 km</option>
+                                <option value="5">Dưới 5 km</option>
+                                <option value="10">Dưới 10 km</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Tiện ích -->
+                    <div class="col-12 col-md-4">
+                        <button class="btn btn-outline-secondary w-100" type="button" data-bs-toggle="collapse" data-bs-target="#collapseUtilities">
+                            <i class="bi bi-sliders"></i> Tiện ích (mái che, bãi xe, ...)
+                        </button>
+                    </div>
+
+                    <!-- Sắp xếp -->
+                    <div class="col-12 col-md-4">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-filter"></i></span>
+                            <select class="form-select" id="sortSelect">
+                                <option value="top">Lựa chọn hàng đầu</option>
+                                <option value="rating_desc">Đánh giá cao → thấp</option>
+                                <option value="rating_asc">Đánh giá thấp → cao</option>
+                                <option value="distance_asc">Gần → xa</option>
+                                <option value="distance_desc">Xa → gần</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tiện ích collapse -->
+                <div class="collapse" id="collapseUtilities">
+                    <div class="card card-body">
+                        <div class="row g-3">
+                            <div class="col-6 col-md-3" th:each="f : ${features}">
+                                <div class="form-check">
+                                    <input class="form-check-input util-check" type="checkbox"
+                                           th:id="'feature-' + ${f.id}" th:value="${f.id}">
+                                    <label class="form-check-label"
+                                           th:for="'feature-' + ${f.id}"
+                                           th:text="${f.name}">Tiện ích</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danh sách sân -->
+                <div class="row g-3" id="fieldsGrid">
+                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3" th:each="f : ${fields}">
+                        <a th:href="@{${f.fieldTypeResponse.slug} + '/' + ${f.slug}}" class="card h-100 text-decoration-none text-reset shadow-sm hover-shadow">
+                            <div class="ratio ratio-16x9 bg-light rounded-top"
+                                 th:style="'background:url(' + (${f.banner} != null ? ${f.banner} : '/images/default-field.jpg') + ') center/cover no-repeat'"></div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i>
+                                        <span th:text="${f.openTime}">05:00</span> - <span th:text="${f.closeTime}">22:00</span>
+                                    </small>
+                                </div>
+                                <h6 class="card-title mb-1 fw-semibold" th:text="${f.name}">Tên sân</h6>
+                                <small class="text-muted d-block">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <span th:text="${f.wardResponse.name}">Phường/Xã</span>
+                                </small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-4">
+                    <nav aria-label="pagination">
+                        <ul class="pagination pagination-sm" id="pager"></ul>
+                    </nav>
+                </div>
+            </div>
+        </section>
+
+    </div>
+    <section layout:fragment="scripts">
+        <script>
+            $(document).ready(function() {
+
+                const params = new URLSearchParams(window.location.search);
+                const wardSlug = params.get("ward");
+
+                // ===============================
+                // Biến global
+                // ===============================
+                let currentPage = 1;       // Trang hiện tại
+                const pageSize = 10;       // Số item trên 1 trang
+                const fieldTypeId = $('#fieldTypeId').val();
+
+                // ===============================
+                // Hàm lấy danh sách featureId đã chọn
+                // ===============================
+                function getSelectedFeatures() {
+                    return $('.util-check:checked').map(function() { return this.value; }).get();
+                }
+
+                // ===============================
+                // Hàm tạo query params cho API
+                // ===============================
+                function buildQuery() {
+                    const qs = {};
+
+                    // Field Type
+                    // if (fieldTypeId) qs.fieldTypeId = fieldTypeId;
+
+                    // Distance & Sort
+                    // const distance = $('#distanceSelect').val();
+                    // const sort = $('#sortSelect').val();
+                    // if (distance) qs.distanceKm = distance;
+                    // if (sort) qs.sort = sort;
+
+                    // Utilities
+                    const utils = getSelectedFeatures();
+                    if (utils.length) qs.featureIds = utils.join(',');
+                    if (wardSlug) qs.wardSlug = wardSlug;
+
+                    // Pagination
+                    // qs.page = currentPage;
+                    // qs.size = pageSize;
+                    return qs;
+                }
+
+                // ===============================
+                // Hàm render danh sách sân
+                // ===============================
+                function renderFields(fields) {
+                    const $grid = $('#fieldsGrid');
+                    $grid.empty();
+
+                    if (!fields || fields.length === 0) {
+                        $grid.html('<p class="text-center w-100">Không có sân phù hợp .</p>');
+                        return;
+                    }
+
+                    fields.forEach(f => {
+                        const banner = f.banner ? f.banner : '/images/default-field.jpg';
+                        const html = `
+                            <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                                <a href="${f.fieldTypeResponse.slug}/${f.slug}" class="card h-100 text-decoration-none text-reset shadow-sm hover-shadow">
+                                    <div class="ratio ratio-16x9 bg-light rounded-top" style="background:url(${banner}) center/cover no-repeat"></div>
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="text-muted">
+                                                <i class="bi bi-clock"></i>
+                                                ${f.openTime} - ${f.closeTime}
+                                            </small>
+                                        </div>
+                                        <h6 class="card-title mb-1 fw-semibold">${f.name}</h6>
+                                        <small class="text-muted d-block">
+                                            <i class="bi bi-geo-alt"></i>
+                                            ${f.wardResponse.name}
+                                        </small>
+                                    </div>
+                                </a>
+                            </div>
+                        `;
+                        $grid.append(html);
+                    });
+                }
+
+                // ===============================
+                // Hàm render pagination
+                // ===============================
+                function renderPager(totalPages) {
+                    const $pager = $('#pager');
+                    $pager.empty();
+                    totalPages = Math.max(1, totalPages || 1);
+
+                    for (let p = 1; p <= totalPages; p++) {
+                        const $li = $('<li>').addClass('page-item' + (p === currentPage ? ' active' : ''));
+                        const $a = $('<a>').addClass('page-link').attr('href', 'javascript:void(0)').text(p);
+
+                        // Khi click vào số trang, cập nhật currentPage và load lại
+                        $a.on('click', function() {
+                            currentPage = p;
+                            loadFields();
+                        });
+
+                        $li.append($a);
+                        $pager.append($li);
+                    }
+                }
+
+                // ===============================
+                // Hàm gọi API và render kết quả
+                // ===============================
+                function loadFields() {
+                    const qs = buildQuery();
+
+                    // Hiển thị loading tạm thời
+                    $('#fieldsGrid').html('<p class="text-center w-100">Đang tải...</p>');
+
+                    $.ajax({
+                        url: '/api/v1/fields',
+                        type: 'GET',
+                        data: qs,
+                        success: function(data) {
+                            // Hỗ trợ cả array trực tiếp hoặc {content, totalPages}
+                            const fields = Array.isArray(data) ? data : (data.data || []);
+                            const totalPages = Array.isArray(data) ? 1 : (data.totalPages || 1);
+
+                            renderFields(fields);
+                            renderPager(totalPages);
+                        },
+                        error: function() {
+                            $('#fieldsGrid').html('<p class="text-center w-100 text-danger">Lỗi khi tải sân.</p>');
+                            renderPager(1);
+                        }
+                    });
+                }
+
+                // ===============================
+                // Event listeners
+                // ===============================
+
+                // Chọn field type
+                // $('#fieldTypeFilterBar').on('click', 'button[data-type]', function() {
+                //     $('#fieldTypeFilterBar button').removeClass('active');
+                //     $(this).addClass('active');
+                //     currentPage = 1;
+                //     loadFields();
+                // });
+
+                // // Thay đổi khoảng cách
+                // $('#distanceSelect').on('change', function() {
+                //     currentPage = 1;
+                //     loadFields();
+                // });
+
+                // // Thay đổi sắp xếp
+                // $('#sortSelect').on('change', function() {
+                //     currentPage = 1;
+                //     loadFields();
+                // });
+
+                // Chọn/uncheck tiện ích
+                $('#collapseUtilities').on('change', '.util-check', function() {
+                    currentPage = 1;
+                    loadFields();
+                });
+
+                // ===============================
+                // Load lần đầu
+                // ===============================
+                // loadFields();
+
+            });
+        </script>
+    </section>
+</body>
+</html>

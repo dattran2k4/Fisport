@@ -2,10 +2,31 @@ package com.Fisport.service;
 
 import com.Fisport.dto.request.LoginRequestDTO;
 import com.Fisport.dto.request.RegisterRequestDTO;
-import com.Fisport.dto.response.LoginResponseDTO;
+import com.Fisport.dto.request.ResetPasswordRequest;
+import com.Fisport.dto.request.TwoFARequest;
+import com.Fisport.dto.response.LoginResponse;
 import com.Fisport.dto.response.RegisterResponseDTO;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpSession;
+
+import java.io.UnsupportedEncodingException;
 
 public interface AuthService {
-    LoginResponseDTO login(LoginRequestDTO loginRequestDTO);
-    RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO);
+    RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) throws MessagingException, UnsupportedEncodingException;
+
+    LoginResponse login(LoginRequestDTO request);
+
+    boolean verify2FA(TwoFARequest request);
+
+    void verify2FARegister(String username, String code);
+
+    String confirmUser(String verifyCode);
+
+    String logout();
+
+    String forgotPassword(String email) throws MessagingException, UnsupportedEncodingException;
+
+    void resetPassword(ResetPasswordRequest request, String verifyCode);
+
+    String generateQRCodeBase64(String otpAuthURL, int width, int height);
 }

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/web/web}">
+
+<body>
+    <div layout:fragment="content">
+        <div class="container mt-4">
+
+            <h2>Đặt sân: <span th:text="${field.name}"></span></h2>
+            <p>Địa chỉ: <span th:text="${field.address + ', ' + field.ward + ', ' + field.city}"></span></p>
+
+            <form th:action="@{/booking}" th:object="${booking}" method="POST" id="bookingForm">
+                <!-- CSRF nếu dùng Spring Security -->
+                <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+
+                <!-- 8 ngày + calendar picker -->
+                <div class="d-flex flex-wrap mb-3" id="day-container"></div>
+                <div class="mb-3">
+                    <input type="date" class="form-control" id="customDate">
+                </div>
+
+                <!-- Subfields -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold mb-2">Chọn sân con:</label>
+                    <div class="list-group">
+                        <label
+                            class="list-group-item d-flex justify-content-between align-items-center border rounded-3 mb-2"
+                            th:each="sub, iter : ${subField}">
+                            <span th:text="${sub.name}" class="fw-medium text-dark">Sân bóng</span>
+                            <input type="radio" class="form-check-input subfield-radio" th:field="*{subFieldId}"
+                                th:value="${sub.id}" />
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Khung giờ bắt đầu -->
+                <div class="mb-3">
+                    <label>Các khung giờ có thể chọn:</label>
+                    <div class="d-flex flex-wrap" id="hours-container"></div>
+                </div>
+
+                <!-- Durations -->
+                <div id="durationContainer" class="mt-3"></div>
+
+                <!-- Field Service Items (giữ nguyên layout) -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Dịch vụ kèm theo:</label>
+                    <div class="list-group">
+                        <div class="list-group-item d-flex align-items-center justify-content-between"
+                            th:each="item, iter : ${items}">
+                            <div>
+                                <input class="form-check-input me-2 service-checkbox" type="checkbox"
+                                    th:id="${'item-' + item.id}" th:value="${item.serviceItemId}"
+                                    th:data-index="${iter.index}" />
+                                <label class="form-check-label" th:for="${'item-' + item.id}">
+                                    <span th:text="${item.serviceItemName}"></span>
+                                    <small class="text-muted" th:text="'(' + ${item.serviceName} + ')'"></small>
+                                </label>
+                            </div>
+                            <div class="text-end d-flex align-items-center gap-2">
+                                <input type="number" class="form-control form-control-sm service-qty" min="1"
+                                    th:max="${item.quantity}" value="1" style="width: 70px; display: none;"
+                                    th:data-index="${iter.index}">
+                                <span class="text-success fw-bold"
+                                    th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="service-hidden-inputs"></div>
+                </div>
+
+                <button type="submit" class="btn btn-success"><i class="fa fa-check"></i> Đặt sân</button>
+
+                <!-- Hidden fields để Spring bind -->
+                <input type="hidden" th:field="*{startTime}" id="startTime">
+                <input type="hidden" th:field="*{endTime}" id="endTime">
+                <input type="hidden" th:field="*{duration}" id="duration">
+                <input type="hidden" th:field="*{date}" id="date">
+                <input type="hidden" th:field="*{subFieldId}" id="subFieldId">
+                <!-- Lưu fieldTypeId để gọi API durations -->
+                <input type="hidden" id="fieldTypeId" th:value="${field.typeId}">
+            </form>
+        </div>
+    </div>
+    <section layout:fragment="scripts">
+        <script th:inline="javascript">
+            $(document).ready(function () {
+                const dayContainer = $('#day-container');
+                const hoursContainer = $('#hours-container');
+                let selectedDate = null;
+                let selectedSubFieldId = null;
+                const API_BASE = '/api/v1/bookings/occupied';
+
+                const openTime = /*[[${field.openTime != null ? field.openTime : '06:00'}]]*/ '06:00';
+                const closeTime = /*[[${field.closeTime != null ? field.closeTime : '18:00'}]]*/ '18:00';
+
+                // Render 8 ngày
+                for (let i = 0; i < 8; i++) {
+                    let date = new Date();
+                    date.setDate(date.getDate() + i);
+
+                    let iso = date.toISOString().slice(0, 10); // yyyy-mm-dd
+                    let label = `${date.toLocaleDateString('vi-VN', { weekday: 'short' })} ${date.getDate()}/${date.getMonth() + 1}`;
+
+                    let btn = $('<button>')
+                        .attr('type', 'button')
+                        .addClass('btn btn-outline-primary me-2 mb-2 day-btn')
+                        .data('date', iso)
+                        .text(label);
+
+                    dayContainer.append(btn);
+                }
+
+                // Khi click chọn ngày
+                $(document).on('click', '.day-btn', function () {
+                    $('.day-btn').removeClass('active');
+                    $(this).addClass('active');
+                    selectedDate = $(this).data('date');
+                    $('#date').val(selectedDate); // cập nhật hidden date
+                    console.log(selectedDate);
+                    if (selectedSubFieldId) renderHours(selectedDate, selectedSubFieldId);
+                });
+
+                // Khi chọn ngày bằng calendar picker
+                $('#customDate').on('change', function () {
+                    selectedDate = $(this).val();
+                    // làm nổi bật nếu trùng format yyyy-mm-dd
+                    $('.day-btn').removeClass('active');
+                    $('#date').val(selectedDate);
+                    if (selectedSubFieldId) renderHours(selectedDate, selectedSubFieldId);
+                });
+
+                // Khi chọn sân con (radio)
+                $(document).on('change', '.subfield-radio', function () {
+                    selectedSubFieldId = $(this).val();
+                    $('#subFieldId').val(selectedSubFieldId); // cập nhật hidden subFieldId
+                    $('.subfield-radio').not(this).prop('checked', false);
+                    console.log(selectedSubFieldId);
+                    if (selectedDate) renderHours(selectedDate, selectedSubFieldId);
+                });
+
+                /**
+                 * Render các khung giờ và disable các giờ đã được đặt
+                 * date: yyyy-MM-dd
+                 * subFieldId: number
+                 */
+                function renderHours(date, subFieldId) {
+                    const container = $('#hours-container');
+                    container.empty().append('<div class="text-muted">Đang tải giờ...</div>');
+
+                    if (!date || !subFieldId) {
+                        container.empty().append('<div class="text-muted">Vui lòng chọn ngày và sân con.</div>');
+                        return;
+                    }
+
+                    $.getJSON(`${API_BASE}?subFieldId=${subFieldId}&date=${date}`)
+                        .done(function (response) {
+                            const bookedSlots = (response && response.data) ? response.data : [];
+                            container.empty();
+
+                            const openHour = parseInt(openTime.split(':')[0]);
+                            const closeHour = parseInt(closeTime.split(':')[0]);
+
+                            for (let hour = openHour; hour < closeHour; hour++) {
+                                const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+                                const btn = $('<button>')
+                                    .attr('type', 'button')
+                                    .addClass('btn btn-outline-primary hour-btn px-3 py-2')
+                                    .text(timeStr)
+                                    .data('hour', hour)
+                                    .data('time', timeStr);
+
+                                // kiểm tra theo phút chính xác
+                                let matchedSlot = null;
+                                for (const slot of bookedSlots) {
+                                    const [startH, startM] = (slot.startTime || '00:00').split(':').map(Number);
+                                    const [endH, endM] = (slot.endTime || '00:00').split(':').map(Number);
+
+                                    const startMinutes = startH * 60 + startM;
+                                    const endMinutes = endH * 60 + endM;
+                                    const currentMinutes = hour * 60;
+
+                                    if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+                                        matchedSlot = slot;
+                                        break;
+                                    }
+                                }
+
+                                if (matchedSlot) {
+                                    btn.prop('disabled', true)
+                                        .addClass('text-muted text-decoration-line-through')
+                                        .append(' ❌');
+
+                                    if (matchedSlot.bookingStatus === 'pending') {
+                                        btn.removeClass('btn-outline-primary').addClass('btn-warning');
+                                    } else if (matchedSlot.bookingStatus === 'paid') {
+                                        btn.removeClass('btn-outline-primary').addClass('btn-danger text-white');
+                                    }
+                                }
+
+                                container.append(btn);
+                            }
+
+                            if ((bookedSlots || []).length === 0) {
+                                console.log('Tất cả giờ trống.');
+                            } else {
+                                console.log('Giờ bị đặt:', bookedSlots);
+                            }
+                        })
+                        .fail(function () {
+                            container.empty().append('<div class="text-danger">Không thể tải dữ liệu giờ.</div>');
+                        });
+                }
+
+                // Khi click chọn 1 mốc giờ (dùng delegation vì button tạo động)
+                $(document).on('click', '.hour-btn:not(:disabled)', function () {
+                    // highlight visually
+                    $('.hour-btn').removeClass('active btn-success text-white');
+                    $(this).addClass('active btn-success text-white');
+
+                    const timeStr = $(this).data('time'); // "08:00"
+                    $('#startTime').val(timeStr); // set hidden startTime
+                    console.log(timeStr);
+
+                    // lấy fieldTypeId để gọi API durations
+                    const fieldTypeId = $('#fieldTypeId').val();
+                    if (!fieldTypeId) {
+                        console.error('Không tìm thấy fieldTypeId');
+                        return;
+                    }
+
+                    // call durations API
+                    $.getJSON(`/api/v1/field-types/${fieldTypeId}/durations`)
+                        .done(function (resp) {
+                            const durations = (resp && resp.data) ? resp.data : resp; // accommodate different shapes
+                            const container = $('#durationContainer');
+                            container.empty();
+
+                            if (!Array.isArray(durations) || durations.length === 0) {
+                                container.append('<div class="text-muted">Không có loại duration phù hợp.</div>');
+                                return;
+                            }
+
+                            // render buttons durations
+                            durations.forEach(d => {
+                                // expected d has { id, name, minutes }
+                                const btn = $('<button>')
+                                    .addClass('btn btn-outline-primary m-1 duration-btn')
+                                    .data('minutes', d.minutes)
+                                    .data('duration-id', d.id)
+                                    .data('duration-name', d.name)
+                                    .text(`${d.minutes} phút`)
+                                    .attr('type', 'button');
+
+                                container.append(btn);
+                            });
+                        })
+                        .fail(function () {
+                            console.error('Lỗi khi tải durations');
+                            $('#durationContainer').empty().append('<div class="text-danger">Lỗi tải thời lượng.</div>');
+                        });
+                });
+
+                // Khi chọn duration -> set duration, endTime
+                $(document).on('click', '.duration-btn', function () {
+                    $('.duration-btn').removeClass('active btn-primary text-white');
+                    $(this).addClass('active btn-primary text-white');
+
+                    const minutes = parseInt($(this).data('minutes'));
+                    const start = $('#startTime').val(); // "08:00"
+                    if (!start || isNaN(minutes)) {
+                        console.error('Thiếu startTime hoặc minutes');
+                        return;
+                    }
+
+                    // set duration (minutes) và endTime
+                    $('#duration').val(minutes);
+                    console.log(minutes);
+
+                    // compute endTime HH:mm
+                    const [h, m] = start.split(':').map(Number);
+                    const startMinutes = h * 60 + m;
+                    const endMinutes = startMinutes + minutes;
+                    const endH = Math.floor(endMinutes / 60);
+                    const endM = endMinutes % 60;
+                    const endTime = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
+
+                    $('#endTime').val(endTime);
+                    console.log(endTime);
+
+                });
+
+                // Show/hide số lượng khi chọn checkbox
+                $(document).on('change', '.service-checkbox', function () {
+                    const qtyInput = $(this).closest('.list-group-item').find('.service-qty');
+                    if ($(this).is(':checked')) qtyInput.show();
+                    else qtyInput.hide();
+                });
+
+                // Khi submit form, tạo hidden input cho Spring bind
+                $('#bookingForm').on('submit', function () {
+                    $('#service-hidden-inputs').empty();
+                    $('.service-checkbox:checked').each(function (i) {
+                        const serviceId = $(this).val();
+                        const qty = $(this).closest('.list-group-item').find('.service-qty').val() || 1;
+                        $('#service-hidden-inputs').append(
+                            `<input type="hidden" name="bookingServiceItemRequest[${i}].fieldServiceItemId" value="${serviceId}">` +
+                            `<input type="hidden" name="bookingServiceItemRequest[${i}].quantity" value="${qty}">`
+                        );
+                    });
+
+                    // $('#subFieldId').val($('.subfield-radio:checked').val());
+                });
+
+                // === NOTE: bạn cần đảm bảo JS xử lý service-checkbox & service-qty (thêm hidden inputs)
+                // nếu bạn muốn mình chèn lại phần js đó, báo mình sẽ thêm đầy đủ.
+            });
+        </script>
+    </section>
+
+</body>
+
+</html>

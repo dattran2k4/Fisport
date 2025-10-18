@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{layout/web/web}">
+
+<body>
+    <div layout:fragment="content">
+        <section class="field-detail container my-5">
+            <div class="row g-4 align-items-center">
+                <!-- Banner hình ảnh -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                        <div class="ratio ratio-16x9">
+                            <div class="w-100 h-100"
+                                th:style="'background: url(' + ${field.banner != null ? field.banner : '/web/img/field/default-field.jpg'} + ') center/cover no-repeat;'">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Thông tin chi tiết sân -->
+                <div class="col-lg-6">
+                    <div class="card border-0 shadow p-4 rounded-4">
+                        <!-- Tên sân -->
+                        <h2 class="fw-bold mb-2 d-flex align-items-center">
+                            <i class="bi bi-geo-alt-fill text-primary me-2"></i>
+                            <span th:text="${field.name}">Tên sân</span>
+                        </h2>
+
+                        <!-- Loại sân -->
+                        <p class="text-muted mb-2">
+                            <i class="bi bi-tags me-2"></i>
+                            <span th:text="${field.type}">Loại sân</span>
+                        </p>
+
+                        <!-- Địa chỉ -->
+                        <p class="text-muted mb-3">
+                            <i class="bi bi-geo-alt text-danger me-2"></i>
+                            <span th:text="${field.address + ', ' + field.ward + ', ' + field.city}">
+                                123 Nguyễn Văn Cừ, Phường An Hòa, Cần Thơ
+                            </span>
+                        </p>
+
+                        <!-- Rating -->
+                        <div class="mb-3">
+                            <i class="bi bi-star-fill text-warning me-1"></i>
+                            <span class="fw-semibold" th:text="${#numbers.formatDecimal(field.rating, 1, 1)}">4.5</span>
+                            <span class="text-muted">/ 5.0</span>
+                        </div>
+
+                        <!-- Giờ mở cửa -->
+                        <div class="mb-3">
+                            <i class="bi bi-clock me-2 text-primary"></i>
+                            <span th:text="${field.openTime} + ' - ' + ${field.closeTime}">06:00 - 22:00</span>
+                        </div>
+
+                        <!-- Mô tả -->
+                        <div class="mb-4">
+                            <h6 class="fw-semibold mb-1">
+                                <i class="bi bi-info-circle me-2 text-secondary"></i>Mô tả
+                            </h6>
+                            <p class="text-secondary" th:text="${field.description}">
+                                Mô tả sân chi tiết...
+                            </p>
+                        </div>
+
+                        <!-- Tiện ích -->
+                        <div class="mb-4">
+                            <h6 class="fw-semibold mb-2">
+                                <i class="bi bi-check2-circle text-success me-2"></i>Tiện ích
+                            </h6>
+
+                            <!-- Nếu có danh sách features -->
+                            <div th:if="${field.features != null and !field.features.isEmpty()}">
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span
+                                        class="badge bg-light text-dark border rounded-pill px-3 py-2 d-flex align-items-center"
+                                        th:each="feature : ${field.features}">
+                                        <i class="bi bi-dot text-success me-1"></i>
+                                        <span th:text="${feature}">Wifi miễn phí</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Nếu không có tiện ích -->
+                            <p class="text-muted fst-italic"
+                                th:if="${field.features == null or field.features.isEmpty()}">
+                                Không có tiện ích được liệt kê.
+                            </p>
+                        </div>
+
+                        <!-- Nút đặt sân -->
+                        <a th:href="@{/{loai}/{slug}/dat-san(loai=${field.typeSlug}, slug=${field.slug})}"
+                            class="btn btn-lg btn-primary d-flex align-items-center justify-content-center gap-2 rounded-3 shadow-sm"
+                            id="btn-booking">
+                            <i class="bi bi-calendar-check"></i> Đặt sân ngay
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Bản đồ mini hiển thị vị trí sân -->
+        <section class="container my-5">
+            <h4 class="fw-semibold mb-3">
+                <i class="bi bi-map text-primary me-2"></i> Vị trí & các sân lân cận
+            </h4>
+            <div id="field-map" style="height: 400px;" class="rounded-4 shadow-sm"></div>
+        </section>
+    </div>
+
+    <section layout:fragment="scripts">
+        <script th:inline="javascript">
+            $(document).ready(function () {
+                const fieldLat = /*[[${field.latitude}]]*/ 10.035;
+                const fieldLng = /*[[${field.longitude}]]*/ 105.785;
+                const fieldName = /*[[${field.name}]]*/ 'Sân bóng đá A';
+                const fieldSlug = /*[[${field.slug}]]*/ 'san-bong-da-a';
+                const fieldId = /*[[${field.id}]]*/ 0;
+
+                // Tạo bản đồ Leaflet
+                const map = L.map('field-map', { scrollWheelZoom: false }).setView([fieldLat, fieldLng], 30);
+
+                // Gọi bản đồ nền miễn phí (OpenStreetMap)
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; OpenStreetMap contributors'
+                }).addTo(map);
+
+                const fieldIcons = {
+                    "BONG-DA": L.icon({
+                        iconUrl: '/web/img/field/icons/football.png',
+                        iconSize: [35, 35],
+                        iconAnchor: [17, 34],
+                        popupAnchor: [0, -30]
+                    }),
+                    "CAU-LONG": L.icon({
+                        iconUrl: '/web/img/field/icons/badminton.png',
+                        iconSize: [35, 35],
+                        iconAnchor: [17, 34],
+                        popupAnchor: [0, -30]
+                    }),
+                    "TENNIS": L.icon({
+                        iconUrl: '/web/img/field/icons/tennis.png',
+                        iconSize: [35, 35],
+                        iconAnchor: [17, 34],
+                        popupAnchor: [0, -30]
+                    }),
+                    "PICKLEBALL": L.icon({
+                        iconUrl: '/web/img/field/icons/pickleball.png',
+                        iconSize: [35, 35],
+                        iconAnchor: [17, 34],
+                        popupAnchor: [0, -30]
+                    }),
+                    "BOI-LOI": L.icon({
+                        iconUrl: '/web/img/field/icons/swimming.png',
+                        iconSize: [35, 35],
+                        iconAnchor: [17, 34],
+                        popupAnchor: [0, -30]
+                    }),
+                    "BONG-RO": L.icon({
+                        iconUrl: '/web/img/field/icons/basketball.png',
+                        iconSize: [35, 35],
+                        iconAnchor: [17, 34],
+                        popupAnchor: [0, -30]
+                    }),
+                    "DEFAULT": L.icon({
+                        iconUrl: '/web/img/field/icons/default.png',
+                        iconSize: [30, 30]
+                    })
+                };
+
+                // Ghim sân hiện tại
+                // const mainMarker = L.marker([fieldLat, fieldLng], { icon: mainIcon }).addTo(map);
+                // mainMarker.bindPopup(`<b>${fieldName}</b><br><a href='/${fieldSlug}'>Xem chi tiết</a>`).openPopup();
+
+                // Vẽ vùng bán kính 2km quanh sân
+                L.circle([fieldLat, fieldLng], {
+                    color: '#007bff',
+                    fillColor: '#cce5ff',
+                    fillOpacity: 0.25,
+                    radius: 2000
+                }).addTo(map);
+
+                // Gọi API lấy các sân gần
+                $.ajax({
+                    url: `/api/v1/fields/nearby`,
+                    method: 'GET',
+                    data: { lat: fieldLat, lng: fieldLng },
+                    success: function (data) {
+                        const fields = data.data;
+                        if (!fields || fields.length === 0) {
+                            console.log("Không có sân gần đó.");
+                            return;
+                        }
+
+                        fields.forEach(function (field) {
+                        const icon = fieldIcons[field.typeSlug?.toUpperCase()] || fieldIcons.DEFAULT;
+                            const tooltipHtml = `<div style="text-align:center;">
+                                <img src="${field.banner}" style="width:100px;height:60px;object-fit:cover;border-radius:8px;"><br>
+                                <strong>${field.name}</strong><br>
+                                ⭐ ${field.rating ?? 0}
+                            </div>`;
+
+                            const popupHtml = `
+                                <div class="card border-0 shadow-sm rounded-4 overflow-hidden" style="width: 250px;">
+                                    <!-- Banner -->
+                                    <div class="ratio ratio-16x9">
+                                        <div class="w-100 h-100"
+                                            style="background: url('${field.banner ?? '/web/img/field/default-field.jpg'}') center/cover no-repeat;">
+                                        </div>
+                                    </div>
+
+                                    <!-- Nội dung -->
+                                    <div class="card-body p-3">
+                                        <h6 class="fw-bold mb-1 text-primary d-flex align-items-center">
+                                            <i class="bi bi-geo-alt-fill me-2"></i>${field.name}
+                                        </h6>
+
+                                        <p class="mb-1 text-muted small">
+                                            <i class="bi bi-tags me-1"></i>${field.type ?? 'Không xác định'}
+                                        </p>
+
+                                        <p class="mb-1 text-muted small d-flex align-items-center">
+                                            <i class="bi bi-geo-alt me-1 text-danger"></i>${field.address}
+                                        </p>
+
+                                        <p class="mb-1">
+                                            <i class="bi bi-star-fill text-warning me-1"></i>
+                                            <span class="fw-semibold">${field.rating ? field.rating.toFixed(1) : '0.0'}</span>
+                                            <span class="text-muted">/ 5.0</span>
+                                        </p>
+
+                                        <p class="mb-3 text-muted small">
+                                            <i class="bi bi-clock me-1 text-primary"></i>
+                                            ${field.openTime ?? '07:00'} - ${field.closeTime ?? '21:00'}
+                                        </p>
+
+                                        <a href="/${field.typeSlug}/${field.slug}/dat-san"
+                                        class="btn btn-sm btn-primary w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                                            <i class="bi bi-calendar-check"></i> Đặt sân ngay
+                                        </a>
+                                    </div>
+                                </div>
+                            `;
+                            const marker = L.marker([field.latitude, field.longitude], { icon: icon })
+                                .addTo(map)
+                                .bindTooltip(tooltipHtml)
+                                .bindPopup(popupHtml);
+
+                            // Hiệu ứng popup hover
+                            // marker.on('mouseover', () => marker.openPopup());
+                            // marker.on('mouseout', () => marker.closePopup());
+                        });
+                    },
+                    error: function (xhr) {
+                        console.error("Lỗi khi gọi API nearby:", xhr);
+                    }
+                });
+
+            });
+        </script>
+    </section>
+</body>
+
+</html>
