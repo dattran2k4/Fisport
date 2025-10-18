@@ -11,4 +11,6 @@ public enum EPaymentStatus {
     FAILED,
     @JsonProperty("refunded")
     REFUNDED,
+    @JsonProperty("refunded")
+    CANCELLED,
 }

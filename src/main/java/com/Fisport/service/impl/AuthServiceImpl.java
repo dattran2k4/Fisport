@@ -149,7 +149,7 @@ public class AuthServiceImpl implements AuthService {
         CustomUserDetails userDetails = new CustomUserDetails(user);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                userDetails.getUsername(),
+                userDetails,
                 null,
                 userDetails.getAuthorities());
         securityContextService.save(auth);

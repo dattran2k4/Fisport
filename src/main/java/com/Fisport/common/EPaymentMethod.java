@@ -10,5 +10,7 @@ public enum EPaymentMethod {
     @JsonProperty("bank_transfer")
     BANK_TRANSFER,
     @JsonProperty("zalopay")
-    ZALOPAY
+    ZALOPAY,
+    @JsonProperty("payos")
+    PAYOS
 }
