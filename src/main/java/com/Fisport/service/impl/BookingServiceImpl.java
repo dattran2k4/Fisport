@@ -126,6 +126,10 @@ public class BookingServiceImpl implements BookingService {
                     throw new InvalidParameterException("Quantity not valid");
                 }
 
+                if (fsi.getStatus().equals(ESubFieldStatus.INACTIVE)) {
+                    throw new InvalidParameterException("Service Item is Inactive");
+                }
+
                 BookingServiceItem bookingServiceItem = BookingServiceItem.builder()
                         .fieldServiceItem(fsi)
                         .quantity(requestItem.getQuantity())
@@ -189,6 +193,7 @@ public class BookingServiceImpl implements BookingService {
                 .build();
     }
 
+    @Transactional
     @Override
     public void cancelBooking(Long id, String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));

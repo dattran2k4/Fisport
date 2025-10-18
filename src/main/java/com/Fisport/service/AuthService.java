@@ -28,5 +28,4 @@ public interface AuthService {
 
     void resetPassword(ResetPasswordRequest request, String verifyCode);
 
-    String generateQRCodeBase64(String otpAuthURL, int width, int height);
 }
