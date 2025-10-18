@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -36,5 +37,19 @@ public class PaymentController {
             return "payment-fail";
         }
         return "payment-success";
+    }
+
+    @GetMapping("/thanh-toan/payos/thanh-cong")
+    public String showPaymentPayOSSucces(@RequestParam("orderCode") long orderCode, @RequestParam("status") String status, Model model) {
+        PaymentResponse response = paymentService.checkPaymentPayOSView(orderCode, status);
+        model.addAttribute("response", response);
+        return "payment-success";
+    }
+
+    @GetMapping("/thanh-toan/payos/that-bai")
+    public String showPaymentPayOSFail(@RequestParam("orderCode") long orderCode, @RequestParam("status") String status, Model model) {
+        PaymentResponse response = paymentService.checkPaymentPayOSView(orderCode, status);
+        model.addAttribute("response", response);
+        return "payment-fail";
     }
 }

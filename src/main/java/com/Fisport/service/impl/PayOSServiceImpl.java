@@ -9,6 +9,7 @@ import vn.payos.PayOS;
 import vn.payos.model.v2.paymentRequests.CreatePaymentLinkRequest;
 import vn.payos.model.v2.paymentRequests.CreatePaymentLinkResponse;
 import vn.payos.model.v2.paymentRequests.PaymentLinkItem;
+import vn.payos.model.webhooks.WebhookData;
 
 @RequiredArgsConstructor
 @Service
@@ -18,13 +19,14 @@ public class PayOSServiceImpl implements PayOSService {
     private final PayOS payOS;
 
     @Override
-    public String createPaymentLink() {
+    public String createPaymentLink(Booking booking) {
 
-        long orderCode = System.currentTimeMillis() / 1000;
-        long amount = (long) (Math.random() * 100);
+        long timePart = System.currentTimeMillis() / 100;
+        long orderCode = timePart * 100000 + booking.getId();
+        long amount = booking.getTotalPrice().longValue();
 
         PaymentLinkItem item = PaymentLinkItem.builder()
-                .name("Ten san pham")
+                .name("Đặt sân trực tuyến Fisport")
                 .quantity(1)
                 .price(amount)
                 .build();
@@ -32,9 +34,10 @@ public class PayOSServiceImpl implements PayOSService {
         CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
                 .orderCode(orderCode)
                 .amount(amount)
-                .description("This is the description")
+                .description("Thanh toán đi m")
                 .returnUrl(payOSConfig.getReturnSuccessUrl())
                 .cancelUrl(payOSConfig.getReturnCancelUrl())
+                .item(item)
                 .build();
 
         CreatePaymentLinkResponse data = payOS.paymentRequests().create(paymentData);
@@ -42,4 +45,21 @@ public class PayOSServiceImpl implements PayOSService {
         String checkoutUrl = data.getCheckoutUrl();
         return checkoutUrl;
     }
+
+    @Override
+    public WebhookData verifyWebHook(Object body) {
+        return payOS.webhooks().verify(body);
+    }
+
+    @Override
+    public boolean comfirmWebHook(String paymentLink) {
+        try {
+            return payOS.webhooks().confirm(paymentLink) != null;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
 }

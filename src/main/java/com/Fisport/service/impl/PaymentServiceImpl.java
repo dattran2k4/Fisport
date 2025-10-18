@@ -10,11 +10,14 @@ import com.Fisport.model.Booking;
 import com.Fisport.model.Payment;
 import com.Fisport.repository.BookingRepository;
 import com.Fisport.repository.PaymentRepository;
+import com.Fisport.service.PayOSService;
 import com.Fisport.service.PaymentService;
 import com.Fisport.service.VnPayService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import vn.payos.model.webhooks.WebhookData;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +30,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final BookingRepository bookingRepository;
     private final VnPayService vnPayService;
     private final PaymentRepository paymentRepository;
+    private final PayOSService payOSService;
 
     @Override
     public String createPayment(PaymentRequest request, HttpServletRequest httpServletRequest) {
@@ -39,6 +43,8 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new UnsupportedOperationException("Momo payment not implemented");
             case ZALOPAY:
                 throw new UnsupportedOperationException("Zalopay payment not implemented");
+            case PAYOS:
+                return payOSService.createPaymentLink(booking);
             default:
                 throw new ResourceNotFoundException("Payment method not supported");
         }
@@ -86,7 +92,9 @@ public class PaymentServiceImpl implements PaymentService {
             booking.setBookingStatus(EBookingStatus.FAILED);
         } else if ("24".equals(response)) {
             paymentStatus =  EPaymentStatus.FAILED;
-            booking.setBookingStatus(EBookingStatus.CANCELLED);
+            booking.setBookingStatus(EBookingStatus.FAILED);
+        } else {
+            throw new ResourceNotFoundException("Payment method not supported");
         }
 
         bookingRepository.save(booking);
@@ -101,8 +109,64 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
+    public void handlePayOSWebHook(WebhookData data) {
+        Long bookingId = data.getOrderCode() % 100000;
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        Payment payment = new Payment();
+        payment.setBooking(booking);
+        payment.setAmount(booking.getTotalPrice());
+        payment.setMethod(EPaymentMethod.PAYOS);
+
+        if (data.getCode().equals("00") && data.getDesc().equals("success")) {
+            booking.setBookingStatus(EBookingStatus.PAID);
+            payment.setStatus(EPaymentStatus.SUCCESS);
+            payment.setTransactionId(data.getReference());
+            payment.setPaymentTime(LocalDateTime.now());
+            payment.setBooking(booking);
+        } else {
+            payment.setStatus(EPaymentStatus.FAILED);
+        }
+
+        paymentRepository.save(payment);
+        bookingRepository.save(booking);
+    }
+
+
+    @Override
     public Booking findByPaymentToken(String paymentToken) {
         return bookingRepository.findByPaymentTokenAndBookingStatus(paymentToken, List.of(EBookingStatus.PENDING, EBookingStatus.FAILED))
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found or already paid"));
+    }
+
+    @Override
+    public Booking findByOrderCodePayOs(long orderCode) {
+        Long bookingId = orderCode % 100000;
+
+        return bookingRepository.findById(bookingId).orElseThrow(() -> new RuntimeException("Booking not found"));
+    }
+
+    @Override
+    public PaymentResponse checkPaymentPayOSView(long orderCode, String status) {
+        Booking booking = findByOrderCodePayOs(orderCode);
+
+        if (status.equals("SUCCESS")) {
+            return PaymentResponse.builder()
+                    .status(EPaymentStatus.SUCCESS)
+                    .amount(booking.getTotalPrice())
+                    .method(EPaymentMethod.PAYOS)
+                    .transactionId(paymentRepository.findByBooking(booking).getTransactionId())
+                    .build();
+        } else {
+            return PaymentResponse.builder()
+                    .status(EPaymentStatus.CANCELLED)
+                    .amount(booking.getTotalPrice())
+                    .method(EPaymentMethod.PAYOS)
+                    .build();
+        }
+
     }
 }

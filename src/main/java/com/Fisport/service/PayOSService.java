@@ -1,7 +1,12 @@
 package com.Fisport.service;
 
 import com.Fisport.model.Booking;
+import vn.payos.model.webhooks.WebhookData;
 
 public interface PayOSService {
-    String createPaymentLink();
+    String createPaymentLink(Booking booking);
+
+    WebhookData verifyWebHook(Object body);
+
+    boolean comfirmWebHook(String paymentLink);
 }
