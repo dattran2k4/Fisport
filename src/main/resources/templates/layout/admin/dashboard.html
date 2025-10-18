@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<div class="dashboard"  th:fragment="content">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <i class="fas fa-map-location-dot"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Total Fields</h3>
+                <p class="stat-number">12</p>
+                <small class="stat-change positive">+2 this month</small>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Total Bookings</h3>
+                <p class="stat-number">284</p>
+                <small class="stat-change positive">+45 this week</small>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Revenue</h3>
+                <p class="stat-number">$12,450</p>
+                <small class="stat-change positive">+12% this month</small>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Total Users</h3>
+                <p class="stat-number">456</p>
+                <small class="stat-change positive">+28 this week</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts & Tables Row -->
+    <div class="dashboard-row">
+        <!-- Revenue Chart -->
+        <div class="card chart-card">
+            <div class="card-header">
+                <h3>Revenue Overview</h3>
+                <div class="period-selector">
+                    <button class="btn-small active">Week</button>
+                    <button class="btn-small">Month</button>
+                    <button class="btn-small">Year</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Recent Bookings</h3>
+                <a href="#" class="link-view-all">View All</a>
+            </div>
+            <div class="card-body">
+                <div class="mini-table">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td>Field 1 - Court A</td>
+                            <td>Jan 15, 2024</td>
+                            <td>14:00 - 15:30</td>
+                            <td><span class="badge badge-success">Confirmed</span></td>
+                        </tr>
+                        <tr>
+                            <td>Field 2 - Court B</td>
+                            <td>Jan 15, 2024</td>
+                            <td>16:00 - 17:30</td>
+                            <td><span class="badge badge-warning">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>Field 1 - Court C</td>
+                            <td>Jan 16, 2024</td>
+                            <td>10:00 - 11:30</td>
+                            <td><span class="badge badge-success">Confirmed</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Row -->
+    <div class="dashboard-row">
+        <!-- Top Fields -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Top Fields</h3>
+            </div>
+            <div class="card-body">
+                <div class="field-list">
+                    <div class="field-item">
+                        <div class="field-info">
+                            <h4>Field 1 - Premium Court</h4>
+                            <p>48 bookings this month</p>
+                        </div>
+                        <div class="field-rating">
+                            <span class="stars">★★★★★</span>
+                            <span class="rating">4.8</span>
+                        </div>
+                    </div>
+                    <div class="field-item">
+                        <div class="field-info">
+                            <h4>Field 2 - Standard Court</h4>
+                            <p>36 bookings this month</p>
+                        </div>
+                        <div class="field-rating">
+                            <span class="stars">★★★★☆</span>
+                            <span class="rating">4.5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <div class="card-header">
+                <h3>Quick Actions</h3>
+            </div>
+            <div class="card-body quick-actions">
+                <a href="/owner/fields/create" class="action-button">
+                    <i class="fas fa-plus"></i>
+                    <span>Add New Field</span>
+                </a>
+                <a href="/owner/vouchers/create" class="action-button">
+                    <i class="fas fa-ticket"></i>
+                    <span>Create Voucher</span>
+                </a>
+                <a href="/owner/news/create" class="action-button">
+                    <i class="fas fa-newspaper"></i>
+                    <span>Post News</span>
+                </a>
+                <a href="/owner/tournaments/create" class="action-button">
+                    <i class="fas fa-trophy"></i>
+                    <span>Create Tournament</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Revenue',
+                data: [1200, 1900, 1500, 2500, 2200, 2800, 3200],
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>

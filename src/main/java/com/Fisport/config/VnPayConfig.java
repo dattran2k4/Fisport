@@ -9,15 +9,15 @@ import org.springframework.context.annotation.Configuration;
 @Getter
 public class VnPayConfig {
 
-    @Value("${vnpay.tmn-code}")
+//    @Value("${vnpay.tmn-code}")
     private String vnpTmnCode;
 
-    @Value("${vnpay.hash-secret}")
+//    @Value("${vnpay.hash-secret}")
     private String vnpHashSecret;
 
-    @Value("${vnpay.pay-url}")
+//    @Value("${vnpay.pay-url}")
     private String vnpPayUrl;
 
-    @Value("${vnpay.return-url}")
+//    @Value("${vnpay.return-url}")
     private String vnpReturnUrl;
 }

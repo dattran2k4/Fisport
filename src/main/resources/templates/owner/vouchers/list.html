@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="content">
+<div class="vouchers-section">
+    <!-- Header -->
+    <div class="section-header">
+        <h2>Vouchers</h2>
+        <a href="/owner/vouchers/create" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Create Voucher
+        </a>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+        <div class="filter-group">
+            <input type="text" class="filter-input" placeholder="Search vouchers...">
+        </div>
+        <div class="filter-group">
+            <select class="filter-select">
+                <option>All Status</option>
+                <option>Active</option>
+                <option>Expired</option>
+                <option>Disabled</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Vouchers Grid -->
+    <div class="vouchers-grid">
+        <div class="voucher-card">
+            <div class="voucher-header">
+                <h3>Summer Discount 20%</h3>
+                <span class="status-badge active">Active</span>
+            </div>
+            <div class="voucher-content">
+                <div class="voucher-code">
+                    <span class="code-label">Code:</span>
+                    <span class="code-value">SUMMER20</span>
+                    <button class="copy-btn" onclick="copyCode('SUMMER20')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div class="voucher-details">
+                    <p><strong>Discount:</strong> 20% off</p>
+                    <p><strong>Min. Booking:</strong> $50</p>
+                    <p><strong>Valid Until:</strong> Dec 31, 2024</p>
+                    <p><strong>Used:</strong> 45 / 100</p>
+                </div>
+            </div>
+            <div class="voucher-actions">
+                <a href="/owner/vouchers/1/edit" class="action-link edit">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <button class="action-link delete" onclick="deleteVoucher(1)">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+
+        <div class="voucher-card">
+            <div class="voucher-header">
+                <h3>Weekend Special</h3>
+                <span class="status-badge">Expired</span>
+            </div>
+            <div class="voucher-content">
+                <div class="voucher-code">
+                    <span class="code-label">Code:</span>
+                    <span class="code-value">WEEKEND15</span>
+                    <button class="copy-btn" onclick="copyCode('WEEKEND15')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div class="voucher-details">
+                    <p><strong>Discount:</strong> $15 off</p>
+                    <p><strong>Min. Booking:</strong> $75</p>
+                    <p><strong>Valid Until:</strong> Jan 10, 2024</p>
+                    <p><strong>Used:</strong> 82 / Unlimited</p>
+                </div>
+            </div>
+            <div class="voucher-actions">
+                <a href="/owner/vouchers/2/edit" class="action-link edit">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <button class="action-link delete" onclick="deleteVoucher(2)">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+
+        <div class="voucher-card">
+            <div class="voucher-header">
+                <h3>New User Welcome</h3>
+                <span class="status-badge active">Active</span>
+            </div>
+            <div class="voucher-content">
+                <div class="voucher-code">
+                    <span class="code-label">Code:</span>
+                    <span class="code-value">WELCOME10</span>
+                    <button class="copy-btn" onclick="copyCode('WELCOME10')">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+                <div class="voucher-details">
+                    <p><strong>Discount:</strong> $10 off</p>
+                    <p><strong>Min. Booking:</strong> $30</p>
+                    <p><strong>Valid Until:</strong> Feb 28, 2024</p>
+                    <p><strong>Used:</strong> 156 / 200</p>
+                </div>
+            </div>
+            <div class="voucher-actions">
+                <a href="/owner/vouchers/3/edit" class="action-link edit">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <button class="action-link delete" onclick="deleteVoucher(3)">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyCode(code) {
+        navigator.clipboard.writeText(code);
+        alert('Code copied to clipboard!');
+    }
+
+    function deleteVoucher(id) {
+        if (confirm('Are you sure you want to delete this voucher?')) {
+            alert('Voucher deleted');
+        }
+    }
+</script>

@@ -3,6 +3,7 @@ package com.Fisport.repository;
 import com.Fisport.dto.response.FieldDetailResponse;
 import com.Fisport.model.Field;
 import com.Fisport.common.EFieldStatus;
+import com.Fisport.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,7 @@ public interface FieldRepository extends JpaRepository<Field,Long>, JpaSpecifica
     List<Field> findByOwnerId(Long ownerId);
     List<Field> findByFieldStatus(EFieldStatus fieldStatus);
     List<Field> findByFieldStatusAndOwner_Username(EFieldStatus fieldStatus, String userName);
+    List<Field> findByOwner(User owner);
 
     Field findBySlug(String fieldNameSlug);
 
