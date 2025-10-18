@@ -236,23 +236,6 @@ public class AuthServiceImpl implements AuthService {
         tokenService.invalidateToken(verifyCode);
     }
 
-    @Override
-    public String generateQRCodeBase64(String otpAuthURL, int width, int height) {
-        try {
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            Map<EncodeHintType, Object> hints = new HashMap<>();
-            hints.put(EncodeHintType.MARGIN, 1); // lề nhỏ
-            BitMatrix bitMatrix = qrCodeWriter.encode(otpAuthURL, BarcodeFormat.QR_CODE, width, height, hints);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", baos);
-
-            String base64 = Base64.getEncoder().encodeToString(baos.toByteArray());
-            return "data:image/png;base64," + base64;
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi tạo QR code", e);
-        }
-    }
 }
 
 

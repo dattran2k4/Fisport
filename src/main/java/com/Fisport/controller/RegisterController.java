@@ -7,6 +7,7 @@ import com.Fisport.service.AuthService;
 import com.Fisport.service.TwoFAService;
 import com.Fisport.service.UserService;
 import com.Fisport.service.impl.SessionService;
+import com.Fisport.util.QRCodeUtil;
 import jakarta.mail.MessagingException;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +25,9 @@ import java.io.UnsupportedEncodingException;
 @RequestMapping
 @Controller
 public class RegisterController {
-    private final UserService userService;
     private final AuthService authService;
-    private final TwoFAService twoFAService;
     private final SessionService sessionService;
+    private final QRCodeUtil qrCodeUtil;
 
     @GetMapping("/register")
     public String showRegisterPage(Model model) {
@@ -55,7 +55,7 @@ public class RegisterController {
     @GetMapping("/confirm")
     public String showConfirmPage(@NotBlank @RequestParam String verifyCode, Model model) {
         String qrUrl = authService.confirmUser(verifyCode);
-        String qrCode = authService.generateQRCodeBase64(qrUrl, 250, 250);
+        String qrCode = qrCodeUtil.generateQRCodeBase64(qrUrl, 250, 250);
         String username = sessionService.get("username", String.class);
 
         //to-do the message
