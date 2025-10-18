@@ -22,6 +22,7 @@ import vn.payos.model.webhooks.WebhookData;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -51,60 +52,57 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    @Transactional
     public PaymentResponse handleVnpayReturn(Map<String, String> params) {
         boolean valid = vnPayService.validatePayment(params);
         if (!valid) {
             throw new RuntimeException("Invalid VNPay callback");
         }
 
-        String transactionNo = params.get("vnp_TransactionNo");
 
         Long bookingId = vnPayService.extractBookingId(params);
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-//        Payment payment = new Payment();
-//        payment.setBooking(booking);
-//        payment.setAmount(booking.getTotalPrice());
-//        payment.setMethod(EPaymentMethod.VNPAY);
-//        payment.setStatus(EPaymentStatus.PENDING);
-//        payment.setTransactionId(transactionNo);
-
-        EPaymentStatus paymentStatus = EPaymentStatus.PENDING;
-
         String response = params.get("vnp_ResponseCode");
-        if ("00".equals(response)) {
-            paymentStatus = EPaymentStatus.SUCCESS;
+        String transactionNo = Optional.ofNullable(params.get("vnp_TransactionNo")).orElse("UNKNOWN");
 
-            Payment payment = Payment.builder()
-                    .booking(booking)
-                    .amount(booking.getTotalPrice())
-                    .method(EPaymentMethod.VNPAY)
-                    .status(EPaymentStatus.SUCCESS)
-                    .transactionId(transactionNo)
-                    .paymentTime(LocalDateTime.now())
-                    .build();
-
-            booking.setBookingStatus(EBookingStatus.PAID);
-            paymentRepository.save(payment);
-        } else if("99".equals(response)) {
-            paymentStatus =  EPaymentStatus.FAILED;
-            booking.setBookingStatus(EBookingStatus.FAILED);
-        } else if ("24".equals(response)) {
-            paymentStatus =  EPaymentStatus.FAILED;
-            booking.setBookingStatus(EBookingStatus.FAILED);
-        } else {
-            throw new ResourceNotFoundException("Payment method not supported");
+        EPaymentStatus paymentStatus;
+        EBookingStatus bookingStatus = EBookingStatus.PENDING;
+        LocalDateTime paymentTime = null;
+        switch (response) {
+            case "00":
+                paymentStatus = EPaymentStatus.SUCCESS;
+                bookingStatus = EBookingStatus.PAID;
+                paymentTime = LocalDateTime.now();
+                break;
+            case "24":
+                paymentStatus = EPaymentStatus.CANCELLED;
+                break;
+            default:
+                paymentStatus = EPaymentStatus.FAILED;
+                break;
         }
 
+        booking.setBookingStatus(bookingStatus);
         bookingRepository.save(booking);
 
-        return PaymentResponse.builder()
-                .status(paymentStatus)
+        Payment payment = Payment.builder()
+                .booking(booking)
+                .paymentTime(paymentTime)
                 .amount(booking.getTotalPrice())
                 .method(EPaymentMethod.VNPAY)
+                .status(paymentStatus)
                 .transactionId(transactionNo)
-                .paymentAt(paymentStatus == EPaymentStatus.SUCCESS ? LocalDateTime.now() : null)
+                .build();
+        paymentRepository.save(payment);
+
+        return PaymentResponse.builder()
+                .amount(booking.getTotalPrice())
+                .method(EPaymentMethod.VNPAY)
+                .paymentAt(paymentTime)
+                .transactionId(transactionNo)
+                .status(paymentStatus)
                 .build();
     }
 
