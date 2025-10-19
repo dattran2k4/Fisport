@@ -16,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.security.InvalidParameterException;
-import java.security.Principal;
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -36,6 +33,7 @@ public class BookingServiceImpl implements BookingService {
     private final FieldHasTimeSlotRepository fieldHasTimeSlotRepository;
     private final UserRepository userRepository;
     private final FieldHasTimeSlotService fieldHasTimeSlotService;
+    private final FieldTypeBookDurationRepository fieldTypeBookDurationRepository;
 
     @Override
     public List<BookingTimeResponse> getOccupiedSlots(Long subFieldId, LocalDate date) {
@@ -85,7 +83,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         //Valid duration must be in field type
-        if (request.getDuration() != Duration.between(request.getStartTime(), request.getEndTime()).toMinutes()) {
+        if (request.getDuration() != java.time.Duration.between(request.getStartTime(), request.getEndTime()).toMinutes()) {
             throw new InvalidParameterException("Duration not valid");
         }
 
@@ -98,11 +96,14 @@ public class BookingServiceImpl implements BookingService {
             throw new InvalidParameterException("Duration not valid");
         }
 
+        //Check overlap
+        List<Booking> bookings = bookingRepository.findOverlappingBookingsForUpdate(request.getSubFieldId(), request.getDate(), request.getStartTime(), request.getEndTime());
+        if (!bookings.isEmpty()) {
+            throw new InvalidDataException("This subfield is already booked at the requested time\"");
+        }
+
         //Valid occupied
         List<FieldHasTimeSlot> slots = fieldHasTimeSlotRepository.findSlotsForBooking(subField.getField().getId(), request.getStartTime(), request.getEndTime());
-        if (slots.isEmpty()) {
-            throw new ResourceNotFoundException("Slot not found");
-        }
 
         Booking booking = Booking.builder()
                 .bookingDate(request.getDate())
@@ -201,6 +202,8 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
+        checkExpiredBooking(booking);
+
         if (LocalDateTime.now().isAfter(LocalDateTime.of(booking.getBookingDate(), booking.getStartTime()))) {
             throw new IllegalStateException("Cannot cancel a booking that has already started or passed.");
         }
@@ -258,6 +261,43 @@ public class BookingServiceImpl implements BookingService {
                                 .collect(Collectors.joining(", "))
                 )
                 .build();
+    }
+
+    @Override
+    public void checkExpiredBooking(Booking booking) {
+        if (booking.getBookingStatus().equals(EBookingStatus.PENDING) && booking.getExpiredAt().isBefore(LocalDateTime.now())) {
+            booking.setBookingStatus(EBookingStatus.FAILED);
+            bookingRepository.save(booking);
+        } else {
+            throw new InvalidParameterException("Booking is expried");
+        }
+    }
+
+    @Override
+    public List<Integer> getAvailableDurationsBooking(Long id, LocalDate date, LocalTime startTime) {
+        SubField subField = subFieldRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Subfield not found"));
+
+        List<Booking> bookings = bookingRepository.findBySubfieldAndBookingDate(subField, date);
+
+        List<Duration> durations = fieldTypeBookDurationRepository.findDurationByFieldTypeId(subField.getField().getFieldType().getId());
+
+        List<Integer> availableDurations = durations.stream()
+                .map(Duration::getMinutes)
+                .filter(d -> isDurationAvailable(bookings, startTime, d))
+                .toList();
+
+        return availableDurations;
+    }
+
+    private boolean isDurationAvailable(List<Booking> bookings, LocalTime startTime, Integer d) {
+        LocalTime endTime = startTime.plusMinutes(d);
+
+        for (Booking booking : bookings) {
+            if (startTime.isBefore(booking.getEndTime()) && endTime.isAfter(booking.getStartTime())) {
+                return false;
+            }
+        }
+        return true;
     }
 
 }

@@ -33,7 +33,7 @@ public class Field extends AbstractEntity {
     @Column(name = "banner", nullable = false)
     private String banner;
 
-    @Column(name = "slug", nullable = false,  unique = true)
+    @Column(name = "slug", nullable = false, unique = true)
     private String slug;
 
     @Column(name = "open_time", nullable = false)
@@ -60,12 +60,15 @@ public class Field extends AbstractEntity {
     @JoinColumn(name = "ward_id")
     private Ward ward;
 
-    @OneToMany(mappedBy = "field",  fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "field", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FieldHasTimeSlot> fieldTimeSlots = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "field_type_id")
     private FieldType fieldType;
+
+    @OneToMany(mappedBy = "field")
+    private Set<SubField> subFields = new HashSet<>();
 
     @OneToMany(mappedBy = "field")
     private Set<FieldHasFeature> fieldHasFeatures = new HashSet<>();
@@ -76,11 +79,11 @@ public class Field extends AbstractEntity {
                 .collect(Collectors.toSet());
     }
 
-    @OneToMany(mappedBy = "field",  cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FieldServiceItem> fieldServiceItems = new HashSet<>();
 
     @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Review>  reviews = new HashSet<>();
+    private Set<Review> reviews = new HashSet<>();
 
     @CreationTimestamp
     @Column(name = "created_at")

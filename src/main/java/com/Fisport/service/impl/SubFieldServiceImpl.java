@@ -15,13 +15,15 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SubFieldServiceImpl implements SubFieldService {
     private final FieldRepository fieldRepository;
-    private final SubFieldRepository  subFieldRepository;
+    private final SubFieldRepository subFieldRepository;
 
     @Override
     public List<SubFieldResponse> getAllSubFields(Long fieldId, ESubFieldStatus status) {
@@ -36,7 +38,7 @@ public class SubFieldServiceImpl implements SubFieldService {
     }
 
     @Override
-    public void createSubField(SubFieldRequest request,  String username) throws AccessDeniedException {
+    public void createSubField(SubFieldRequest request, String username) throws AccessDeniedException {
         Field field = fieldRepository.findById(request.getFieldId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sân"));
 

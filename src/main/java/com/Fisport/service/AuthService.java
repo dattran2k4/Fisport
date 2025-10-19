@@ -24,7 +24,7 @@ public interface AuthService {
 
     String logout();
 
-    String forgotPassword(String email) throws MessagingException, UnsupportedEncodingException;
+    void forgotPassword(String email) throws MessagingException, UnsupportedEncodingException;
 
     void resetPassword(ResetPasswordRequest request, String verifyCode);
 

@@ -8,6 +8,10 @@ import org.springframework.util.StringUtils;
 
 public class FieldSpecification {
 
+    private FieldSpecification() {
+
+    }
+
     public static Specification<Field> filterFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, Long... featureIds) {
         return (Root<Field> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             Join<?, ?> hasFeatureJoin = root.join("fieldHasFeatures");
@@ -35,7 +39,7 @@ public class FieldSpecification {
                         //sth
                 ));
             }
-            
+
             if (featureIds != null && featureIds.length > 0) {
                 predicate = cb.and(predicate, featureJoin.get("id").in((Object[]) featureIds));
 

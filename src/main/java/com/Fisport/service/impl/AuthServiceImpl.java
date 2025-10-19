@@ -202,19 +202,19 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String forgotPassword(String email) throws MessagingException, UnsupportedEncodingException {
+    public void forgotPassword(String email) throws MessagingException, UnsupportedEncodingException {
         if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-            return "Email sai định dạng";
+            throw new InvalidDataException("Email sai định dạng");
         }
 
-        User user = userRepository.findByEmail(email).orElse(null);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new InvalidDataException("Email không tồn tại trong hệ thống"));
+
         if (user != null) {
             //to-fix
-            String token = tokenService.createTokenForEmail(user.getUsername());
+            String token = tokenService.createTokenForEmail(user.getEmail());
             mailService.sendConfirmLink(email, "reset-password-email.html", endPointResetPassword, token);
         }
 
-        return "Kiểm tra email để tạo lại mật khẩu";
     }
 
     @Override

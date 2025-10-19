@@ -8,5 +8,5 @@ public class SecurityWhiteList {
             "/api/v1/wards", "/cau-long/**", "/tennis/**", "/bong-ro", "/pickleball/**", "/api/v1/sub-fields", "/booking/**",
             "/login/**", "/2fa/**", "/",
             "/api/v1/bookings/**",
-            "/bong-da/**", "/api/v1/users/**", "/web/js/**"); //test
+            "/bong-da/**", "/api/v1/users/**", "/web/js/**", "/forgot-password"); //test
 }
