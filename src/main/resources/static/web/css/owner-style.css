@@ -1567,3 +1567,18 @@ body {
         padding: 15px;
     }
 }
+
+button.remove-btn {
+    background-color: #ff5252;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    cursor: pointer;
+}
+
+.sub-field-item input {
+    flex: 1;
+}

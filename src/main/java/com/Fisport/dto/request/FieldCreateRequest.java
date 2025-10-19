@@ -15,7 +15,9 @@ public class FieldCreateRequest {
     private String latitude;
     private String banner;
     private String ward;
+    private List<ServiceItemsRequest> serviceItems;
     private LocalTime openingTime;
     private LocalTime closingTime;
+    private List<String> sub_fields;
     private List<String> features;
 }

@@ -1,8 +1,10 @@
 package com.Fisport.controller.owner;
 
 import com.Fisport.dto.request.FieldCreateRequest;
+import com.Fisport.dto.request.ServiceItemsRequest;
 import com.Fisport.service.*;
 import com.Fisport.service.impl.SessionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,6 +36,9 @@ public class OwnerFieldsController {
     @Autowired
     private FieldService fieldService;
 
+    @Autowired
+    private ServiceItemService serviceItemService;
+
     @GetMapping
     public String listFields(Model model, HttpServletRequest request, Principal principal) {
         model.addAttribute("content", "fields-list");
@@ -48,6 +54,7 @@ public class OwnerFieldsController {
         model.addAttribute("cities", cityService.findAll());
         model.addAttribute("features", featureService.getListFeatures());
         model.addAttribute("fieldTypes", fieldTypeService.findAll());
+        model.addAttribute("serviceItems", serviceItemService.findAll());
         return "owner/fields/create";
     }
 
@@ -56,8 +63,15 @@ public class OwnerFieldsController {
             @ModelAttribute FieldCreateRequest request,
             @RequestParam("image") List<MultipartFile> image,
             Model model,
-            Principal principal
+            Principal principal,
+            @RequestParam("serviceItemsJson") String serviceItemsJson
     ) throws IOException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        List<ServiceItemsRequest> serviceItems =
+                Arrays.asList(mapper.readValue(serviceItemsJson, ServiceItemsRequest[].class));
+        request.setServiceItems(serviceItems);
+
         String uploadDir = new File("src/main/resources/static/web/img/field/FieldType"+request.getField_type()).getAbsolutePath();
         File uploadFolder = new File(uploadDir);
         if (!uploadFolder.exists()) {
@@ -78,6 +92,9 @@ public class OwnerFieldsController {
                 request.setBanner(imageUrl);
             }
         }
+//        TODO : THÊM SERVICE VÀO BẢNG SERVICE_ITEM_FIELD , ĐÃ CÓ TOÀN BỘ THÔNG TIN SERVICE_ITEM_ID, FIELD_IT , QUANTITY , NAME
+//        TODO : BỎ SELECTED TRONG SERVICE ITEM REQUEST DTO
+//        TODO : THÊM SUB _FIELD VÀO BẢNG SUB_FIELD, ĐÃ CÓ NAME CỦA SUB_FIELD
         fieldService.createFieldByOwner(request,principal.getName());
 
         return "redirect:/owner/fields";
