@@ -1,7 +1,10 @@
 package com.Fisport.service.impl;
 
+import com.Fisport.common.EFieldServiceItem;
+import com.Fisport.common.ESubFieldStatus;
 import com.Fisport.dto.request.FieldCreateRequest;
 import com.Fisport.dto.request.FieldRequest;
+import com.Fisport.dto.request.ServiceItemsRequest;
 import com.Fisport.dto.response.*;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.*;
@@ -15,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,6 +33,9 @@ public class FieldServiceImpl implements FieldService {
     private final FieldHasFeatureRepository fieldHasFeatureRepository;
     private final ReviewRepository reviewRepository;
     private final FeatureRepository featureRepository;
+    private final ServiceItemRepository serviceItemRepository;
+    private final SubFieldRepository subFieldRepository;
+    private final FieldServiceItemRepository fieldServiceItemRepository;
 
     @Override
     public List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, Long... featureIds) {
@@ -100,58 +108,60 @@ public class FieldServiceImpl implements FieldService {
         fieldRepository.save(field);
     }
 
+    //    @Override
+//    @Transactional
+//    public void createFieldByOwner(FieldCreateRequest req, String username) {
+//        User owner = getUser(username);
+//        Ward ward = getWard(req.getWard());
+//        FieldType fieldType = getFieldType(req.getField_type());
+//
+//        validateOpeningHours(req);
+//
+//        Field field = buildField(req, owner, ward, fieldType);
+//        fieldRepository.save(field);
+//
+//        saveFeatures(req, field);
+//        saveSubFields(req, field);
+//        saveServiceItems(req, field);
+//    }
     @Override
     @Transactional
     public void createFieldByOwner(FieldCreateRequest fieldCreateRequest, String name) {
-        User user = userRepository.findByUsername(name)
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
-
-        Ward ward = wardRepository.findById(Long.parseLong(fieldCreateRequest.getWard()))
-                .orElseThrow(() -> new ResourceNotFoundException("Ward not found"));
-
-        FieldType fieldType = fieldRepository.findById(Long.parseLong(fieldCreateRequest.getField_type()))
-                .orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
-
-
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        Ward ward = wardRepository.findById(Long.parseLong(fieldCreateRequest.getWard())).orElseThrow(() -> new ResourceNotFoundException("Ward not found"));
+        FieldType fieldType = fieldRepository.findById(Long.parseLong(fieldCreateRequest.getField_type())).orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
         if (!fieldCreateRequest.getOpeningTime().isBefore(fieldCreateRequest.getClosingTime())) {
             throw new IllegalArgumentException("Giờ mở cửa phải sớm hơn giờ đóng cửa");
         }
         String slug = SlugUtils.slugify(fieldCreateRequest.getName());
-        Field field = Field.builder()
-                .name(fieldCreateRequest.getName())
-                .banner(fieldCreateRequest.getBanner())
-                .address(fieldCreateRequest.getAddress())
-                .slug(slug)
-                .openTime(fieldCreateRequest.getOpeningTime())
-                .closeTime(fieldCreateRequest.getClosingTime())
-                .fieldStatus(EFieldStatus.INACTIVE)
-                .ward(ward)
-                .longitude(Double.parseDouble(fieldCreateRequest.getLongitude()))
-                .latitude(Double.parseDouble(fieldCreateRequest.getLatitude()))
-                .owner(user)
-                .fieldType(fieldType)
-                .description(fieldCreateRequest.getDescription())
-                .build();
+        Field field = Field.builder().name(fieldCreateRequest.getName()).banner(fieldCreateRequest.getBanner()).address(fieldCreateRequest.getAddress()).slug(slug).openTime(fieldCreateRequest.getOpeningTime()).closeTime(fieldCreateRequest.getClosingTime()).fieldStatus(EFieldStatus.INACTIVE).ward(ward).longitude(Double.parseDouble(fieldCreateRequest.getLongitude())).latitude(Double.parseDouble(fieldCreateRequest.getLatitude())).owner(user).fieldType(fieldType).description(fieldCreateRequest.getDescription()).build();
         fieldRepository.save(field);
         if (fieldCreateRequest.getFeatures() != null && !fieldCreateRequest.getFeatures().isEmpty()) {
-
-            List<Long> featureIds = fieldCreateRequest.getFeatures()
-                    .stream()
-                    .map(Long::parseLong)
-                    .toList();
-
+            List<Long> featureIds = fieldCreateRequest.getFeatures().stream().map(Long::parseLong).toList();
             List<Feature> features = featureRepository.findAllById(featureIds);
-            List<FieldHasFeature> fieldFeatures = features.stream()
-                    .map(feature -> FieldHasFeature.builder()
-                            .feature(feature)
-                            .field(field)
-                            .build())
-                    .toList();
-
+            List<FieldHasFeature> fieldFeatures = features.stream().map(feature -> FieldHasFeature.builder().feature(feature).field(field).build()).toList();
             fieldHasFeatureRepository.saveAll(fieldFeatures);
         }
+        if (fieldCreateRequest.getSub_fields() != null && !fieldCreateRequest.getSub_fields().isEmpty()) {
+            List<SubField> subFields = fieldCreateRequest.getSub_fields().stream().map(sub_field -> SubField.builder().field(field).name(sub_field).status(ESubFieldStatus.AVAILABLE).build()).toList();
+            subFieldRepository.saveAll(subFields);
+        }
+        if (fieldCreateRequest.getServiceItems() != null && !fieldCreateRequest.getServiceItems().isEmpty()) {
+            List<Long> serviceItemIds = fieldCreateRequest.getServiceItems().stream().map(ServiceItemsRequest::getId).toList();
+            List<ServiceItem> serviceItems = serviceItemRepository.findAllById(serviceItemIds);
+            Map<Long, ServiceItem> serviceItemMap = serviceItems.stream().collect(Collectors.toMap(ServiceItem::getId, s -> s));
+            List<FieldServiceItem> fieldServiceItems = fieldCreateRequest.getServiceItems().stream().map(reqItem -> {
+                FieldServiceItem fsi = new FieldServiceItem();
+                fsi.setServiceItem(serviceItemMap.get(reqItem.getId()));
+                fsi.setPrice(BigDecimal.valueOf(reqItem.getPrice()));
+                fsi.setQuantity(reqItem.getQuantity());
+                fsi.setField(field);
+                fsi.setStatus(EFieldServiceItem.ACTIVE);
+                return fsi;
+            }).toList();
+            fieldServiceItemRepository.saveAll(fieldServiceItems);
+        }
     }
-
 
     @Override
     public void changeStatusFieldByAdmin(Long fieldId, EFieldStatus fieldStatus) {

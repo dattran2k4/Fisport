@@ -92,9 +92,6 @@ public class OwnerFieldsController {
                 request.setBanner(imageUrl);
             }
         }
-//        TODO : THÊM SERVICE VÀO BẢNG SERVICE_ITEM_FIELD , ĐÃ CÓ TOÀN BỘ THÔNG TIN SERVICE_ITEM_ID, FIELD_IT , QUANTITY , NAME
-//        TODO : BỎ SELECTED TRONG SERVICE ITEM REQUEST DTO
-//        TODO : THÊM SUB _FIELD VÀO BẢNG SUB_FIELD, ĐÃ CÓ NAME CỦA SUB_FIELD
         fieldService.createFieldByOwner(request,principal.getName());
 
         return "redirect:/owner/fields";

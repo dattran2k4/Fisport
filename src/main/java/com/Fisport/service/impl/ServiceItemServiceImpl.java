@@ -1,5 +1,6 @@
 package com.Fisport.service.impl;
 
+import com.Fisport.dto.request.ServiceItemsRequest;
 import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.dto.response.ServiceItemResponse;
 import com.Fisport.model.Field;
@@ -23,6 +24,11 @@ public class ServiceItemServiceImpl implements ServiceItemService {
     public List<ServiceItemResponse> findAll() {
         List<ServiceItem> serviceItems = serviceItemRepository.findAll();
         return serviceItems.stream().map(this::toDto).toList();
+    }
+
+    @Override
+    public void save(ServiceItemsRequest serviceItemsRequest) {
+
     }
 
     private ServiceItemResponse toDto(ServiceItem si) {
