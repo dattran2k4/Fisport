@@ -6,10 +6,9 @@
     <div class="section-header">
         <h2>Add New Field</h2>
     </div>
-
     <!-- Form -->
     <div class="form-container">
-        <form th:action="@{/owner/fields/save}" method="post" enctype="multipart/form-data" class="form">
+        <form th:action="@{/owner/fields/save}" method="post" id="fieldForm" enctype="multipart/form-data" class="form">
             <div class="form-grid">
                 <!-- Basic Information -->
                 <div class="form-group-section">
@@ -90,7 +89,7 @@
 
                 <!-- Images -->
                 <div class="form-group-section">
-                    <h3>Ảnh sân</h3>
+                    <h3>Ảnh của sân</h3>
 
                     <div class="file-upload">
                         <input type="file" name="image" multiple accept="image/*" id="imageInput">
@@ -101,6 +100,48 @@
                         <div class="image-preview" id="imagePreview"></div>
                     </div>
                 </div>
+
+<!--                THONG TIN KHAC-->
+                <div class="form-group-section">
+                    <h3>Sân con</h3>
+
+                    <div class="form-group"
+                         id="subFieldsContainer"
+                         style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
+                        <!-- input mặc định đầu tiên -->
+                        <div class="sub-field-item" style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <input type="text" name="sub_fields" placeholder="Nhập tên sân con" required>
+                            <button type="button" class="remove-btn" style="display:none;">−</button>
+                        </div>
+                    </div>
+
+                    <button class="upload-label" type="button" id="addSubField" style=" max-height: 32px">＋ Thêm sân con</button>
+                </div>
+
+
+                <div class="form-group-section">
+                    <h3>Dịch vụ đi kèm</h3>
+                    <div class="checkbox-group" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
+                        <div th:each="si : ${serviceItems}"  >
+                            <div class="service-item">
+                                <input type="checkbox"
+                                       class="service-checkbox"
+                                       th:data-id="${si.id}">
+                                <label th:for="${si.id}" th:text="${si.name}"></label>
+                                <div class="form-group">
+                                    <input type="number" class="quantity" placeholder="Số lượng" min="1">
+                                    <input type="number" class="price" placeholder="Đơn giá" min="0" step="1000">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- hidden field để chứa JSON -->
+                    <input type="hidden" name="serviceItemsJson" id="serviceItemsJson">
+                </div>
+
+
+
 
             </div>
             <div class="form-group-section" style="margin-bottom: 12px">
@@ -126,6 +167,47 @@
 
 <section layout:fragment="scripts">
     <script th:inline="javascript">
+    //DYANMIC INPUT
+document.getElementById("addSubField").addEventListener("click", function() {
+    const container = document.getElementById("subFieldsContainer");
+    // Tạo phần tử mới
+    const newDiv = document.createElement("div");
+    newDiv.className = "sub-field-item";
+    newDiv.style.cssText = "display: flex; align-items: center; gap: 8px; margin-bottom: 8px;";
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.name = "sub_fields";
+    input.placeholder = "Nhập tên sân con";
+    input.required = true;
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "−";
+    removeBtn.className = "remove-btn";
+    removeBtn.addEventListener("click", () => newDiv.remove());
+
+    newDiv.appendChild(input);
+    newDiv.appendChild(removeBtn);
+
+    container.appendChild(newDiv);
+});
+//JSON SERVICE
+document.getElementById("fieldForm").addEventListener("submit", function (e) {
+    const selectedItems = [];
+    document.querySelectorAll(".service-item").forEach(item => {
+        const checkbox = item.querySelector(".service-checkbox");
+        if (checkbox.checked) {
+            const id = checkbox.dataset.id;
+            const quantity = item.querySelector(".quantity").value || 0;
+            const price = item.querySelector(".price").value || 0;
+            selectedItems.push({ id, quantity, price });
+        }
+    });
+
+    // Gán JSON vào hidden input
+    document.getElementById("serviceItemsJson").value = JSON.stringify(selectedItems);
+});
         // PREVIEW IMAGE
         const input = document.getElementById('imageInput');
         const preview = document.getElementById('imagePreview');
