@@ -22,5 +22,5 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
                        @Param("activeStatus") EVoucherStatus activeStatus,
                        @Param("now") LocalDate now);
 
-
+    List<Voucher> findByStatus(EVoucherStatus status);
 }

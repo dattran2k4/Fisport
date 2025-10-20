@@ -20,21 +20,16 @@ import java.util.List;
 public class HomeController {
 
     private final CityService cityService;
-    private final FieldService fieldService;
+    private final VoucherService voucherService;
 
-    @GetMapping("/favicon.ico")
-    @ResponseBody
-    void returnNoFavicon() {
-        // Không làm gì cả, chỉ để chặn request này
-    }
 
     @GetMapping("/")
     public String home(Model model) {
         List<CityResponse> cities = cityService.findAll();
-//        List<FieldResponse> fields = fieldService.getAllFields(null, null, EFieldStatus.ACTIVE, null, null);
+        List<VoucherResponse> vouchers = voucherService.findAllByActive();
+        List<String> descriptions = vouchers.stream().map(VoucherResponse::getDescription).toList();
         model.addAttribute("cities", cities);
-//        model.addAttribute("fields", fields);
-
+        model.addAttribute("vouchers", descriptions);
         return "web/index";
     }
 

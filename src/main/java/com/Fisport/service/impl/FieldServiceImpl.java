@@ -149,6 +149,7 @@ public class FieldServiceImpl implements FieldService {
                 .latitude(field.getLatitude())
                 .longitude(field.getLongitude())
                 .address(field.getAddress())
+                .banner(field.getBanner())
                 .slug(field.getSlug())
                 .openTime(field.getOpenTime())
                 .closeTime(field.getCloseTime())

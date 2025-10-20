@@ -230,8 +230,11 @@ public class BookingServiceImpl implements BookingService {
                 .paymentMethod(b.getPayments().stream().map(Payment::getMethod).map(Object::toString).collect(Collectors.joining(",")))
                 .status(String.valueOf(b.getBookingStatus()))
                 .cancel(b.getBookingStatus() == EBookingStatus.PENDING || b.getBookingStatus() == EBookingStatus.PAID)
-                .canReview(b.getBookingStatus() == EBookingStatus.COMPLETED)
+                .canReview(b.getBookingStatus() == EBookingStatus.COMPLETED && (b.getReview() == null || b.getReview().getRating() == null))
                 .totalPrice(b.getTotalPrice())
+                .rating(Optional.ofNullable(b.getReview())
+                                .map(Review::getRating)
+                                .orElse(null))
                 .build()).toList();
     }
 
@@ -268,8 +271,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getBookingStatus().equals(EBookingStatus.PENDING) && booking.getExpiredAt().isBefore(LocalDateTime.now())) {
             booking.setBookingStatus(EBookingStatus.FAILED);
             bookingRepository.save(booking);
-        } else {
-            throw new InvalidParameterException("Booking is expried");
+            throw new InvalidParameterException("Booking has expired");
         }
     }
 
