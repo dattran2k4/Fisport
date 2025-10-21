@@ -151,6 +151,7 @@
                     const container = $('#hours-container');
                     container.empty().append('<div class="text-muted">Đang tải giờ...</div>');
 
+
                     if (!date || !subFieldId) {
                         container.empty().append('<div class="text-muted">Vui lòng chọn ngày và sân con.</div>');
                         return;
@@ -158,6 +159,11 @@
 
                     $.getJSON(`${API_BASE}?subFieldId=${subFieldId}&date=${date}`)
                         .done(function (response) {
+                            // Lấy thời gian hiện tại
+                            const today = new Date();
+                            const selectedDateObj = new Date(date);
+                            const isToday = selectedDateObj.toDateString() === today.toDateString();
+                            const currentHour = today.getHours();
                             const bookedSlots = (response && response.data) ? response.data : [];
                             container.empty();
 
@@ -199,6 +205,11 @@
                                     } else if (matchedSlot.bookingStatus === 'paid') {
                                         btn.removeClass('btn-outline-primary').addClass('btn-danger text-white');
                                     }
+                                } else if (isToday && hour < currentHour) {
+                                    // Nếu giờ đã qua hôm nay
+                                    btn.prop('disabled', true)
+                                        .addClass('text-muted text-decoration-line-through')
+                                        .append(' ⏰');
                                 }
 
                                 container.append(btn);

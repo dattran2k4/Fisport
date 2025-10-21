@@ -286,13 +286,13 @@ public class BookingServiceImpl implements BookingService {
 
         List<Integer> availableDurations = durations.stream()
                 .map(Duration::getMinutes)
-                .filter(d -> isDurationAvailable(bookings, startTime, d))
+                .filter(d -> isDurationAvailable(bookings, startTime, d, subField))
                 .toList();
 
         return availableDurations;
     }
 
-    private boolean isDurationAvailable(List<Booking> bookings, LocalTime startTime, Integer d) {
+    private boolean isDurationAvailable(List<Booking> bookings, LocalTime startTime, Integer d, SubField subField) {
         LocalTime endTime = startTime.plusMinutes(d);
 
         for (Booking booking : bookings) {
@@ -300,6 +300,11 @@ public class BookingServiceImpl implements BookingService {
                 return false;
             }
         }
+
+        if (subField.getField().getCloseTime().isBefore(endTime)) {
+            return false;
+        }
+
         return true;
     }
 
