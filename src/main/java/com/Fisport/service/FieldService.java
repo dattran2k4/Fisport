@@ -15,7 +15,6 @@ public interface FieldService {
     List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, Long[] features);
 
     void createFieldByOwnerId(FieldRequest fieldRequest, String name);
-
     void updateFieldByOwnerId(FieldRequest fieldRequest, Long ownerId, Long fieldId);
     public void createFieldByOwner(FieldCreateRequest fieldCreateRequest, String name);
     void changeStatusFieldByAdmin(Long fieldId, EFieldStatus fieldStatus);
