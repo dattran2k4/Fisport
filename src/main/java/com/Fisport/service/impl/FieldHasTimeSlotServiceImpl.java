@@ -32,8 +32,8 @@ public class FieldHasTimeSlotServiceImpl implements FieldHasTimeSlotService {
     }
 
     @Override
-    public List<FieldHasTimeSlotResponse> getPriceTimeSlotBooking(Long id, LocalTime start, LocalTime end) {
-        List<FieldHasTimeSlot> fieldHasTimeSlots = fieldHasTimeSlotRepository.findSlotsForBooking(id, start, end);
+    public List<FieldHasTimeSlotResponse> getPriceTimeSlotBooking(Long fieldId, LocalTime start, LocalTime end) {
+        List<FieldHasTimeSlot> fieldHasTimeSlots = fieldHasTimeSlotRepository.findSlotsForBooking(fieldId, start, end);
         return fieldHasTimeSlots.stream()
                 .map(fieldHasTimeSlot -> FieldHasTimeSlotResponse.builder()
                         .id(fieldHasTimeSlot.getId())
@@ -43,8 +43,8 @@ public class FieldHasTimeSlotServiceImpl implements FieldHasTimeSlotService {
     }
 
     @Override
-    public BigDecimal getTotalPriceSlotBooking(Long id, LocalTime start, LocalTime end) {
-        List<FieldHasTimeSlot> slots = fieldHasTimeSlotRepository.findSlotsForBooking(id, start, end);
+    public BigDecimal getTotalPriceSlotBooking(Long fieldId, LocalTime start, LocalTime end) {
+        List<FieldHasTimeSlot> slots = fieldHasTimeSlotRepository.findSlotsForBooking(fieldId, start, end);
         if (slots.isEmpty()) {
             throw new ResourceNotFoundException("Slot not found");
         }

@@ -1,5 +1,6 @@
 package com.Fisport.service.impl;
 
+import com.Fisport.common.EVoucherStatus;
 import com.Fisport.dto.response.VoucherResponse;
 import com.Fisport.model.Voucher;
 import com.Fisport.repository.VoucherRepository;
@@ -26,6 +27,18 @@ public class VoucherServiceImpl implements VoucherService {
                 .description(f.getDescription())
                 .startDate(f.getStartDate())
                 .endDate(f.getEndDate())
+                .build()).toList();
+    }
+
+    @Override
+    public List<VoucherResponse> findAllByActive() {
+        List<Voucher> vouchers = voucherRepository.findByStatus(EVoucherStatus.ACTIVE);
+        return vouchers.stream().map(f -> VoucherResponse.builder()
+                .code(f.getCode())
+                .description(f.getDescription())
+                .startDate(f.getStartDate())
+                .endDate(f.getEndDate())
+                .limit(f.getLimit())
                 .build()).toList();
     }
 }

@@ -15,20 +15,44 @@
         }
 
         .sidebar {
-            min-width: 220px;
-            max-width: 220px;
-            background-color: #f8f9fa;
-            transition: all 0.3s;
+            width: 260px;
+            min-height: 100vh;
+            background: linear-gradient(180deg, #1e293b, #0f172a);
+            color: white;
+            transition: all 0.3s ease;
         }
 
         .sidebar .nav-link {
-            color: #495057;
+            color: #cbd5e1;
+            border-radius: 8px;
+            padding: 10px 15px;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
         }
 
         .sidebar .nav-link.active {
-            background-color: #0d6efd;
-            color: white;
-            border-radius: 0.375rem;
+            background-color: #2563eb;
+            color: #fff !important;
+            font-weight: 600;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+        }
+
+        .sidebar .sidebar-title {
+            color: #f8fafc;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .sidebar .sidebar-title:hover {
+            color: #93c5fd;
+        }
+
+        .sidebar hr {
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .content {
@@ -61,11 +85,12 @@
     <div class="d-flex">
 
         <!-- Sidebar -->
-        <div id="sidebar" class="sidebar d-flex flex-column p-3">
-            <a href="#" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none">
+        <div id="sidebar" class="sidebar d-flex flex-column p-3 shadow-lg rounded-3">
+            <a href="#"
+                class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-decoration-none text-white sidebar-title">
                 <span class="fs-4"><i class="bi bi-house-door-fill me-2"></i>Dashboard</span>
             </a>
-            <hr>
+            <hr class="text-secondary">
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
                     <a th:href="@{/user/profile}" class="nav-link" th:classappend="${activePage=='profile'}? ' active'">
@@ -96,7 +121,20 @@
                     </a>
                 </li>
                 <li>
-                    <a th:href="@{/logout}" class="nav-link"><i class="bi bi-box-arrow-right me-2"></i>Logout</a>
+                    <a th:href="@{/user/change-password}" class="nav-link"
+                        th:classappend="${activePage=='change-password'}? ' active'">
+                        <i class="bi bi-lock-fill me-2"></i>Change Password
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/user/2fa}" class="nav-link" th:classappend="${activePage=='2fa'}? ' active'">
+                        <i class="bi bi-shield-lock-fill me-2"></i>Two-Factor Auth
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/logout}" class="nav-link text-danger fw-semibold">
+                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                    </a>
                 </li>
             </ul>
         </div>

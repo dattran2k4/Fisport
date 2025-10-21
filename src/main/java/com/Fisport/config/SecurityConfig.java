@@ -67,6 +67,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/v1/fields/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/field-types/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/sub-fields/**").permitAll()
+                        .requestMatchers("/api/payment/webhook/**").permitAll()
                         .requestMatchers(SecurityWhiteList.WHITE_LIST.toArray(String[]::new)).permitAll()
 //                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 //                        .requestMatchers("/api/owner/**").hasRole("OWNER")

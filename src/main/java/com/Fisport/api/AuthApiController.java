@@ -6,6 +6,7 @@ import com.Fisport.dto.request.RegisterRequestDTO;
 import com.Fisport.dto.request.ResetPasswordRequest;
 import com.Fisport.dto.response.*;
 import com.Fisport.service.AuthService;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.UnsupportedEncodingException;
 
 @RequiredArgsConstructor
 @RestController
@@ -62,22 +65,25 @@ public class AuthApiController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseData<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+    public ResponseData<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) throws MessagingException, UnsupportedEncodingException {
+        authService.forgotPassword(request.getEmail());
+
         try {
-            String message = authService.forgotPassword(request.getEmail());
-            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Loading", message);
+            return new ResponseData<>(HttpStatus.OK.value(),
+                    "Đã gửi tín hiệu vũ trụ đến email của bạn. Vui lòng kiểm tra để tạo lại mật khẩu");
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Forgot password failed");
+            return new ResponseError(HttpStatus.NOT_FOUND.value(), e.getMessage());
         }
     }
 
+
     @PostMapping("/reset-password")
     public ResponseData<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request, @RequestParam String verifyCode) {
+        authService.resetPassword(request, verifyCode);
         try {
-            authService.resetPassword(request, verifyCode);
-            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Reset password successfully");
+            return new ResponseData<>(HttpStatus.OK.value(), "Tạo lại thành công");
         } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Reset password failed");
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
 }

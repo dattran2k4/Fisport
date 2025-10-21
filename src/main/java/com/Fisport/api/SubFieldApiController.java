@@ -2,18 +2,23 @@ package com.Fisport.api;
 
 import com.Fisport.common.ESubFieldStatus;
 import com.Fisport.dto.request.SubFieldRequest;
+import com.Fisport.dto.response.ApiResponse;
 import com.Fisport.dto.response.ResponseData;
 import com.Fisport.dto.response.ResponseError;
 import com.Fisport.dto.response.SubFieldResponse;
+import com.Fisport.service.BookingService;
 import com.Fisport.service.SubFieldService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -22,6 +27,7 @@ import java.util.List;
 public class SubFieldApiController {
 
     private final SubFieldService subFieldService;
+    private final BookingService bookingService;
 
     @GetMapping
     public ResponseData<?> getAllSubFields(
@@ -66,5 +72,18 @@ public class SubFieldApiController {
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Delete SubField Error");
         }
+    }
+
+    @GetMapping("/{id}/available-durations")
+    public ApiResponse<?> getAvailableDurations(@PathVariable Long id,
+                                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+                                                @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime startTime) {
+        List<Integer> durations = bookingService.getAvailableDurationsBooking(id, date, startTime);
+
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("Get Available Durations Booking Success")
+                .data(durations)
+                .build();
     }
 }

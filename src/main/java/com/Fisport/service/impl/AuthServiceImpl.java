@@ -149,7 +149,7 @@ public class AuthServiceImpl implements AuthService {
         CustomUserDetails userDetails = new CustomUserDetails(user);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(
-                userDetails.getUsername(),
+                userDetails,
                 null,
                 userDetails.getAuthorities());
         securityContextService.save(auth);
@@ -202,19 +202,19 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String forgotPassword(String email) throws MessagingException, UnsupportedEncodingException {
+    public void forgotPassword(String email) throws MessagingException, UnsupportedEncodingException {
         if (!email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
-            return "Email sai định dạng";
+            throw new InvalidDataException("Email sai định dạng");
         }
 
-        User user = userRepository.findByEmail(email).orElse(null);
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new InvalidDataException("Email không tồn tại trong hệ thống"));
+
         if (user != null) {
             //to-fix
-            String token = tokenService.createTokenForEmail(user.getUsername());
+            String token = tokenService.createTokenForEmail(user.getEmail());
             mailService.sendConfirmLink(email, "reset-password-email.html", endPointResetPassword, token);
         }
 
-        return "Kiểm tra email để tạo lại mật khẩu";
     }
 
     @Override
@@ -236,23 +236,6 @@ public class AuthServiceImpl implements AuthService {
         tokenService.invalidateToken(verifyCode);
     }
 
-    @Override
-    public String generateQRCodeBase64(String otpAuthURL, int width, int height) {
-        try {
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            Map<EncodeHintType, Object> hints = new HashMap<>();
-            hints.put(EncodeHintType.MARGIN, 1); // lề nhỏ
-            BitMatrix bitMatrix = qrCodeWriter.encode(otpAuthURL, BarcodeFormat.QR_CODE, width, height, hints);
-
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", baos);
-
-            String base64 = Base64.getEncoder().encodeToString(baos.toByteArray());
-            return "data:image/png;base64," + base64;
-        } catch (Exception e) {
-            throw new RuntimeException("Lỗi tạo QR code", e);
-        }
-    }
 }
 
 

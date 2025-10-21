@@ -42,6 +42,8 @@ public class FieldServiceImpl implements FieldService {
     private final FieldTypeRepository fieldTypeRepository;
     @PersistenceContext
     private EntityManager entityManager;
+    private final FieldServiceItemRepository fieldServiceItemRepository;
+
     @Override
     public List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, Long... featureIds) {
         Specification<Field> specification = FieldSpecification.filterFields(wardId, fieldTypeId, status, keyword, featureIds);
@@ -180,6 +182,61 @@ public class FieldServiceImpl implements FieldService {
         }
     }
 
+    //    @Override
+//    @Transactional
+//    public void createFieldByOwner(FieldCreateRequest req, String username) {
+//        User owner = getUser(username);
+//        Ward ward = getWard(req.getWard());
+//        FieldType fieldType = getFieldType(req.getField_type());
+//
+//        validateOpeningHours(req);
+//
+//        Field field = buildField(req, owner, ward, fieldType);
+//        fieldRepository.save(field);
+//
+//        saveFeatures(req, field);
+//        saveSubFields(req, field);
+//        saveServiceItems(req, field);
+//    }
+    @Override
+    @Transactional
+    public void createFieldByOwner(FieldCreateRequest fieldCreateRequest, String name) {
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        Ward ward = wardRepository.findById(Long.parseLong(fieldCreateRequest.getWard())).orElseThrow(() -> new ResourceNotFoundException("Ward not found"));
+        FieldType fieldType = fieldRepository.findById(Long.parseLong(fieldCreateRequest.getField_type())).orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
+        if (!fieldCreateRequest.getOpeningTime().isBefore(fieldCreateRequest.getClosingTime())) {
+            throw new IllegalArgumentException("Giờ mở cửa phải sớm hơn giờ đóng cửa");
+        }
+        String slug = SlugUtils.slugify(fieldCreateRequest.getName());
+        Field field = Field.builder().name(fieldCreateRequest.getName()).banner(fieldCreateRequest.getBanner()).address(fieldCreateRequest.getAddress()).slug(slug).openTime(fieldCreateRequest.getOpeningTime()).closeTime(fieldCreateRequest.getClosingTime()).fieldStatus(EFieldStatus.INACTIVE).ward(ward).longitude(Double.parseDouble(fieldCreateRequest.getLongitude())).latitude(Double.parseDouble(fieldCreateRequest.getLatitude())).owner(user).fieldType(fieldType).description(fieldCreateRequest.getDescription()).build();
+        fieldRepository.save(field);
+        if (fieldCreateRequest.getFeatures() != null && !fieldCreateRequest.getFeatures().isEmpty()) {
+            List<Long> featureIds = fieldCreateRequest.getFeatures().stream().map(Long::parseLong).toList();
+            List<Feature> features = featureRepository.findAllById(featureIds);
+            List<FieldHasFeature> fieldFeatures = features.stream().map(feature -> FieldHasFeature.builder().feature(feature).field(field).build()).toList();
+            fieldHasFeatureRepository.saveAll(fieldFeatures);
+        }
+        if (fieldCreateRequest.getSub_fields() != null && !fieldCreateRequest.getSub_fields().isEmpty()) {
+            List<SubField> subFields = fieldCreateRequest.getSub_fields().stream().map(sub_field -> SubField.builder().field(field).name(sub_field).status(ESubFieldStatus.AVAILABLE).build()).toList();
+            subFieldRepository.saveAll(subFields);
+        }
+        if (fieldCreateRequest.getServiceItems() != null && !fieldCreateRequest.getServiceItems().isEmpty()) {
+            List<Long> serviceItemIds = fieldCreateRequest.getServiceItems().stream().map(ServiceItemsRequest::getId).toList();
+            List<ServiceItem> serviceItems = serviceItemRepository.findAllById(serviceItemIds);
+            Map<Long, ServiceItem> serviceItemMap = serviceItems.stream().collect(Collectors.toMap(ServiceItem::getId, s -> s));
+            List<FieldServiceItem> fieldServiceItems = fieldCreateRequest.getServiceItems().stream().map(reqItem -> {
+                FieldServiceItem fsi = new FieldServiceItem();
+                fsi.setServiceItem(serviceItemMap.get(reqItem.getId()));
+                fsi.setPrice(BigDecimal.valueOf(reqItem.getPrice()));
+                fsi.setQuantity(reqItem.getQuantity());
+                fsi.setField(field);
+                fsi.setStatus(EFieldServiceItem.ACTIVE);
+                return fsi;
+            }).toList();
+            fieldServiceItemRepository.saveAll(fieldServiceItems);
+        }
+    }
+
     @Override
     public void changeStatusFieldByAdmin(Long fieldId, EFieldStatus fieldStatus) {
         Field field = getFieldByid(fieldId);
@@ -240,6 +297,7 @@ public class FieldServiceImpl implements FieldService {
                 .latitude(field.getLatitude())
                 .longitude(field.getLongitude())
                 .address(field.getAddress())
+                .banner(field.getBanner())
                 .slug(field.getSlug())
                 .openTime(field.getOpenTime())
                 .closeTime(field.getCloseTime())
