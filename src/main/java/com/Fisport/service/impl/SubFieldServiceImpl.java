@@ -36,6 +36,12 @@ public class SubFieldServiceImpl implements SubFieldService {
     }
 
     @Override
+    public List<SubFieldResponse> getSubFieldsByFieldId(Long fieldId) {
+        List<SubField> s = subFieldRepository.findAllByFieldId(fieldId);
+        return s.stream().map(this::toDto).toList();
+    }
+
+    @Override
     public void createSubField(SubFieldRequest request,  String username) throws AccessDeniedException {
         Field field = fieldRepository.findById(request.getFieldId())
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy sân"));

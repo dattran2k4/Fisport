@@ -31,4 +31,7 @@ public interface FieldService {
     FieldDetailResponse findBySlug(String fieldNameSlug);
 
     List<FieldDetailResponse> getFieldsNearBy(Double lat, Double lng, Double radius);
+
+    FieldResponse getFieldByIdAndOwnerName(Long id, String name);
+    public void updateFieldByOwner(FieldCreateRequest fieldCreateRequest, String username, Long id);
 }

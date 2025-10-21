@@ -19,7 +19,7 @@ public interface FieldRepository extends JpaRepository<Field,Long>, JpaSpecifica
     List<Field> findByFieldStatus(EFieldStatus fieldStatus);
     List<Field> findByFieldStatusAndOwner_Username(EFieldStatus fieldStatus, String userName);
     List<Field> findByOwner(User owner);
-
+    Field findByOwnerIdAndId(long user_id, long id);
     Field findBySlug(String fieldNameSlug);
 
     //Bounding-box advanced calculating raidus

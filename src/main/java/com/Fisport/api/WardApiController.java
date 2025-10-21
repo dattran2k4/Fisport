@@ -35,6 +35,7 @@ public class WardApiController {
     public ResponseData<?> getWardByCityId(@Valid @Min(1) @RequestParam Long cityId) {
         try {
             List<WardResponse> wardResponseList = wardService.getAllWardsByCityId(cityId);
+
             return new ResponseData<>(HttpStatus.OK.value(), "Get Ward By City Id Succesfully", wardResponseList);
         } catch(Exception ex) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), ex.getMessage());

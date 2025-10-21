@@ -11,6 +11,7 @@ import java.util.List;
 public interface SubFieldService {
     List<SubFieldResponse> getAllSubFields(Long fieldId, ESubFieldStatus status);
     SubFieldResponse getSubFieldById(Long id);
+    List<SubFieldResponse> getSubFieldsByFieldId(Long fieldId);
     void createSubField(SubFieldRequest request, String username) throws AccessDeniedException;
     void updateSubField(Long id, SubFieldRequest request, String username) throws AccessDeniedException;
     void deleteSubField(Long id, String username) throws AccessDeniedException;

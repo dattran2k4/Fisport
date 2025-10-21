@@ -1,5 +1,6 @@
 package com.Fisport.dto.response;
 
+import com.Fisport.model.City;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,5 +18,5 @@ public class WardResponse {
 
     private String slug;
 
-
+    private CityResponse cityResponse;
 }

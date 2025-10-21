@@ -106,6 +106,9 @@
             <div th:if="${content.contains('fields-create')}" >
                 <div th:replace="owner/fields/create :: content"></div>
             </div>
+            <div th:if="${content.contains('fields-update')}" >
+                <div th:replace="owner/fields/update :: content"></div>
+            </div>
         </div>
     </main>
 </div>
