@@ -64,7 +64,7 @@
                                 <input type="number" class="form-control form-control-sm service-qty" min="1"
                                     th:max="${item.quantity}" value="1" style="width: 70px; display: none;"
                                     th:data-index="${iter.index}">
-                                <span class="text-success fw-bold"
+                                <span th:data-price="${item.price}" class="text-success fw-bold"
                                     th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
                             </div>
                         </div>
@@ -283,13 +283,11 @@
                     const minutes = parseInt($(this).data('minutes'));
                     const start = $('#startTime').val(); // "08:00"
                     if (!start || isNaN(minutes)) {
-                        console.error('Thiếu startTime hoặc minutes');
                         return;
                     }
 
                     // set duration (minutes) và endTime
                     $('#duration').val(minutes);
-                    console.log(minutes);
 
                     // compute endTime HH:mm
                     const [h, m] = start.split(':').map(Number);
@@ -300,8 +298,31 @@
                     const endTime = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
 
                     $('#endTime').val(endTime);
-                    console.log(endTime);
 
+                    //Dynamic time pricing
+                    const fieldId = /*[[${field.id}]]*/ 0;
+
+                    $.ajax({
+                        url: `/api/v1/bookings/preview-timingPrice?fieldId=${fieldId}&startTime=${start}&endTime=${endTime}`,
+                        method: 'GET',
+                        success: function (response) {
+                            const price = response.data || 0;
+
+                            // Nếu chưa có vùng hiển thị giá thì tạo mới
+                            if ($('#pricePreview').length === 0) {
+                                $('#durationContainer').after('<div id="pricePreview" class="mt-3 fs-5 fw-bold text-success"></div>');
+                            }
+
+                            $('#pricePreview').text(`💰 Giá tạm tính: ${price.toLocaleString()}₫`);
+                        },
+                        error: function (xhr) {
+                            console.error('Lỗi khi gọi API giá:', xhr);
+                            if ($('#pricePreview').length === 0) {
+                                $('#durationContainer').after('<div id="pricePreview" class="mt-3 text-danger"></div>');
+                            }
+                            $('#pricePreview').text('Không thể tính giá.');
+                        }
+                    });
                 });
 
                 // Show/hide số lượng khi chọn checkbox
@@ -322,10 +343,48 @@
                             `<input type="hidden" name="bookingServiceItemRequest[${i}].quantity" value="${qty}">`
                         );
                     });
-
-                    // $('#subFieldId').val($('.subfield-radio:checked').val());
                 });
 
+
+                // Hàm định dạng giá (dùng dấu phẩy ngăn cách nghìn)
+                function formatCurrency(value) {
+                    return value.toLocaleString('vi-VN') + '₫';
+                }
+
+                // Hàm cập nhật tổng giá cho từng item
+                function updateServiceTotal(itemEl) {
+                    const checkbox = itemEl.find('.service-checkbox');
+                    const qtyInput = itemEl.find('.service-qty');
+                    const totalSpan = itemEl.find('.service-total');
+                    const price = parseFloat(totalSpan.data('price')) || 0;
+                    const qty = parseInt(qtyInput.val()) || 1;
+
+                    if (checkbox.is(':checked')) {
+                        const total = price * qty;
+                        totalSpan.text(formatCurrency(total));
+                    } else {
+                        totalSpan.text(formatCurrency(price)); // nếu bỏ chọn thì quay lại giá gốc
+                    }
+                }
+
+                // Khi check/uncheck checkbox
+                $(document).on('change', '.service-checkbox', function () {
+                    const itemEl = $(this).closest('.list-group-item');
+                    const qtyInput = itemEl.find('.service-qty');
+                    if ($(this).is(':checked')) {
+                        qtyInput.show();
+                    } else {
+                        qtyInput.hide();
+                        qtyInput.val(1); // reset về 1 khi bỏ chọn
+                    }
+                    updateServiceTotal(itemEl);
+                });
+
+                // Khi thay đổi số lượng
+                $(document).on('input', '.service-qty', function () {
+                    const itemEl = $(this).closest('.list-group-item');
+                    updateServiceTotal(itemEl);
+                });
                 // === NOTE: bạn cần đảm bảo JS xử lý service-checkbox & service-qty (thêm hidden inputs)
                 // nếu bạn muốn mình chèn lại phần js đó, báo mình sẽ thêm đầy đủ.
             });
