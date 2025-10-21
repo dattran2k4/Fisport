@@ -241,7 +241,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public String getRoleByUserName(String username) {
         User user = userRepository.findByUsername(username).orElse(null);
-        return user.getRole().toString();
+        return user.getRole().getName().toString();
     }
 
 }

@@ -80,9 +80,14 @@ public class LoginController {
             model.addAttribute("username", sessionService.get("PRE_AUTH_USER", String.class));
             model.addAttribute("errorCode", "Mã xác thực không đúng hoặc phiên đã hết hạn");
             return "2fa";
-        } else if (authService.getRoleByUserName(sessionService.get("PRE_AUTH_USER", String.class)).equals("ADMIN")) {
+        }
+
+        String role = authService.getRoleByUserName(twoFARequest.getUsername());
+
+
+        if (role.equals("ADMIN")) {
             return "redirect:/admin";
-        } else if (authService.getRoleByUserName(sessionService.get("PRE_AUTH_USER", String.class)).equals("OWNER")) {
+        }  else if (role.equals("OWNER")) {
             return "redirect:/owner";
         }
 

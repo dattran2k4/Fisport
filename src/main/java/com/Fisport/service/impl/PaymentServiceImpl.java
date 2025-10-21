@@ -10,6 +10,7 @@ import com.Fisport.model.Booking;
 import com.Fisport.model.Payment;
 import com.Fisport.repository.BookingRepository;
 import com.Fisport.repository.PaymentRepository;
+import com.Fisport.service.BookingService;
 import com.Fisport.service.PayOSService;
 import com.Fisport.service.PaymentService;
 import com.Fisport.service.VnPayService;
@@ -32,10 +33,13 @@ public class PaymentServiceImpl implements PaymentService {
     private final VnPayService vnPayService;
     private final PaymentRepository paymentRepository;
     private final PayOSService payOSService;
+    private final BookingService bookingService;
 
     @Override
     public String createPayment(PaymentRequest request, HttpServletRequest httpServletRequest) {
         Booking booking = findByPaymentToken(request.getPaymentToken());
+
+        bookingService.checkExpiredBooking(booking);
 
         switch (request.getPaymentMethod()) {
             case VNPAY:
