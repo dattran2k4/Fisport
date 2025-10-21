@@ -1,7 +1,7 @@
 package com.Fisport.config;
 
-import com.Fisport.constant.SecurityWhiteList;
 import com.Fisport.security.CustomAccessDeniedHandler;
+import com.Fisport.security.CustomAuthenticationEntryPoint;
 import com.Fisport.security.CustomAuthenticationFailureHandler;
 import com.Fisport.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +14,13 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.*;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RegexRequestMatcher;
 
 import java.util.List;
 
@@ -29,13 +31,14 @@ import java.util.List;
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
-    private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
-    private final TwoFactorAuthFilter twoFactorAuthFilter;
+
+    public static final List<String> WHITE_LIST = List.of( "/common/**", "/web/**", "/web/css/**", "/web/img/**", "/favicon.ico",
+            "/san/**", "/login/**", "/2fa/**", "/", "/web/js/**", "/forgot-password", "/register**", "/error/**"); //test
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // production: tăng độ strength nếu cần
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -51,11 +54,11 @@ public class SecurityConfig {
         return p;
     }
 
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer() {
-//        return (web) -> web.ignoring()
-//                .requestMatchers("/swagger-ui/**", "/v3/api-docs*/**");
-//    }
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs*/**");
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -63,39 +66,22 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/fields/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/field-types/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/v1/sub-fields/**").permitAll()
-                        .requestMatchers("/api/payment/webhook/**").permitAll()
-                        .requestMatchers(SecurityWhiteList.WHITE_LIST.toArray(String[]::new)).permitAll()
-//                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-//                        .requestMatchers("/api/owner/**").hasRole("OWNER")
+                        .requestMatchers( "/api/**").permitAll()
+                        .requestMatchers( new RegexRequestMatcher("/san.+/dat-san", null)).authenticated()
+                        .requestMatchers(WHITE_LIST.toArray(String[]::new)).permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/owner/**").hasAnyRole("OWNER", "ADMIN")
+                        .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN", "OWNER")
                         .anyRequest().authenticated()
                 )
-//                .addFilterBefore(twoFactorAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(form -> form.disable())
-                .exceptionHandling(ex -> ex.accessDeniedHandler(customAccessDeniedHandler))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                        .accessDeniedPage("/access-denied")
+                        .accessDeniedHandler(customAccessDeniedHandler))
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 );
-
-//                .formLogin(form -> form
-//                        .loginPage("/login")
-//                        .loginProcessingUrl("/perform_login")
-//                        .defaultSuccessUrl("/", true)
-//                        .failureHandler(customAuthenticationFailureHandler)
-//                        .permitAll()
-//                )
-//                .formLogin(AbstractHttpConfigurer::disable)
-//                .exceptionHandling(ex -> ex
-//                        .accessDeniedHandler(customAccessDeniedHandler)
-//                )
-//                .logout(logout -> logout
-//                        .logoutUrl("/perform_logout")
-//                        .logoutSuccessUrl("/login?logout")
-//                        .permitAll()
-//                );
 
         // register custom auth provider
         http.authenticationProvider(authenticationProvider());

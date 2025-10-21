@@ -27,10 +27,11 @@ public class AuthApiController {
 
     @PostMapping("/login")
     public ApiResponse<?> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
-        authService.login(loginRequestDTO);
+        LoginResponse response = authService.login(loginRequestDTO);
         return ApiResponse.builder()
                 .status(HttpStatus.ACCEPTED.value())
                 .message("Successfully logged in")
+                .data(response)
                 .build();
     }
 

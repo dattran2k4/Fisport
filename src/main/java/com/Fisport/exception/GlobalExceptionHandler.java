@@ -17,7 +17,7 @@ import java.util.Date;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.Fisport.api")
 public class GlobalExceptionHandler {
 
     /**

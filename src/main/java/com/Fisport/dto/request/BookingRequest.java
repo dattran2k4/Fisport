@@ -19,15 +19,15 @@ public class BookingRequest {
     @NotNull(message = "Giờ bắt đầu không được trống")
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime startTime;
-    @NotNull
+    @NotNull(message = "Chọn thời gian chơi")
     private Integer duration;
     @NotNull
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime endTime;
-    @NotNull
+    @NotNull(message = "Chọn ngày chơi")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
-    @NotNull
+    @NotNull(message = "Chọn sân chơi")
     private Long subFieldId;
     @Valid
     private List<BookingServiceItemRequest> bookingServiceItemRequest = new ArrayList<>();

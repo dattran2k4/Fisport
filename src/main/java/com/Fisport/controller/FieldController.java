@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @RequiredArgsConstructor
-@RequestMapping("/{slug}")
+@RequestMapping("/san/{slug}")
 @Controller
 public class FieldController {
 
@@ -33,10 +33,6 @@ public class FieldController {
         List<FeatureResponse> featureResponses = featureService.getListFeatures();
 
         FieldTypeResponse fieldTypeResponse = fieldTypeService.findBySlug(slug);
-
-        if (fieldTypeResponse == null) {
-            return "redirect:/not-found?Field type not found";
-        }
 
         WardResponse wardResponse = (ward != null) ? wardService.getWardBySlug(ward) : null;
         Long wardId = wardResponse != null ? wardResponse.getId() : null;

@@ -111,6 +111,7 @@ public class AuthServiceImpl implements AuthService {
                     .username(user.getUsername())
                     .email(user.getEmail())
                     .is2FAEnabled(true)
+                    .role(String.valueOf(user.getRole().getName()))
                     .build();
         }
 
@@ -125,6 +126,7 @@ public class AuthServiceImpl implements AuthService {
         return LoginResponse.builder()
                 .username(user.getUsername())
                 .is2FAEnabled(false)
+                .role(String.valueOf(user.getRole().getName()))
                 .build();
     }
 
@@ -234,6 +236,12 @@ public class AuthServiceImpl implements AuthService {
         userRepository.save(user);
 
         tokenService.invalidateToken(verifyCode);
+    }
+
+    @Override
+    public String getRoleByUserName(String username) {
+        User user = userRepository.findByUsername(username).orElse(null);
+        return user.getRole().toString();
     }
 
 }

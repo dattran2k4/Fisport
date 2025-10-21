@@ -6,6 +6,7 @@ import com.Fisport.dto.request.ResetPasswordRequest;
 import com.Fisport.dto.request.TwoFARequest;
 import com.Fisport.dto.response.LoginResponse;
 import com.Fisport.dto.response.RegisterResponseDTO;
+import com.Fisport.dto.response.TwoFAResponse;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpSession;
 
@@ -27,5 +28,7 @@ public interface AuthService {
     void forgotPassword(String email) throws MessagingException, UnsupportedEncodingException;
 
     void resetPassword(ResetPasswordRequest request, String verifyCode);
+
+    String getRoleByUserName(String username);
 
 }

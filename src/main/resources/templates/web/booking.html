@@ -8,7 +8,10 @@
 
             <h2>Đặt sân: <span th:text="${field.name}"></span></h2>
             <p>Địa chỉ: <span th:text="${field.address + ', ' + field.ward + ', ' + field.city}"></span></p>
-
+            <!-- Lỗi chung -->
+            <div th:if="${error != null}" class="alert alert-danger">
+                <span th:text="${error}"></span>
+            </div>
             <form th:action="@{/booking}" th:object="${booking}" method="POST" id="bookingForm">
                 <!-- CSRF nếu dùng Spring Security -->
                 <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->

@@ -12,7 +12,7 @@ INSERT INTO role (name) VALUES
 INSERT INTO user (username, email, password, phone, birth_day, status, gender, is_two_factor, two_fa_secret, role_id)
 VALUES
     ('dattran0901', 'tranquocdat@gmail.com', '$2a$10$s3go5e.GYivSMmrJXG6jceddjfSAbg6O832Sip8XIVNRRLIjXNP6G', '0785819692', '2004-01-09', 'ACTIVE', 'MALE', 0, NULL, 1),
-    ('johndoe', 'dattranquoc@gmail.com', '$2a$10$2rQkUgA4sMS5z4QK8f1QXeF6p3iP63PHGQo2og4g0oY6Qp1QjOq9e', '0912345678', '1998-08-15', 'ACTIVE', 'FEMALE', 0,  NULL, 2),
+    ('johndoe', 'dattranquoc@gmail.com', '$2a$10$EeSehs49igNMz6Vuk69cDuaAGHFrWSjeOvMmNkaAr6ZwyZtltKStS', '0912345678', '1998-08-15', 'ACTIVE', 'FEMALE', 0,  NULL, 2),
     ('vitidsarn', 'dattran@gmail.com', '$2a$10$llGgE5VlZzM0.pCzbOLGWev.cqdovrjSsq0lGM87wo0FVgATXsh12', '0934567890', '1990-01-10', 'ACTIVE', 'MALE', 0, NULL, 3),
     ('dt12', 'tranquocthanhdat@gmail.com', '$2a$10$L1RrZcmnBVdz5EzZ9LtP9eNcPV1CiYvKwhEK/Qs9ocuqHakirdqg6', '0785819680', '2004-09-20', 'ACTIVE', 'MALE', 1, '4EFZSYXKQ6BFDGMAXWQKSFSTZFUYYLQD', 2);
 
@@ -489,47 +489,31 @@ VALUES
 (4, 1),
 (4, 2);
 
-INSERT INTO booking (booking_date, start_time, end_time, duration, total_price, status, subfield_id, user_id, created_at)
+INSERT INTO booking (booking_date, start_time, end_time, duration, total_price, status, subfield_id, user_id, created_at, expired_at)
 VALUES
-(DATE_ADD(CURDATE(), INTERVAL -1 DAY), '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 1, NOW()),
-(DATE_ADD(CURDATE(), INTERVAL -2 DAY), '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 2, NOW())
-(DATE_ADD(CURDATE(), INTERVAL -3 DAY), '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 3, NOW())
-(DATE_ADD(CURDATE(), INTERVAL 5 DAY), '07:00:00', '08:30:00', 90, 180000.00, 'PENDING', 3, 2, NOW()),
-(DATE_ADD(CURDATE(), INTERVAL 6 DAY), '18:00:00', '19:30:00', 90, 200000.00, 'PAID', 4, 2, NOW()),
-(DATE_ADD(CURDATE(), INTERVAL 5 DAY), '09:00:00', '10:00:00', 60, 150000.00, 'CANCELLED', 5, 2, NOW());
+(DATE_ADD(CURDATE(), INTERVAL -1 DAY), '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 2, DATE_ADD(CURDATE(), INTERVAL -2 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 15 MINUTE)),
+(DATE_ADD(CURDATE(), INTERVAL -3 DAY), '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 2, DATE_ADD(CURDATE(), INTERVAL -4 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -4 DAY), INTERVAL 15 MINUTE)),
+(DATE_ADD(CURDATE(), INTERVAL 6 DAY), '18:00:00', '19:30:00', 90, 200000.00, 'PAID', 4, 2, DATE_ADD(CURDATE(), INTERVAL 5 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 5 DAY), INTERVAL 15 MINUTE)),
+(DATE_ADD(CURDATE(), INTERVAL 6 DAY), '19:00:00', '20:00:00', 60, 120000.00, 'COMPLETED', 26, 2, DATE_ADD(CURDATE(), INTERVAL -5 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 5 DAY), INTERVAL 15 MINUTE)),
 
--- 📅 Booking cho user_id = 4 (ngày 5–6 ngày sau hôm nay)
-INSERT INTO booking (booking_date, start_time, end_time, duration, total_price, status, subfield_id, user_id, created_at)
-VALUES
-(DATE_ADD(CURDATE(), INTERVAL 6 DAY), '19:00:00', '20:00:00', 60, 120000.00, 'COMPLETED', 26, 4, NOW()),
-(DATE_ADD(CURDATE(), INTERVAL 5 DAY), '20:30:00', '22:00:00', 90, 220000.00, 'PENDING', 27, 4, NOW());
+(DATE_ADD(CURDATE(), INTERVAL -2 DAY), '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 4, DATE_ADD(CURDATE(), INTERVAL -3 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -3 DAY), INTERVAL 15 MINUTE)),
+(DATE_ADD(CURDATE(), INTERVAL 5 DAY), '18:00:00', '19:30:00', 90, 180000.00, 'PENDING', 3, 4, DATE_SUB(NOW(), INTERVAL 3 MINUTE), DATE_SUB(NOW(), INTERVAL 15 MINUTE)),
+(DATE_ADD(CURDATE(), INTERVAL 5 DAY), '09:00:00', '10:00:00', 60, 150000.00, 'CANCELLED', 5, 4, DATE_ADD(CURDATE(), INTERVAL 4 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 4 DAY), INTERVAL 15 MINUTE)),
+(DATE_ADD(CURDATE(), INTERVAL 6 DAY), '17:30:00', '18:00:00', 90, 220000.00, 'PENDING', 27, 4, DATE_SUB(NOW(), INTERVAL 2 MINUTE), DATE_SUB(NOW(), INTERVAL 15 MINUTE));
 
--- Booking 1 (PENDING): Chưa thanh toán hoặc đang chờ
 INSERT INTO payment (booking_id, method, status, amount, transaction_id, payment_time, created_at)
 VALUES
-    (1, 'MOMO', 'PENDING', 180000, 'TXN-MOMO-001', NULL, NOW());
+(1, 'VNPAY', 'SUCCESS', 120000.00, 'TXN001', DATE_ADD(CURDATE(), INTERVAL -1 DAY), DATE_ADD(CURDATE(), INTERVAL -2 DAY)),
+(2, 'PAYOS', 'SUCCESS', 120000.00, 'TXN002', DATE_ADD(CURDATE(), INTERVAL -3 DAY), DATE_ADD(CURDATE(), INTERVAL -4 DAY)),
+(3, 'MOMO', 'SUCCESS', 200000.00, 'TXN003', DATE_ADD(CURDATE(), INTERVAL 6 DAY), DATE_ADD(CURDATE(), INTERVAL 5 DAY)),
+(4, 'ZALOPAY', 'SUCCESS', 120000.00, 'TXN004', DATE_ADD(CURDATE(), INTERVAL 6 DAY), DATE_ADD(CURDATE(), INTERVAL 5 DAY)),
+(5, 'BANK_TRANSFER', 'SUCCESS', 120000.00, 'TXN005', DATE_ADD(CURDATE(), INTERVAL -2 DAY), DATE_ADD(CURDATE(), INTERVAL -3 DAY)),
+(6, 'MOMO', 'FAILED', 180000.00, 'TXN006', NULL, DATE_ADD(CURDATE(), INTERVAL 4 DAY)),
+(7, 'PAYOS', 'SUCCESS', 150000.00, NULL, NULL, DATE_ADD(CURDATE(), INTERVAL 4 DAY)),
+(8, 'VNPAY', 'FAILED', 220000.00, NULL, NULL, DATE_ADD(CURDATE(), INTERVAL 4 DAY));
 
--- Booking 2 (PAID): Đã thanh toán VNPay thành công
-INSERT INTO payment (booking_id, method, status, amount, transaction_id, payment_time, created_at)
-VALUES
-    (2, 'VNPAY', 'SUCCESS', 200000, 'TXN-VNPAY-002', NOW(), NOW());
-
--- Booking 3 (CANCELLED): Có thể đã thanh toán rồi và được hoàn tiền hoặc chưa thanh toán
-INSERT INTO payment (booking_id, method, status, amount, transaction_id, payment_time, created_at)
-VALUES
-    (3, 'BANK_TRANSFER', 'REFUNDED', 150000, 'TXN-BANK-003', NOW(), NOW());
-
--- Booking 4 (COMPLETED): Đã thanh toán xong
-INSERT INTO payment (booking_id, method, status, amount, transaction_id, payment_time, created_at)
-VALUES
-    (4, 'MOMO', 'SUCCESS', 120000, 'TXN-MOMO-004', NOW(), NOW());
-
--- Booking 5 (PENDING): Chưa thanh toán
-INSERT INTO payment (booking_id, method, status, amount, transaction_id, payment_time, created_at)
-VALUES
-    (5, 'VNPAY', 'PENDING', 220000, 'TXN-VNPAY-005', NULL, NOW());
--- Review cho booking 2 (user_id = 2, field_id giả định là 1)
 INSERT INTO review (rating, comment, user_id, field_id, booking_id, create_at, updated_at)
 VALUES
-    (5, 'Sân rất sạch, dịch vụ tốt, sẽ quay lại!', 2, 2, 2, NOW(), NOW()),
-    (4, 'Sân đẹp, ánh sáng tốt nhưng hơi trơn một chút.', 4, 27, 4, NOW(), NOW());
+(5, 'Dịch vụ rất tốt, hài lòng!', 2, 26, 1, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -1 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -1 DAY), INTERVAL 1 HOUR)),
+(5, 'Rất chuyên nghiệp và nhiệt tình.', 2, 26, 4, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 6 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 6 DAY), INTERVAL 1 HOUR)),
+(4, 'Ok, sẽ quay lại lần sau.', 4, 26, 5, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 1 HOUR));

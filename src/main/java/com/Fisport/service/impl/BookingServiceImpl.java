@@ -5,6 +5,7 @@ import com.Fisport.common.ESubFieldStatus;
 import com.Fisport.dto.request.BookingRequest;
 import com.Fisport.dto.request.BookingServiceItemRequest;
 import com.Fisport.dto.response.*;
+import com.Fisport.exception.BookingException;
 import com.Fisport.exception.InvalidDataException;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.*;
@@ -56,35 +57,35 @@ public class BookingServiceImpl implements BookingService {
         SubField subField = subFieldRepository.findById(request.getSubFieldId()).orElseThrow(() -> new ResourceNotFoundException("SubField not found"));
 
         if (!subField.getStatus().equals(ESubFieldStatus.AVAILABLE)) {
-            throw new InvalidDataException("Subfield not available");
+            throw new BookingException("Subfield not available");
         }
 
         //Valid date
         if (request.getDate().isBefore(LocalDate.now())) {
-            throw new InvalidParameterException("Date must be after now");
+            throw new BookingException("Date must be after now");
         }
 
         //Valid time
         LocalDateTime startDateTime = LocalDateTime.of(request.getDate(), request.getStartTime());
         if (startDateTime.isBefore(LocalDateTime.now())) {
-            throw new InvalidParameterException("Invalid start time");
+            throw new BookingException("Invalid start time");
         }
 
         if (request.getStartTime().isAfter(request.getEndTime())) {
-            throw new InvalidParameterException("Start time must be before end time");
+            throw new BookingException("Start time must be before end time");
         }
 
         if (request.getStartTime().isBefore(subField.getField().getOpenTime())) {
-            throw new InvalidParameterException("Start time must be after open time");
+            throw new BookingException("Start time must be after open time");
         }
 
         if (request.getEndTime().isAfter(subField.getField().getCloseTime())) {
-            throw new InvalidParameterException("End time must be before close time");
+            throw new BookingException("End time must be before close time");
         }
 
         //Valid duration must be in field type
         if (request.getDuration() != java.time.Duration.between(request.getStartTime(), request.getEndTime()).toMinutes()) {
-            throw new InvalidParameterException("Duration not valid");
+            throw new BookingException("Duration not valid");
         }
 
         Set<FieldTypeBookDuration> durations = subField.getField().getFieldType().getFieldTypeBookDuration();
@@ -93,13 +94,13 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toSet());
 
         if (!validMinutes.contains(request.getDuration())) {
-            throw new InvalidParameterException("Duration not valid");
+            throw new ResourceNotFoundException("Duration not found in this field");
         }
 
         //Check overlap
         List<Booking> bookings = bookingRepository.findOverlappingBookingsForUpdate(request.getSubFieldId(), request.getDate(), request.getStartTime(), request.getEndTime());
         if (!bookings.isEmpty()) {
-            throw new InvalidDataException("This subfield is already booked at the requested time\"");
+            throw new BookingException("This subfield is already booked at the requested time\"");
         }
 
         //Valid occupied
@@ -113,7 +114,7 @@ public class BookingServiceImpl implements BookingService {
                 .subfield(subField)
                 .user(user)
                 .bookingStatus(EBookingStatus.PENDING)
-                .expiredAt(LocalDateTime.now().plusMinutes(10))
+                .expiredAt(LocalDateTime.now().plusMinutes(15))
                 .build();
 
         //BookingServiceItem
@@ -124,11 +125,11 @@ public class BookingServiceImpl implements BookingService {
 
                 //quantity check
                 if (requestItem.getQuantity() < 0 || requestItem.getQuantity() > fsi.getQuantity()) {
-                    throw new InvalidParameterException("Quantity not valid");
+                    throw new BookingException("Quantity not valid");
                 }
 
                 if (fsi.getStatus().equals(ESubFieldStatus.INACTIVE)) {
-                    throw new InvalidParameterException("Service Item is Inactive");
+                    throw new BookingException("Service Item is Inactive");
                 }
 
                 BookingServiceItem bookingServiceItem = BookingServiceItem.builder()
@@ -205,14 +206,14 @@ public class BookingServiceImpl implements BookingService {
         checkExpiredBooking(booking);
 
         if (LocalDateTime.now().isAfter(LocalDateTime.of(booking.getBookingDate(), booking.getStartTime()))) {
-            throw new IllegalStateException("Cannot cancel a booking that has already started or passed.");
+            throw new BookingException("Cannot cancel a booking that has already started or passed.");
         }
 
         if (EBookingStatus.PENDING.equals(booking.getBookingStatus()) || EBookingStatus.PAID.equals(booking.getBookingStatus())) {
             booking.setBookingStatus(EBookingStatus.CANCELLED);
             bookingRepository.save(booking);
         } else {
-            throw new IllegalStateException("Cannot cancel booking with status: " + booking.getBookingStatus());
+            throw new BookingException("Cannot cancel booking with status: " + booking.getBookingStatus());
         }
     }
 
@@ -271,7 +272,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getBookingStatus().equals(EBookingStatus.PENDING) && booking.getExpiredAt().isBefore(LocalDateTime.now())) {
             booking.setBookingStatus(EBookingStatus.FAILED);
             bookingRepository.save(booking);
-            throw new InvalidParameterException("Booking has expired");
+            throw new BookingException("Booking has expired");
         }
     }
 

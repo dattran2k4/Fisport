@@ -21,4 +21,6 @@ public class GlobalControllerAdvice {
         common.put("fieldTypes", fieldTypeService.findAll());
         model.addAllAttributes(common);
     }
+
+
 }

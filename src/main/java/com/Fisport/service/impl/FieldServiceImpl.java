@@ -6,6 +6,7 @@ import com.Fisport.dto.request.FieldCreateRequest;
 import com.Fisport.dto.request.FieldRequest;
 import com.Fisport.dto.request.ServiceItemsRequest;
 import com.Fisport.dto.response.*;
+import com.Fisport.exception.BusinessException;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.*;
 import com.Fisport.repository.*;
@@ -215,6 +216,9 @@ public class FieldServiceImpl implements FieldService {
     @Override
     public FieldDetailResponse findBySlug(String fieldNameSlug) {
         Field field = fieldRepository.findBySlug(fieldNameSlug);
+        if (!field.getFieldStatus().equals(EFieldStatus.ACTIVE)) {
+            throw new BusinessException("Field not found");
+        }
         Set<Feature> features = fieldHasFeatureRepository.findFeaturesByFieldId(field.getId());
         Double rating = reviewRepository.findAverageByFieldId(field.getId());
         return FieldDetailResponse.builder()

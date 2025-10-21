@@ -8,7 +8,9 @@ import com.Fisport.service.BookingService;
 import com.Fisport.service.FieldService;
 import com.Fisport.service.FieldServiceItemService;
 import com.Fisport.service.SubFieldService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -28,11 +30,8 @@ public class BookingController {
     private final SubFieldService subFieldService;
     private final FieldServiceItemService fieldServiceItemService;
 
-    @GetMapping("/{fieldTypeSlug}/{fieldNameSlug}/dat-san")
-    public String showBookingPage(Model model, @PathVariable String fieldTypeSlug, @PathVariable String fieldNameSlug, Principal principal) {
-        if (principal == null) {
-            return String.format("redirect:/login?backLink=/%s/%s/dat-san", fieldTypeSlug, fieldNameSlug);
-        }
+    @GetMapping("/san/{fieldTypeSlug}/{fieldNameSlug}/dat-san")
+    public String showBookingPage(Model model, @PathVariable String fieldTypeSlug, @PathVariable String fieldNameSlug) {
 
         FieldDetailResponse field = fieldService.findBySlug(fieldNameSlug);
         model.addAttribute("field", field);
@@ -43,13 +42,15 @@ public class BookingController {
         List<FieldServiceItemResponse> items = fieldServiceItemService.getAllByActive(field.getId());
         model.addAttribute("items", items);
 
-        model.addAttribute("booking", new BookingRequest());
+        if (!model.containsAttribute("booking")) {
+            model.addAttribute("booking", new BookingRequest());
+        }
 
         return "web/booking";
     }
 
     @PostMapping("/booking")
-    public String booking(@ModelAttribute("booking") BookingRequest request,
+    public String booking(@Valid @ModelAttribute("booking") BookingRequest request,
                           @AuthenticationPrincipal CustomUserDetails customUserDetails,
                           Model model, BindingResult result) {
         if (result.hasErrors()) {

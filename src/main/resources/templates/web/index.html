@@ -127,10 +127,10 @@
                 nhu cầu luyện tập và thi đấu.
               </p>
               <div class="d-flex gap-2">
-                <a href="/fields" class="btn btn-primary btn-lg"
-                  ><i class="bi bi-geo-alt"></i> Tìm sân gần bạn</a
+                <a href="#" class="btn btn-primary btn-lg"
+                  ><i class="bi bi-geo-alt"></i> Tìm kiếm sân thể thao</a
                 >
-                <a href="#promotions" class="btn btn-outline-light btn-lg"
+                <a href="#" class="btn btn-outline-light btn-lg"
                   ><i class="bi bi-lightning"></i> Khám phá ưu đãi</a
                 >
               </div>
@@ -401,7 +401,7 @@
               // city: $('#citySelect').find('option:selected').data('name'),
               ward: $("#wardSelect").find("option:selected").data("name"),
             });
-            window.location.href = `${slug}${qs ? "?" + qs : ""}`;
+            window.location.href = `/san/${slug}${qs ? "?" + qs : ""}`;
           });
 
           $("#topFieldTypeFilters").on("click", "button", function () {
@@ -468,7 +468,7 @@
                   : "";
                 const openTime = field.openTime || "05:00";
                 const closeTime = field.closeTime || "23:00";
-                const href = `/${field.fieldTypeResponse.slug}/${
+                const href = `/san/${field.fieldTypeResponse.slug}/${
                   field.slug || ""
                 }`;
 

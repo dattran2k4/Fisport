@@ -32,9 +32,7 @@ public class LoginController {
 
     @PostMapping("/login")
     public String doLogin(@Valid @ModelAttribute("login") LoginRequestDTO loginRequestDTO,
-                          @RequestParam(required = false) String backLink,
                           BindingResult result,
-                          RedirectAttributes redirect,
                           Model model) {
 
         if (result.hasErrors()) {
@@ -45,14 +43,19 @@ public class LoginController {
         try {
             LoginResponse response = authService.login(loginRequestDTO);
             if (response.is2FAEnabled()) {
-                return String.format("redirect:/2fa/verify?backLink=%s", backLink);
+                return "redirect:/2fa/verify";
+            }
+            else if (response.getRole().equals("ADMIN")) {
+                return "redirect:/admin";
+            } else if (response.getRole().equals("OWNER")) {
+                return "redirect:/owner";
             }
         } catch (Exception ex) {
             model.addAttribute("error", "Username hoặc password không đúng");
             return "login";
         }
 
-        return "redirect:" + (backLink != null ? backLink : "/");
+        return "redirect:/";
     }
 
     @GetMapping("/2fa/verify")
@@ -66,7 +69,6 @@ public class LoginController {
 
     @PostMapping("/2fa/verify")
     public String verify2Fa(@Valid @ModelAttribute("request") TwoFARequest twoFARequest,
-                            @RequestParam(required = false) String backLink,
                             BindingResult result, Model model) {
 
         if (result.hasErrors()) {
@@ -78,8 +80,12 @@ public class LoginController {
             model.addAttribute("username", sessionService.get("PRE_AUTH_USER", String.class));
             model.addAttribute("errorCode", "Mã xác thực không đúng hoặc phiên đã hết hạn");
             return "2fa";
+        } else if (authService.getRoleByUserName(sessionService.get("PRE_AUTH_USER", String.class)).equals("ADMIN")) {
+            return "redirect:/admin";
+        } else if (authService.getRoleByUserName(sessionService.get("PRE_AUTH_USER", String.class)).equals("OWNER")) {
+            return "redirect:/owner";
         }
 
-        return "redirect:" + (backLink != null ? backLink : "/");
+        return "redirect:/";
     }
 }
