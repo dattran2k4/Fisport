@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 @Getter
 public class WalletTopUpRequest {
-    @Min(1)
+    @Min(10000)
     private BigDecimal amount;
 
     @EnumValue(name = "paymentMethod", enumClass = EPaymentMethod.class)

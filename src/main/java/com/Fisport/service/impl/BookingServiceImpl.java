@@ -172,7 +172,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDetailResponse getBooking(Long id, String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        Booking booking = bookingRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+        Booking booking = findBooking(id);
 
         PaymentResponse response = null;
         if (booking.getPayments() != null && !booking.getPayments().isEmpty()) {
@@ -228,14 +228,17 @@ public class BookingServiceImpl implements BookingService {
                 .fieldName(b.getSubfield().getField().getName())
                 .startTime(b.getStartTime())
                 .endTime(b.getEndTime())
-                .paymentMethod(b.getPayments().stream().map(Payment::getMethod).map(Object::toString).collect(Collectors.joining(",")))
+                .paymentMethod((b.getPayments() == null || b.getPayments().isEmpty()) &&
+                        (b.getBookingStatus().equals(EBookingStatus.PAID) || b.getBookingStatus().equals(EBookingStatus.COMPLETED))
+                        ? "WALLET" :
+                        b.getPayments().stream().map(Payment::getMethod).map(Object::toString).collect(Collectors.joining(",")))
                 .status(String.valueOf(b.getBookingStatus()))
                 .cancel(b.getBookingStatus() == EBookingStatus.PENDING || b.getBookingStatus() == EBookingStatus.PAID)
                 .canReview(b.getBookingStatus() == EBookingStatus.COMPLETED && (b.getReview() == null || b.getReview().getRating() == null))
                 .totalPrice(b.getTotalPrice())
                 .rating(Optional.ofNullable(b.getReview())
-                                .map(Review::getRating)
-                                .orElse(null))
+                        .map(Review::getRating)
+                        .orElse(null))
                 .build()).toList();
     }
 
@@ -306,6 +309,10 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return true;
+    }
+
+    private Booking findBooking(Long id) {
+        return bookingRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
     }
 
 }
