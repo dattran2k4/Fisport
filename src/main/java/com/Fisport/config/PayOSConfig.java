@@ -20,10 +20,16 @@ public class PayOSConfig {
     private String checksumKey;
 
     @Value("${payos.return-url}")
-    private String returnSuccessUrl;
+    private String returnPaymentBookingSuccessUrl;
 
     @Value("${payos.cancel-url}")
-    private String returnCancelUrl;
+    private String returnPaymentBooingCancelUrl;
+
+    @Value("${payos.return-payment-wallet-url}")
+    private String returnPaymentWalletSuccessUrl;
+
+    @Value(("{payos.cancel-payment-wallet-cancel}"))
+    private String returnPaymentWalletCancelUrl;
 
     @Bean
     public PayOS payOS() {
