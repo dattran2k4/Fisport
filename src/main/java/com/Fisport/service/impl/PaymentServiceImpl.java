@@ -135,7 +135,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .amount(booking.getTotalPrice())
                 .method(EPaymentMethod.VNPAY)
                 .status(paymentStatus)
-                .transactionId(transactionNo)
+                .transactionCode(transactionNo)
                 .build();
         paymentRepository.save(payment);
 
@@ -164,7 +164,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (data.getCode().equals("00") && data.getDesc().equals("success")) {
             booking.setBookingStatus(EBookingStatus.PAID);
             payment.setStatus(EPaymentStatus.SUCCESS);
-            payment.setTransactionId(data.getReference());
+            payment.setTransactionCode(data.getReference());
             payment.setPaymentTime(LocalDateTime.now());
             payment.setBooking(booking);
         } else {
@@ -198,7 +198,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .status(EPaymentStatus.SUCCESS)
                     .amount(booking.getTotalPrice())
                     .method(EPaymentMethod.PAYOS)
-                    .transactionId(paymentRepository.findByBooking(booking).getTransactionId())
+                    .transactionId(paymentRepository.findByBooking(booking).getTransactionCode())
                     .build();
         } else {
             return PaymentResponse.builder()

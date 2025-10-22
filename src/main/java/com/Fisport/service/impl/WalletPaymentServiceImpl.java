@@ -74,7 +74,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         }
 
         payment.setPaymentTime(paymentTime);
-        payment.setTransactionId(transactionNo);
+        payment.setTransactionCode(transactionNo);
         paymentRepository.save(payment);
         transactionRepository.save(transaction);
     }
@@ -91,7 +91,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         if (data.getCode().equals("00") && data.getDesc().equals("success")) {
             transaction.setStatus(ETransactionStatus.SUCCESS);
             payment.setStatus(EPaymentStatus.SUCCESS);
-            payment.setTransactionId(data.getReference());
+            payment.setTransactionCode(data.getReference());
             payment.setPaymentTime(LocalDateTime.now());
             transactionRepository.save(transaction);
             walletService.creditWallet(transaction);

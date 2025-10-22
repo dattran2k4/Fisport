@@ -40,11 +40,13 @@
     </style>
 </head>
 <body>
-<div class="card">
-    <div class="icon"><i class="bi bi-shield-lock-fill"></i></div>
-    <h1>Không được phép truy cập</h1>
-    <p>Bạn không có quyền truy cập vào trang này.</p>
-    <a href="/" class="btn btn-primary">Quay về trang chủ</a>
-</div>
+    <div layout:fragment="content">
+        <div class="card">
+            <div class="icon"><i class="bi bi-shield-lock-fill"></i></div>
+            <h1>Không được phép truy cập</h1>
+            <p>Bạn không có quyền truy cập vào trang này.</p>
+            <a href="/" class="btn btn-primary">Quay về trang chủ</a>
+        </div>
+    </div>
 </body>
 </html>

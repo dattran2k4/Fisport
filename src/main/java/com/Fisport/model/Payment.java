@@ -29,8 +29,8 @@ public class Payment extends AbstractEntity {
     @Column(nullable = false)
     private BigDecimal amount;
 
-    @Column(unique = true)
-    private String transactionId;
+    @Column(name = "transaction_code", unique = true)
+    private String transactionCode;
 
     @Column(name = "payment_time")
     private LocalDateTime paymentTime;
