@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/web/web}">
+    layout:decorate="~{layout/web/web}">
+
 <head>
     <title>Thanh toán</title>
     <style>
@@ -98,66 +99,133 @@
         }
     </style>
 </head>
+
 <body>
-<div layout:fragment="content">
-    <div class="payment-wrap">
-        <div class="payment-container">
-            <h2>Select payment method</h2>
+    <div layout:fragment="content">
+        <div class="payment-wrap">
+            <div class="payment-container">
+                <h2>Select payment method</h2>
 
-            <div id="methods">
-                <div th:each="method : ${methods}" class="payment-method"
-                     th:data-method="${method.name().toLowerCase()}">
-                    <img th:src="|/web/img/payment/${method.name().toLowerCase()}.png|" alt=""/>
-                    <span th:text="'Pay with ' + ${method}"></span>
+                <div id="methods">
+                    <div th:each="method : ${methods}" class="payment-method"
+                        th:data-method="${method.name().toLowerCase()}">
+                        <img th:src="|/web/img/payment/${method.name().toLowerCase()}.png|" alt="" />
+                        <span th:text="'Pay with ' + ${method}"></span>
+                        <div th:if="${method.name() == 'WALLET'}" class="wallet-balance mt-1 fw-bold text-success"
+                            th:text="'Số dư: ' + ${#numbers.formatDecimal(balance, 0, 'COMMA', 0, 'POINT')} + ' VND'">>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="btn-container">
-                <button class="btn btn-secondary" onclick="window.history.back()">Go Back</button>
-                <button class="btn btn-primary" id="continueBtn">Continue</button>
+                <div class="btn-container">
+                    <button class="btn btn-secondary" onclick="window.history.back()">Go Back</button>
+                    <button class="btn btn-primary" id="continueBtn">Continue</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<section layout:fragment="scripts">
-    <script th:inline="javascript">
-        $(document).ready(function () {
-            const paymentToken = /*[[${paymentToken}]]*/ 'dummyToken';
-            let selectedMethod = null;
+    <section layout:fragment="scripts">
+        <script th:inline="javascript">
+            $(document).ready(function () {
+                const paymentToken = /*[[${paymentToken}]]*/ 'dummyToken';
+                let selectedMethod = null;
 
-            // Chọn phương thức
-            $('.payment-method').click(function () {
-                $('.payment-method').removeClass('selected');
-                $(this).addClass('selected');
-                selectedMethod = $(this).data('method');
-            });
+                /* ---------- EVENT BIND ---------- */
+                $('.payment-method').click(selectPaymentMethod);
+                $('#continueBtn').click(handleContinueClick);
 
-            // Continue
-            $('#continueBtn').click(function () {
-                if (!selectedMethod) {
-                    alert("Please select a payment method");
-                    return;
+                /* ---------- HANDLER FUNCTIONS ---------- */
+
+                function selectPaymentMethod() {
+                    $('.payment-method').removeClass('selected');
+                    $(this).addClass('selected');
+                    selectedMethod = $(this).data('method');
                 }
 
-                $.ajax({
-                    url: '/api/payment/create-payment',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({
-                        paymentToken: paymentToken,
-                        paymentMethod: selectedMethod
-                    }),
-                    success: function (res) {
-                        const paymentUrl = res.data; // API trả trực tiếp URL
-                        window.open(paymentUrl, 'Thanh toán', 'width=700,height=900');
-                    },
-                    error: function (xhr) {
-                        alert("Có lỗi xảy ra: " + (xhr.responseJSON?.message || xhr.statusText) + res.message);
+                function handleContinueClick() {
+                    if (!selectedMethod) {
+                        showAlert('warning', 'Vui lòng chọn phương thức thanh toán');
+                        return;
                     }
-                });
+
+                    if (selectedMethod === 'wallet') {
+                        confirmWalletPayment();
+                    } else {
+                        createExternalPayment();
+                    }
+                }
+
+                /* ---------- WALLET PAYMENT ---------- */
+                function confirmWalletPayment() {
+                    Swal.fire({
+                        title: 'Xác nhận thanh toán bằng ví?',
+                        text: 'Số tiền sẽ được trừ trực tiếp từ số dư ví của bạn.',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#6c5dd3',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Xác nhận',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            payWithWallet();
+                        }
+                    });
+                }
+
+                function payWithWallet() {
+                    $.ajax({
+                        url: '/api/payment/booking-wallet-pay',
+                        type: 'POST',
+                        data: { paymentToken },
+                        success: function (res) {
+                            showAlert('success', res.message || 'Đã thanh toán bằng ví.', true);
+                        },
+                        error: function (xhr) {
+                            showAlert('error', xhr.responseJSON?.message || xhr.statusText);
+                        }
+                    });
+                }
+
+                /* ---------- EXTERNAL PAYMENT (VNPAY, MOMO, etc.) ---------- */
+                function createExternalPayment() {
+                    $.ajax({
+                        url: '/api/payment/create-payment-wallet',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            paymentToken: paymentToken,
+                            paymentMethod: selectedMethod
+                        }),
+                        success: function (res) {
+                            const paymentUrl = res.data;
+                            if (paymentUrl) {
+                                window.open(paymentUrl, 'Thanh toán', 'width=700,height=900');
+                            } else {
+                                showAlert('warning', 'Không nhận được URL thanh toán');
+                            }
+                        },
+                        error: function (xhr) {
+                            showAlert('error', xhr.responseJSON?.message || xhr.statusText);
+                        }
+                    });
+                }
+
+                /* ---------- UTILITIES ---------- */
+                function showAlert(icon, message, redirect = false) {
+                    Swal.fire({
+                        icon,
+                        title: message,
+                        confirmButtonColor: '#6c5dd3'
+                    }).then(() => {
+                        if (redirect && icon === 'success') {
+                            window.location.href = '/user/bookings';
+                        }
+                    });
+                }
             });
-        });
-    </script>
-</section>
+        </script>
+    </section>
 </body>
+
 </html>

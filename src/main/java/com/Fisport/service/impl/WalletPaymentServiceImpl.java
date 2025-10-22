@@ -113,7 +113,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         Booking booking = paymentService.findByPaymentToken(paymentToken);
         log.info("Booking: " + booking);
 
-        if (booking.getBookingStatus().equals(EBookingStatus.PAID)) {
+        if (!booking.getBookingStatus().equals(EBookingStatus.PENDING)) {
             throw new RuntimeException("Payment paid already");
         }
 

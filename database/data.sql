@@ -521,6 +521,6 @@ VALUES
 INSERT INTO Wallet (balance, created_at, updated_at, user_id)
 VALUES
 (0, NOW(), NOW(), 1),
-(0, NOW(), NOW(), 2),
+(50000, NOW(), NOW(), 2),
 (0, NOW(), NOW(), 3),
 (500000, NOW(), NOW(), 4);

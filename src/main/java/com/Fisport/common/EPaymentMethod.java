@@ -12,5 +12,7 @@ public enum EPaymentMethod {
     @JsonProperty("zalopay")
     ZALOPAY,
     @JsonProperty("payos")
-    PAYOS
+    PAYOS,
+    @JsonProperty("wallet")
+    WALLET
 }

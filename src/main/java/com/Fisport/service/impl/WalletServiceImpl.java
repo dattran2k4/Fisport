@@ -3,7 +3,9 @@ package com.Fisport.service.impl;
 import com.Fisport.common.ETransactionStatus;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.Transaction;
+import com.Fisport.model.User;
 import com.Fisport.model.Wallet;
+import com.Fisport.repository.UserRepository;
 import com.Fisport.repository.WalletRepository;
 import com.Fisport.service.WalletService;
 import jakarta.transaction.Transactional;
@@ -11,12 +13,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.security.Principal;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class WalletServiceImpl implements WalletService {
 
     private final WalletRepository walletRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -49,5 +55,13 @@ public class WalletServiceImpl implements WalletService {
         walletRepository.save(wallet);
 
         log.info("Wallet credited: userId={}, txId={}, amount={}",  wallet.getUser().getId(), transaction.getId(), transaction.getAmount());
+    }
+
+    @Override
+    public BigDecimal getBalanceByUser(String username) {
+
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return user.getWallet().getBalance();
     }
 }
