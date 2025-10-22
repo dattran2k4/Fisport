@@ -2,6 +2,7 @@ package com.Fisport.service.impl;
 
 import com.Fisport.config.PayOSConfig;
 import com.Fisport.model.Booking;
+import com.Fisport.model.Payment;
 import com.Fisport.service.PayOSService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class PayOSServiceImpl implements PayOSService {
         CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
                 .orderCode(orderCode)
                 .amount(amount)
-                .description("Thanh toán đi m")
+                .description("Thanh toán đi mà")
                 .returnUrl(payOSConfig.getReturnSuccessUrl())
                 .cancelUrl(payOSConfig.getReturnCancelUrl())
                 .item(item)
@@ -59,6 +60,33 @@ public class PayOSServiceImpl implements PayOSService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public String createWalletPaymentLink(Payment payment) {
+        long timePart = System.currentTimeMillis() / 100;
+        long orderCode = timePart * 100000 + payment.getId();
+        long amount = payment.getAmount().longValue();
+
+        PaymentLinkItem item = PaymentLinkItem.builder()
+                .name("Đặt sân trực tuyến Fisport")
+                .quantity(1)
+                .price(amount)
+                .build();
+
+        CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
+                .orderCode(orderCode)
+                .amount(amount)
+                .description("Thanh toán đi mà")
+                .returnUrl(payOSConfig.getReturnSuccessUrl())
+                .cancelUrl(payOSConfig.getReturnCancelUrl())
+                .item(item)
+                .build();
+
+        CreatePaymentLinkResponse data = payOS.paymentRequests().create(paymentData);
+
+        String checkoutUrl = data.getCheckoutUrl();
+        return checkoutUrl;
     }
 
 

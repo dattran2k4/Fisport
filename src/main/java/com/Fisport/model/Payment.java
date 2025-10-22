@@ -36,8 +36,12 @@ public class Payment extends AbstractEntity {
     private LocalDateTime paymentTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_id", nullable = false)
+    @JoinColumn(name = "booking_id")
     private Booking booking;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "transaction_id")
+    private Transaction transaction;
 
     @CreationTimestamp
     @Column(name = "created_at")

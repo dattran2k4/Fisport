@@ -517,3 +517,10 @@ VALUES
 (5, 'Dịch vụ rất tốt, hài lòng!', 2, 26, 1, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -1 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -1 DAY), INTERVAL 1 HOUR)),
 (5, 'Rất chuyên nghiệp và nhiệt tình.', 2, 26, 4, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 6 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 6 DAY), INTERVAL 1 HOUR)),
 (4, 'Ok, sẽ quay lại lần sau.', 4, 26, 5, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 1 HOUR));
+
+INSERT INTO Wallet (balance, created_at, updated_at, user_id)
+VALUES
+(0, NOW(), NOW(), 1),
+(0, NOW(), NOW(), 2),
+(0, NOW(), NOW(), 3),
+(500000, NOW(), NOW(), 4);

@@ -71,6 +71,9 @@ public class User extends AbstractEntity {
     )
     private Set<Voucher> vouchers = new HashSet<>();
 
+    @OneToOne(mappedBy = "user")
+    private Wallet wallet;
+
     @CreationTimestamp
     @Column(name = "create_at", updatable = false)
     private LocalDateTime createdAt;

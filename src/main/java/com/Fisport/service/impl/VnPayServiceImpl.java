@@ -1,7 +1,9 @@
 package com.Fisport.service.impl;
 
 import com.Fisport.config.VnPayConfig;
+import com.Fisport.dto.request.WalletTopUpRequest;
 import com.Fisport.model.Booking;
+import com.Fisport.model.Payment;
 import com.Fisport.service.VnPayService;
 import com.Fisport.util.VnPayUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -65,6 +67,51 @@ public class VnPayServiceImpl implements VnPayService {
         }
     }
 
+    @Override
+    public String createWalletPaymentUrl(Payment payment, HttpServletRequest httpServletRequest) {
+        try {
+            Map<String, String> vnpParams = new HashMap<>();
+            vnpParams.put("vnp_Version", "2.1.0");
+            vnpParams.put("vnp_Command", "pay");
+            vnpParams.put("vnp_TmnCode", vnPayConfig.getVnpTmnCode());
+            vnpParams.put("vnp_Amount", payment.getAmount().multiply(BigDecimal.valueOf(100)).toBigInteger().toString());
+            vnpParams.put("vnp_CurrCode", "VND");
+
+            String prefix = "WL";
+            Long id = payment.getId();
+            Long timestamp = System.currentTimeMillis();
+            // Dùng String.format
+            String txnRef = String.format("%s%d-%d", prefix, id, timestamp);
+            vnpParams.put("vnp_TxnRef", txnRef);
+            //Secure paymentToken
+            vnpParams.put("vnp_OrderInfo", "Nap tien cho vi cua ban: " + txnRef);
+            vnpParams.put("vnp_OrderType", "other");
+            vnpParams.put("vnp_Locale", "vn");
+            vnpParams.put("vnp_ReturnUrl", buildReturnUrl(httpServletRequest));
+            vnpParams.put("vnp_CreateDate", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss")));
+            vnpParams.put("vnp_IpAddr", getClientIp(httpServletRequest));
+
+            // sắp xếp key alphabetically
+            Map<String, String> sortedParams = new TreeMap<>(vnpParams);
+
+            Map<String, String> result = VnPayUtils.buildHashAndQuery(sortedParams);
+
+            String hashData = result.get("hashData");
+            String query = result.get("query");
+
+            //Chữ ký
+            String vnpSecureHash = VnPayUtils.hmacSHA512(vnPayConfig.getVnpHashSecret(), hashData);
+
+            //Ghép url
+            String paymentUrl = vnPayConfig.getVnpPayUrl() + "?" + query + "&vnp_SecureHash=" + vnpSecureHash;
+
+            return paymentUrl;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot create VNPay URL", e);
+        }
+    }
+
     /**
      * Validate secure hash trả về từ VNPay
      */
@@ -93,7 +140,7 @@ public class VnPayServiceImpl implements VnPayService {
     }
 
     @Override
-    public Long extractBookingId(Map<String, String> params) {
+    public Long extractId(Map<String, String> params) {
         String txnRef = params.get("vnp_TxnRef");
         String withoutPrefix = txnRef.substring(2);
         return Long.parseLong(withoutPrefix.split("-")[0]);

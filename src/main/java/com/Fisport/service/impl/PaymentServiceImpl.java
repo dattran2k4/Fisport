@@ -1,19 +1,16 @@
 package com.Fisport.service.impl;
 
-import com.Fisport.common.EBookingStatus;
-import com.Fisport.common.EPaymentMethod;
-import com.Fisport.common.EPaymentStatus;
+import com.Fisport.common.*;
 import com.Fisport.dto.request.PaymentRequest;
+import com.Fisport.dto.request.WalletTopUpRequest;
 import com.Fisport.dto.response.PaymentResponse;
+import com.Fisport.dto.response.UserResponse;
 import com.Fisport.exception.ResourceNotFoundException;
-import com.Fisport.model.Booking;
-import com.Fisport.model.Payment;
+import com.Fisport.model.*;
 import com.Fisport.repository.BookingRepository;
 import com.Fisport.repository.PaymentRepository;
-import com.Fisport.service.BookingService;
-import com.Fisport.service.PayOSService;
-import com.Fisport.service.PaymentService;
-import com.Fisport.service.VnPayService;
+import com.Fisport.repository.TransactionRepository;
+import com.Fisport.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +31,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PayOSService payOSService;
     private final BookingService bookingService;
-
+    private final WalletService walletService;
+    private final TransactionRepository transactionRepository;
     @Override
     public String createPayment(PaymentRequest request, HttpServletRequest httpServletRequest) {
         Booking booking = findByPaymentToken(request.getPaymentToken());
@@ -57,6 +55,46 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
+    public String createWalletPayment(WalletTopUpRequest request, HttpServletRequest httpServletRequest) {
+
+        Payment payment = Payment.builder()
+                .amount(request.getAmount())
+                .method(request.getPaymentMethod())
+                .createAt(LocalDateTime.now())
+                .status(EPaymentStatus.PENDING)
+                .build();
+
+        paymentRepository.save(payment);
+
+        Wallet wallet = walletService.getWallet(request.getWalletId());
+
+        Transaction transaction = Transaction.builder()
+                .amount(request.getAmount())
+                .type(ETransactionType.TOUP)
+                .payment(payment)
+                .createdAt(LocalDateTime.now())
+                .status(ETransactionStatus.PENDING)
+                .wallet(wallet)
+                .build();
+
+        transactionRepository.save(transaction);
+
+        switch (request.getPaymentMethod()) {
+            case VNPAY:
+                return vnPayService.createWalletPaymentUrl(payment, httpServletRequest);
+            case MOMO:
+                throw new UnsupportedOperationException("Momo payment not implemented");
+            case ZALOPAY:
+                throw new UnsupportedOperationException("Zalopay payment not implemented");
+            case PAYOS:
+                return payOSService.createWalletPaymentLink(payment);
+            default:
+                throw new ResourceNotFoundException("Payment method not supported");
+        }
+    }
+
+    @Override
+    @Transactional
     public PaymentResponse handleVnpayReturn(Map<String, String> params) {
         boolean valid = vnPayService.validatePayment(params);
         if (!valid) {
@@ -64,7 +102,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
 
-        Long bookingId = vnPayService.extractBookingId(params);
+        Long bookingId = vnPayService.extractId(params);
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
@@ -170,5 +208,16 @@ public class PaymentServiceImpl implements PaymentService {
                     .build();
         }
 
+    }
+
+    @Override
+    public Payment getPaymentById(Long id) {
+        return paymentRepository.findById(id).orElseThrow(() -> new RuntimeException("Payment not found"));
+    }
+
+    @Override
+    public Payment findPaymentByOrderCodePayOs(long orderCode) {
+        Long paymentId = orderCode % 100000;
+        return getPaymentById(paymentId);
     }
 }
