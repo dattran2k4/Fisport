@@ -36,8 +36,8 @@ public class PayOSServiceImpl implements PayOSService {
                 .orderCode(orderCode)
                 .amount(amount)
                 .description("Thanh toán đi mà")
-                .returnUrl(payOSConfig.getReturnSuccessUrl())
-                .cancelUrl(payOSConfig.getReturnCancelUrl())
+                .returnUrl(payOSConfig.getReturnPaymentBookingSuccessUrl())
+                .cancelUrl(payOSConfig.getReturnPaymentBooingCancelUrl())
                 .item(item)
                 .build();
 
