@@ -193,4 +193,10 @@ public class OwnerFieldsController {
         return "redirect:/owner/fields";
     }
 
+    @DeleteMapping("/{id}/delete")
+    public String deleteFieldByOwner(@PathVariable Long id, Principal principal) {
+        fieldService.deleteFieldByOwner(id, principal.getName());
+        return "redirect:/owner/fields";
+    }
+
 }

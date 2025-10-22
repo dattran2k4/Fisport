@@ -4,8 +4,10 @@ import com.Fisport.dto.response.FieldDetailResponse;
 import com.Fisport.model.Field;
 import com.Fisport.common.EFieldStatus;
 import com.Fisport.model.User;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -22,6 +24,10 @@ public interface FieldRepository extends JpaRepository<Field,Long>, JpaSpecifica
     Field findByOwnerIdAndId(long user_id, long id);
     Field findBySlug(String fieldNameSlug);
 
+    @Modifying
+    @Transactional
+    @Query(value = "DELETE FROM field WHERE id = :fieldId LIMIT 1", nativeQuery = true)
+    void deleteOneById(@Param("fieldId") long fieldId);
     //Bounding-box advanced calculating raidus
     @Query(value = "SELECT * FROM field f " +
             "WHERE f.latitude BETWEEN :minLat AND :maxLat " +

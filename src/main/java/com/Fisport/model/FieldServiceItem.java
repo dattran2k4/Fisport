@@ -3,6 +3,8 @@ package com.Fisport.model;
 import com.Fisport.common.EFieldServiceItem;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -28,7 +30,8 @@ public class FieldServiceItem extends AbstractEntity {
     private EFieldServiceItem status;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "field_id")
+    @JoinColumn(name = "field_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Field field;
 
     @ManyToOne(fetch = FetchType.LAZY)

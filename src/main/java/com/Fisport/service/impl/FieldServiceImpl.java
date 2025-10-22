@@ -216,6 +216,35 @@ public class FieldServiceImpl implements FieldService {
                 .build()).collect(Collectors.toSet());
     }
 
+    @Transactional
+    @Override
+    public void deleteFieldByOwner(Long fieldId, String username) {
+        User owner = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+
+        Field field = fieldRepository.findById(fieldId)
+                .orElseThrow(() -> new ResourceNotFoundException("Field not found"));
+
+        if (!field.getOwner().getId().equals(owner.getId())) {
+            throw new IllegalArgumentException("Bạn không có quyền xóa sân này!");
+        }
+
+        fieldHasFeatureRepository.deleteAllByField(field);
+        fieldServiceItemRepository.deleteAllByField_Id(field.getId());
+        subFieldRepository.deleteAllByField(field);
+        reviewRepository.deleteByFieldId(field.getId());
+
+        String oldImagePath = new File("src/main/resources/static" + field.getBanner()).getAbsolutePath();
+        File oldFile = new File(oldImagePath);
+        if (oldFile.exists()) {
+            boolean deleted = oldFile.delete();
+        }
+
+        fieldRepository.deleteOneById(field.getId());
+
+    }
+
+
     @Override
     public List<FieldResponse> getAllPendingFields() {
         List<Field> fields = fieldRepository.findByFieldStatus(EFieldStatus.PENDING);

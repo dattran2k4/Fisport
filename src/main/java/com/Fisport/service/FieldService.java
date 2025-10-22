@@ -22,7 +22,7 @@ public interface FieldService {
     FieldResponse getField(Long fieldId);
     List<FieldResponse> getMyOwnerFields(String name);
     Set<FeatureResponse> getFeautresByField(Long id);
-
+    void deleteFieldByOwner(Long fieldId, String username);
     List<FieldResponse> getAllPendingFields();
 
     List<FieldResponse> getAllPendingFieldsByOwner(String name);
