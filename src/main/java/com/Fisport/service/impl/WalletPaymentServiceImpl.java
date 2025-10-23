@@ -1,6 +1,8 @@
 package com.Fisport.service.impl;
 
 import com.Fisport.common.*;
+import com.Fisport.exception.InvalidDataException;
+import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.*;
 import com.Fisport.repository.*;
 import com.Fisport.service.*;
@@ -34,22 +36,22 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
 
         boolean valid = vnPayService.validatePayment(params);
         if (!valid) {
-            throw new RuntimeException("Invalid VNPay callback");
+            throw new InvalidDataException("Invalid VNPay callback");
         }
 
         Long paymentId = vnPayService.extractId(params);
         Payment payment = paymentService.getPaymentById(paymentId);
 
-        Transaction transaction =  transactionRepository.findByPayment(payment);
+        Transaction transaction =  transactionRepository.findByPayment(payment).orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
         if (transaction == null) {
-            throw new RuntimeException("Transaction not found");
+            throw new ResourceNotFoundException("Transaction not found");
         }
 
         User user = transaction.getWallet().getUser();
         log.info("VNPay callback for user: {} (ID: {})", user.getUsername(), user.getId());
 
         if (transaction == null) {
-            throw new RuntimeException("Transaction not found");
+            throw new ResourceNotFoundException("Transaction not found");
         }
 
         String response = params.get("vnp_ResponseCode");
@@ -83,17 +85,18 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
     @Transactional
     public void handlePayOSReturn(WebhookData data) {
         Long paymentId = data.getOrderCode() % 100000;
+        log.info("handlePayOSReturn called, paymentId = {}", paymentId);
 
-        Payment payment = paymentService.getPaymentById(paymentId);
+        Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy payment"));
 
-        Transaction transaction =  transactionRepository.findByPayment(payment);
+        Transaction transaction =  transactionRepository.findByPayment(payment).orElseThrow(()  -> new ResourceNotFoundException("Không tìm thấy transaction"));
+        log.info("handlePayOSReturn called, transactionId = {}", transaction.getId());
 
         if (data.getCode().equals("00") && data.getDesc().equals("success")) {
             transaction.setStatus(ETransactionStatus.SUCCESS);
             payment.setStatus(EPaymentStatus.SUCCESS);
             payment.setTransactionCode(data.getReference());
             payment.setPaymentTime(LocalDateTime.now());
-            transactionRepository.save(transaction);
             walletService.creditWallet(transaction);
         } else {
             payment.setStatus(EPaymentStatus.FAILED);
@@ -114,7 +117,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         log.info("Booking: " + booking);
 
         if (!booking.getBookingStatus().equals(EBookingStatus.PENDING)) {
-            throw new RuntimeException("Payment paid already");
+            throw new InvalidDataException("Payment paid already");
         }
 
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
@@ -136,7 +139,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
             transaction.setStatus(ETransactionStatus.FAILED);
             transactionRepository.save(transaction);
             log.warn("Balance of userId {} not enough for bookingId ", username,  booking.getId());
-            throw new RuntimeException("Not enough balance");
+            throw new InvalidDataException("Not enough balance");
         }
 
         walletService.debitWallet(wallet.getId(), transaction);
@@ -162,7 +165,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         Wallet wallet = walletRepository.findByUser(user);
 
         if (!booking.getBookingStatus().equals(EBookingStatus.PAID)) {
-            throw new RuntimeException("Invalid booking status");
+            throw new InvalidDataException("Invalid booking status");
         }
 
         Transaction transaction = Transaction.builder()
@@ -190,7 +193,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
             transaction.setStatus(ETransactionStatus.FAILED);
             transactionRepository.save(transaction);
             log.error("Refund failed for booking {}: {}", bookingId, e.getMessage());
-            throw new RuntimeException("Refund failed: " + e.getMessage());
+            throw new InvalidDataException("Refund failed: " + e.getMessage());
         }
     }
 }

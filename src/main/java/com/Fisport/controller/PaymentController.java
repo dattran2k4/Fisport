@@ -28,7 +28,7 @@ public class PaymentController {
     public String showMethodPayment(@RequestParam("token") String paymentToken, Model model, Principal principal) {
         model.addAttribute("paymentToken", paymentToken);
         model.addAttribute("methods", EPaymentMethod.values());
-        model.addAttribute("balance", walletService.getBalanceByUser(principal.getName()));
+        model.addAttribute("wallet", walletService.getWalletByUser(principal.getName()));
         return "web/payment";
     }
 

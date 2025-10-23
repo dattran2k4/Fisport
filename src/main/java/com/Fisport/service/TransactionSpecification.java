@@ -33,7 +33,7 @@ public class TransactionSpecification {
             }
 
             if (paymentMethod != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("paymentMethod"), paymentMethod));
+                predicate = cb.and(predicate, cb.equal(root.get("method"), paymentMethod));
             }
 
             if (transactionType != null) {

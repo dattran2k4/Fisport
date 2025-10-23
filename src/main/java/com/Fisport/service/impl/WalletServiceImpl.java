@@ -75,4 +75,11 @@ public class WalletServiceImpl implements WalletService {
 
         return user.getWallet().getBalance();
     }
+
+    @Override
+    public WalletResponse getWalletByUser(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        Wallet wallet = user.getWallet();
+        return getWallet(wallet.getId());
+    }
 }

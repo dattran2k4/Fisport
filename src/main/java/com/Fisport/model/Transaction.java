@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @Table(name = "transaction")
 public class Transaction extends AbstractEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wallet_id", nullable = false)
+    @JoinColumn(name = "wallet_id")
     private Wallet wallet;
 
     @Column(nullable = false, precision = 18, scale = 2)
@@ -37,10 +37,12 @@ public class Transaction extends AbstractEntity {
     @JoinColumn(name = "booking_id")
     private Booking booking;
 
-    @OneToOne(mappedBy = "transaction")
+    @OneToOne()
+    @JoinColumn(name = "payment_id")
     private Payment payment;
 
     @Column
+    @Enumerated(EnumType.STRING)
     private EPaymentMethod method;
 
     @Column(nullable = false, updatable = false, name = "created_at")

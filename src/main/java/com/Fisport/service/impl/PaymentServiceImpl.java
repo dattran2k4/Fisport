@@ -5,6 +5,7 @@ import com.Fisport.dto.request.PaymentRequest;
 import com.Fisport.dto.request.WalletTopUpRequest;
 import com.Fisport.dto.response.PaymentResponse;
 import com.Fisport.dto.response.UserResponse;
+import com.Fisport.exception.InvalidDataException;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.*;
 import com.Fisport.repository.BookingRepository;
@@ -89,6 +90,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
 
         paymentRepository.save(payment);
+        log.info("Payment id {} created", payment.getId());
 
         Wallet wallet = walletRepository.findById(request.getWalletId()).orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
 
@@ -98,10 +100,11 @@ public class PaymentServiceImpl implements PaymentService {
                 .payment(payment)
                 .createdAt(LocalDateTime.now())
                 .status(ETransactionStatus.PENDING)
+                .method(request.getPaymentMethod())
                 .wallet(wallet)
                 .build();
-
         transactionRepository.save(transaction);
+        log.info("Transaction id {} created", transaction.getId());
 
         switch (request.getPaymentMethod()) {
             case VNPAY:
@@ -122,17 +125,17 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponse handleVnpayReturn(Map<String, String> params) {
         boolean valid = vnPayService.validatePayment(params);
         if (!valid) {
-            throw new RuntimeException("Invalid VNPay callback");
+            throw new InvalidDataException("Invalid VNPay callback");
         }
 
 
         Long bookingId = vnPayService.extractId(params);
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(() -> new RuntimeException("Booking not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy booking"));
 
         Payment payment = paymentRepository.findByBooking(booking);
 
-        Transaction transaction = transactionRepository.findByPayment(payment);
+        Transaction transaction = transactionRepository.findByPayment(payment).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy giao dịch"));
 
         String response = params.get("vnp_ResponseCode");
         String transactionNo = Optional.ofNullable(params.get("vnp_TransactionNo")).orElse("UNKNOWN");
@@ -199,7 +202,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         Payment payment = paymentRepository.findByBooking(booking);
 
-        Transaction transaction = transactionRepository.findByPayment(payment);
+        Transaction transaction = transactionRepository.findByPayment(payment).orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
 
         if (data.getCode().equals("00") && data.getDesc().equals("success")) {
             booking.setBookingStatus(EBookingStatus.PAID);
@@ -265,7 +268,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Payment getPaymentById(Long id) {
-        return paymentRepository.findById(id).orElseThrow(() -> new RuntimeException("Payment not found"));
+        return paymentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
     }
 
     @Override

@@ -200,18 +200,18 @@
                         <div class="wallet-card mb-4">
                             <h5 class="fw-semibold mb-2">Current Balance:</h5>
                             <div class="wallet-balance mb-2"
-                                 th:text="${#numbers.formatDecimal(balance, 0, 'COMMA', 0, 'POINT') + 'VND'}">
+                                 th:text="${#numbers.formatDecimal(wallet.balance, 0, 'COMMA', 0, 'POINT') + 'VND'}">
                                 0 VND
                             </div>
                             <p class="mb-0">
-                                <span th:text="'WALLET ID: ' + ${#authentication.name}">Wallet ID: WALLET001</span><br>
+                                <span th:text="'WALLET USER: ' + ${#authentication.name}">Wallet ID: WALLET001</span><br>
                             </p>
                         </div>
 
                         <!-- Top-up form -->
                         <div class="border p-4 rounded-4 mb-4 bg-white topup-form shadow-sm">
                             <h5 class="fw-semibold mb-3">Top up your wallet</h5>
-                            <form>
+                            <form class="">
                                 <div class="mb-3">
                                     <label for="amount" class="form-label">Amount (VND)</label>
                                     <input type="number" id="amount" name="amount" class="form-control" min="10000"
@@ -238,37 +238,61 @@
                         <!-- Recent Transactions -->
                         <div class="bg-white p-4 rounded-4 shadow-sm">
                             <h5 class="fw-semibold mb-3">Recent Transactions</h5>
+                            <form th:action="@{/user/wallet}" method="get" class="d-flex flex-wrap mb-3 align-items-center">
+                                <select name="transactionType" class="form-select me-2 mb-2" style="width: 150px;">
+                                    <option value="">All Type</option>
+                                    <option value="TOPUP" th:selected="${transactionType == 'TOPUP'}">TOPUP</option>
+                                    <option value="PAYMENT" th:selected="${transactionType == 'PAYMENT'}">PAYMENT</option>
+                                    <option value="REFUND" th:selected="${transactionType == 'REFUND'}">REFUND</option>
+                                </select>
+
+                                <select name="transactionStatus" class="form-select me-2 mb-2" style="width: 150px;">
+                                    <option value="">All Status</option>
+                                    <option value="PENDING" th:selected="${transactionStatus == 'PENDING'}">PENDING</option>
+                                    <option value="SUCCESS" th:selected="${transactionStatus == 'SUCCESS'}">SUCCESS</option>
+                                    <option value="FAILED" th:selected="${transactionStatus == 'FAILED'}">FAILED</option>
+                                </select>
+
+                                <select name="paymentMethod" class="form-select me-2 mb-2" style="width: 150px;">
+                                    <option value="">All Method</option>
+                                    <option value="PAYOS" th:selected="${paymentMethod == 'PAYOS'}">PAYOS</option>
+                                    <option value="VNPAY" th:selected="${paymentMethod == 'VNPAY'}">VNPAY</option>
+                                    <option value="MOMO" th:selected="${paymentMethod == 'MOMO'}">MOMO</option>
+                                    <option value="ZALOPAY" th:selected="${paymentMethod == 'ZALOPAY'}">ZALOPAY</option>
+                                </select>
+
+                                <select name="sortField" class="form-select me-2 mb-2" style="width: 150px;">
+                                    <option value="createAt_desc" th:selected="${sortField == 'createAt' and sortDir == 'desc'}">Newest</option>
+                                    <option value="createAt_asc" th:selected="${sortField == 'createAt' and sortDir == 'asc'}">Oldest</option>
+                                    <option value="amount_desc" th:selected="${sortField == 'amount' and sortDir == 'desc'}">Amount High → Low</option>
+                                    <option value="amount_asc" th:selected="${sortField == 'amount' and sortDir == 'asc'}">Amount Low → High</option>
+                                </select>
+
+                                <button type="submit" class="btn btn-primary btn-sm mb-2">Apply</button>
+                            </form>
                             <table class="table table-hover align-middle">
                                 <thead>
                                 <tr>
                                     <th>#</th>
                                     <th>Amount</th>
+                                    <th>Type</th>
                                     <th>Method</th>
                                     <th>Status</th>
                                     <th>Date</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>100,000 VND</td>
-                                    <td>VNPAY</td>
-                                    <td><span class="text-success">SUCCESS</span></td>
-                                    <td>21/10/2025 14:30</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>50,000 VND</td>
-                                    <td>MOMO</td>
-                                    <td><span class="text-warning">PENDING</span></td>
-                                    <td>20/10/2025 10:15</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>200,000 VND</td>
-                                    <td>VNPAY</td>
-                                    <td><span class="text-success">SUCCESS</span></td>
-                                    <td>18/10/2025 08:47</td>
+                                <tr th:each="transaction, iterStat : ${transactions.content}">
+                                    <td th:text="${iterStat.index + 1 + transactions.number * transactions.size}">1</td>
+                                    <td th:text="${#numbers.formatDecimal(transaction.amount,0,'COMMA',0,'POINT')} + ' VND'">100,000 VND</td>
+                                    <td th:text="${transaction.transactionType}">TOPUP</td>
+                                    <td th:text="${transaction.paymentMethod}">VNPAY</td>
+                                    <td><span th:classappend="${transaction.transactionStatus == 'SUCCESS' ? 'text-success' :
+                                      transaction.transactionStatus == 'PENDING' ? 'text-warning' :
+                                      'text-danger'}"
+                                        th:text="${transaction.transactionStatus}">SUCCESS</span>
+                                    </td>
+                                    <td th:text="${#temporals.format(transaction.createAt,'dd/MM/yyyy HH:mm')}">21/10/2025 14:30</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -291,7 +315,7 @@
 
                 let amount = $('#amount').val();
                 let paymentMethod = $('select[name="paymentMethod"]').val().toLowerCase();
-                let wardId = /*[[${wardId}]]*/ 0;
+                let walletId = /*[[${wallet.id}]]*/ 0;
 
 
                 if (!amount || amount < 10000) {
@@ -310,7 +334,7 @@
                 let requestData = {
                     amount: amount.toString(),
                     paymentMethod: paymentMethod,
-                    wardId: wardId
+                    walletId: walletId
                 }
 
                 $btn.prop('disabled', true);

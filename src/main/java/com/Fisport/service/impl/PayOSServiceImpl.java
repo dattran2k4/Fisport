@@ -43,8 +43,7 @@ public class PayOSServiceImpl implements PayOSService {
 
         CreatePaymentLinkResponse data = payOS.paymentRequests().create(paymentData);
 
-        String checkoutUrl = data.getCheckoutUrl();
-        return checkoutUrl;
+        return data.getCheckoutUrl();
     }
 
     @Override
@@ -85,8 +84,7 @@ public class PayOSServiceImpl implements PayOSService {
 
         CreatePaymentLinkResponse data = payOS.paymentRequests().create(paymentData);
 
-        String checkoutUrl = data.getCheckoutUrl();
-        return checkoutUrl;
+        return data.getCheckoutUrl();
     }
 
 
