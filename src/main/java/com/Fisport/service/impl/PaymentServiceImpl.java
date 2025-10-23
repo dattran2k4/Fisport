@@ -14,6 +14,7 @@ import com.Fisport.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import vn.payos.model.webhooks.WebhookData;
 
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Slf4j
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
@@ -33,11 +35,32 @@ public class PaymentServiceImpl implements PaymentService {
     private final BookingService bookingService;
     private final WalletService walletService;
     private final TransactionRepository transactionRepository;
+
     @Override
     public String createPayment(PaymentRequest request, HttpServletRequest httpServletRequest) {
         Booking booking = findByPaymentToken(request.getPaymentToken());
 
         bookingService.checkExpiredBooking(booking);
+
+        Payment payment = Payment.builder()
+                .amount(booking.getTotalPrice())
+                .method(request.getPaymentMethod())
+                .booking(booking)
+                .status(EPaymentStatus.PENDING)
+                .build();
+
+        paymentRepository.save(payment);
+
+        Transaction transaction = Transaction.builder()
+                .amount(booking.getTotalPrice())
+                .status(ETransactionStatus.PENDING)
+                .type(ETransactionType.PAYMENT)
+                .payment(payment)
+                .build();
+
+        payment.setTransaction(transaction);
+        paymentRepository.save(payment);
+        transactionRepository.save(transaction);
 
         switch (request.getPaymentMethod()) {
             case VNPAY:
@@ -106,38 +129,55 @@ public class PaymentServiceImpl implements PaymentService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
+        Payment payment = paymentRepository.findByBooking(booking);
+
+        Transaction transaction = transactionRepository.findByPayment(payment);
+
         String response = params.get("vnp_ResponseCode");
         String transactionNo = Optional.ofNullable(params.get("vnp_TransactionNo")).orElse("UNKNOWN");
 
         EPaymentStatus paymentStatus;
         EBookingStatus bookingStatus = EBookingStatus.PENDING;
+        ETransactionStatus transactionStatus;
         LocalDateTime paymentTime = null;
         switch (response) {
             case "00":
                 paymentStatus = EPaymentStatus.SUCCESS;
                 bookingStatus = EBookingStatus.PAID;
+                transactionStatus = ETransactionStatus.SUCCESS;
                 paymentTime = LocalDateTime.now();
+                payment.setTransactionCode(transactionNo);
+                log.info("Payment SUCCESS for booking {} | TransactionNo={} | Amount={} | Time={}",
+                        bookingId, transactionNo, booking.getTotalPrice(), paymentTime);
                 break;
             case "24":
                 paymentStatus = EPaymentStatus.CANCELLED;
+                transactionStatus = ETransactionStatus.FAILED;
                 break;
             default:
                 paymentStatus = EPaymentStatus.FAILED;
+                transactionStatus = ETransactionStatus.FAILED;
                 break;
         }
 
         booking.setBookingStatus(bookingStatus);
         bookingRepository.save(booking);
 
-        Payment payment = Payment.builder()
-                .booking(booking)
-                .paymentTime(paymentTime)
-                .amount(booking.getTotalPrice())
-                .method(EPaymentMethod.VNPAY)
-                .status(paymentStatus)
-                .transactionCode(transactionNo)
-                .build();
+        payment.setStatus(paymentStatus);
+        payment.setPaymentTime(paymentTime);
         paymentRepository.save(payment);
+
+        transaction.setStatus(transactionStatus);
+        transactionRepository.save(transaction);
+
+        log.info("Booking {}, Payment {}, Transaction {} updated with status: {} / {} / {}",
+                booking.getId(),
+                payment.getId(),
+                transaction.getId(),
+                bookingStatus,
+                paymentStatus,
+                transactionStatus
+        );
 
         return PaymentResponse.builder()
                 .amount(booking.getTotalPrice())
@@ -156,23 +196,35 @@ public class PaymentServiceImpl implements PaymentService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        Payment payment = new Payment();
-        payment.setBooking(booking);
-        payment.setAmount(booking.getTotalPrice());
-        payment.setMethod(EPaymentMethod.PAYOS);
+        Payment payment = paymentRepository.findByBooking(booking);
+
+        Transaction transaction = transactionRepository.findByPayment(payment);
 
         if (data.getCode().equals("00") && data.getDesc().equals("success")) {
             booking.setBookingStatus(EBookingStatus.PAID);
             payment.setStatus(EPaymentStatus.SUCCESS);
             payment.setTransactionCode(data.getReference());
             payment.setPaymentTime(LocalDateTime.now());
-            payment.setBooking(booking);
+            transaction.setStatus(ETransactionStatus.SUCCESS);
+            log.info("PayOS payment SUCCESS for booking={} | ref={} | amount={} | time={}",
+                    bookingId, data.getReference(), booking.getTotalPrice(), LocalDateTime.now());
         } else {
             payment.setStatus(EPaymentStatus.FAILED);
+            transaction.setStatus(ETransactionStatus.FAILED);
         }
 
+        transactionRepository.save(transaction);
         paymentRepository.save(payment);
         bookingRepository.save(booking);
+
+        log.info("Booking {}, Payment {}, Transaction {} updated with status: {} / {} / {}",
+                booking.getId(),
+                payment.getId(),
+                transaction.getId(),
+                booking.getBookingStatus(),
+                payment.getStatus(),
+                transaction.getStatus()
+        );
     }
 
 
