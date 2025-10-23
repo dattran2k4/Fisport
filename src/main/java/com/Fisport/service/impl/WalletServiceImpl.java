@@ -1,6 +1,7 @@
 package com.Fisport.service.impl;
 
 import com.Fisport.common.ETransactionStatus;
+import com.Fisport.dto.response.WalletResponse;
 import com.Fisport.exception.ResourceNotFoundException;
 import com.Fisport.model.Transaction;
 import com.Fisport.model.User;
@@ -43,14 +44,24 @@ public class WalletServiceImpl implements WalletService {
     }
 
     @Override
-    public Wallet getWallet(Long id) {
+    public WalletResponse getWallet(Long id) {
+        Wallet wallet = findWallet(id);
+        return WalletResponse.builder()
+                .id(id)
+                .balance(wallet.getBalance())
+                .createdAt(wallet.getCreatedAt())
+                .updatedAt(wallet.getUpdatedAt())
+                .build();
+    }
+
+    private Wallet findWallet(Long id) {
         return walletRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
     }
 
     @Override
     @Transactional
     public void debitWallet(Long wardId, Transaction transaction) {
-        Wallet wallet = getWallet(wardId);
+        Wallet wallet = walletRepository.findById(wardId).orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
         wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
         walletRepository.save(wallet);
 

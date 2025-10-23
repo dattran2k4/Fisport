@@ -10,6 +10,7 @@ import com.Fisport.model.*;
 import com.Fisport.repository.BookingRepository;
 import com.Fisport.repository.PaymentRepository;
 import com.Fisport.repository.TransactionRepository;
+import com.Fisport.repository.WalletRepository;
 import com.Fisport.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -31,8 +32,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final PayOSService payOSService;
     private final BookingService bookingService;
-    private final WalletService walletService;
     private final TransactionRepository transactionRepository;
+    private final WalletRepository walletRepository;
     @Override
     public String createPayment(PaymentRequest request, HttpServletRequest httpServletRequest) {
         Booking booking = findByPaymentToken(request.getPaymentToken());
@@ -66,7 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         paymentRepository.save(payment);
 
-        Wallet wallet = walletService.getWallet(request.getWalletId());
+        Wallet wallet = walletRepository.findById(request.getWalletId()).orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
 
         Transaction transaction = Transaction.builder()
                 .amount(request.getAmount())
