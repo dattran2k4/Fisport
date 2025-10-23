@@ -1,5 +1,6 @@
 package com.Fisport.model;
 
+import com.Fisport.common.EPaymentMethod;
 import com.Fisport.common.ETransactionStatus;
 import com.Fisport.common.ETransactionType;
 import jakarta.persistence.*;
@@ -38,6 +39,9 @@ public class Transaction extends AbstractEntity {
 
     @OneToOne(mappedBy = "transaction")
     private Payment payment;
+
+    @Column
+    private EPaymentMethod method;
 
     @Column(nullable = false, updatable = false, name = "created_at")
     @CreationTimestamp
