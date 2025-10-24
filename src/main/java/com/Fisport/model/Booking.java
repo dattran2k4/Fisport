@@ -1,6 +1,7 @@
 package com.Fisport.model;
 
 import com.Fisport.common.EBookingStatus;
+import com.Fisport.common.EPaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -60,8 +61,11 @@ public class Booking extends AbstractEntity {
     @OneToOne(mappedBy = "booking")
     private Transaction transaction;
 
-    @OneToMany(mappedBy = "booking")
-    private Set<Payment> payments = new HashSet<>();
+    @OneToOne(mappedBy = "booking")
+    private Payment payment;
+
+    @Column(name = "method")
+    private EPaymentMethod  paymentMethod;
 
     @Column(name = "payment_token")
     private String paymentToken;

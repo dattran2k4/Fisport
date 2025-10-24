@@ -21,8 +21,6 @@ public interface BookingService {
 
     List<BookingListResponse> getAllBookings(String name);
 
-    BookingDetailResponse getBooking(Long id, String name);
-
     void cancelBooking(Long id, String name);
 
     List<BookingForUserResponse> getBookingsForUser(String name);

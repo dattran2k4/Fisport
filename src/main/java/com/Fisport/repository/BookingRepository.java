@@ -37,7 +37,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT b FROM Booking b WHERE b.subfield.id = :subfieldId AND b.bookingDate = :date " +
-            "AND b.bookingStatus IN ('PENDING','CONFIRMED') " +
+            "AND b.bookingStatus IN ('PENDING','PAID') " +
             "AND ((:startTime BETWEEN b.startTime AND b.endTime) " +
             "OR (:endTime BETWEEN b.startTime AND b.endTime) " +
             "OR (b.startTime BETWEEN :startTime AND :endTime))")

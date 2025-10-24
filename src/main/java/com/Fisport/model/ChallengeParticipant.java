@@ -3,6 +3,8 @@ package com.Fisport.model;
 import com.Fisport.common.EParticipantStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -42,8 +44,10 @@ public class ChallengeParticipant extends AbstractEntity {
     private LocalDateTime cancelledAt;
 
     @Column(name = "created_at")
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @Column(name = "created_at")
+    @Column(name = "updated_at")
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 }

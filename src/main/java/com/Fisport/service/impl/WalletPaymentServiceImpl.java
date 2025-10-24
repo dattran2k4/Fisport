@@ -120,7 +120,9 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
             throw new InvalidDataException("Payment paid already");
         }
 
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        booking.setPaymentMethod(EPaymentMethod.WALLET);
+
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Wallet wallet = walletRepository.findByUser(user);
         log.info("Wallet id: " + wallet.getId());

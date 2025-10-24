@@ -1,6 +1,7 @@
 package com.Fisport.service.impl;
 
 import com.Fisport.common.EBookingStatus;
+import com.Fisport.common.EFieldServiceItem;
 import com.Fisport.common.ESubFieldStatus;
 import com.Fisport.dto.request.BookingRequest;
 import com.Fisport.dto.request.BookingServiceItemRequest;
@@ -54,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public String createBooking(BookingRequest request, Long userId) {
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
 
         //Valid subfield
         SubField subField = subFieldRepository.findById(request.getSubFieldId()).orElseThrow(() -> new ResourceNotFoundException("SubField not found"));
@@ -103,7 +104,7 @@ public class BookingServiceImpl implements BookingService {
         //Check overlap
         List<Booking> bookings = bookingRepository.findOverlappingBookingsForUpdate(request.getSubFieldId(), request.getDate(), request.getStartTime(), request.getEndTime());
         if (!bookings.isEmpty()) {
-            throw new BookingException("This subfield is already booked at the requested time\"");
+            throw new BookingException("This subfield is already booked at the requested time");
         }
 
         //Valid occupied
@@ -131,7 +132,7 @@ public class BookingServiceImpl implements BookingService {
                     throw new BookingException("Quantity not valid");
                 }
 
-                if (fsi.getStatus().equals(ESubFieldStatus.INACTIVE)) {
+                if (!fsi.getStatus().equals(EFieldServiceItem.ACTIVE)) {
                     throw new BookingException("Service Item is Inactive");
                 }
 
@@ -172,39 +173,13 @@ public class BookingServiceImpl implements BookingService {
                 .build()).toList();
     }
 
-    @Override
-    public BookingDetailResponse getBooking(Long id, String name) {
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        Booking booking = findBooking(id);
-
-        PaymentResponse response = null;
-        if (booking.getPayments() != null && !booking.getPayments().isEmpty()) {
-            Payment last = booking.getPayments().stream()
-                    .max(Comparator.comparing(Payment::getCreateAt))
-                    .orElse(null);
-            response.setStatus(last.getStatus());
-            response.setMethod(last.getMethod());
-            response.setPaymentAt(last.getPaymentTime());
-        }
-
-        return BookingDetailResponse.builder()
-                .id(booking.getId())
-                .date(booking.getBookingDate())
-                .start(booking.getStartTime())
-                .end(booking.getEndTime())
-                .duration(booking.getDuration())
-                .total(booking.getTotalPrice())
-                .payment(response)
-                .build();
-    }
-
     @Transactional
     @Override
     public void cancelBooking(Long id, String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Booking booking = bookingRepository.findByIdAndUser(id, user)
-                .orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy booking"));
 
         checkExpiredBooking(booking);
 
@@ -232,7 +207,7 @@ public class BookingServiceImpl implements BookingService {
                 .fieldName(b.getSubfield().getField().getName())
                 .startTime(b.getStartTime())
                 .endTime(b.getEndTime())
-                .paymentMethod(b.getTransaction().getMethod().toString())
+                .paymentMethod(b.getPaymentMethod().name())
                 .status(String.valueOf(b.getBookingStatus()))
                 .cancel(b.getBookingStatus() == EBookingStatus.PENDING || b.getBookingStatus() == EBookingStatus.PAID)
                 .canReview(b.getBookingStatus() == EBookingStatus.COMPLETED && (b.getReview() == null || b.getReview().getRating() == null))

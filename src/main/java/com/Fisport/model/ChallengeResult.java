@@ -1,7 +1,9 @@
 package com.Fisport.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -22,8 +24,10 @@ public class ChallengeResult extends AbstractEntity {
     @JoinColumn(name = "player_id", nullable = false)
     private User player;
 
+    @Min(0)
     private Integer score;
 
     @Column(name = "created_at")
+    @CreationTimestamp
     private LocalDateTime createdAt;
 }

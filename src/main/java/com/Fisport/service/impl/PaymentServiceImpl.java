@@ -41,9 +41,10 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public String createPayment(PaymentRequest request, HttpServletRequest httpServletRequest) {
         Booking booking = findByPaymentToken(request.getPaymentToken());
+        booking.setPaymentMethod(request.getPaymentMethod());
 
         bookingService.checkExpiredBooking(booking);
-
+        bookingRepository.save(booking);
         Payment payment = Payment.builder()
                 .amount(booking.getTotalPrice())
                 .method(request.getPaymentMethod())
@@ -58,6 +59,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .status(ETransactionStatus.PENDING)
                 .type(ETransactionType.PAYMENT)
                 .payment(payment)
+                .method(request.getPaymentMethod())
                 .build();
 
         payment.setTransaction(transaction);
