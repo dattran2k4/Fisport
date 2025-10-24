@@ -71,6 +71,9 @@ public class User extends AbstractEntity {
     )
     private Set<Voucher> vouchers = new HashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    private Set<UserSportElo>  sportElos = new HashSet<>();
+
     @OneToOne(mappedBy = "user")
     private Wallet wallet;
 

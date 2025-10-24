@@ -3,6 +3,7 @@ package com.Fisport.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -25,4 +26,7 @@ public class FieldType extends AbstractEntity {
 
     @OneToMany(mappedBy = "fieldType")
     private Set<FieldTypeBookDuration>  fieldTypeBookDuration = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "sport")
+    private Set<UserSportElo>  sportElos = new HashSet<>();
 }
