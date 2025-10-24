@@ -40,7 +40,7 @@ public class WalletServiceImpl implements WalletService {
 
         walletRepository.save(wallet);
 
-        log.info("Wallet credited: userId={}, txId={}, amount={}", wallet.getUser().getId(), transaction.getId(), transaction.getAmount());
+        log.info("WalletId {} credited: userId={}, txId={}, amount={}", wallet.getId(), wallet.getUser().getId(), transaction.getId(), transaction.getAmount());
     }
 
     @Override

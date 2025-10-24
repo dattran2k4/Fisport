@@ -64,7 +64,8 @@ public class Booking extends AbstractEntity {
     @OneToOne(mappedBy = "booking")
     private Payment payment;
 
-    @Column(name = "method")
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
     private EPaymentMethod  paymentMethod;
 
     @Column(name = "payment_token")

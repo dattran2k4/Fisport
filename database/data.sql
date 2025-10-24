@@ -489,7 +489,7 @@ VALUES
 (4, 1),
 (4, 2);
 
-INSERT INTO booking (booking_date, paymentMethod, start_time, end_time, duration, total_price, status, subfield_id, user_id, created_at, expired_at)
+INSERT INTO booking (booking_date, payment_method, start_time, end_time, duration, total_price, status, subfield_id, user_id, created_at, expired_at)
 VALUES
 (DATE_ADD(CURDATE(), INTERVAL -1 DAY), 'VNPAY', '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 2, DATE_ADD(CURDATE(), INTERVAL -2 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 15 MINUTE)),
 (DATE_ADD(CURDATE(), INTERVAL -3 DAY), 'PAYOS', '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 2, DATE_ADD(CURDATE(), INTERVAL -4 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -4 DAY), INTERVAL 15 MINUTE)),
@@ -521,6 +521,6 @@ VALUES
 INSERT INTO Wallet (balance, created_at, updated_at, user_id)
 VALUES
 (0, NOW(), NOW(), 1),
-(50000, NOW(), NOW(), 2),
+(2000000, NOW(), NOW(), 2),
 (0, NOW(), NOW(), 3),
 (500000, NOW(), NOW(), 4);

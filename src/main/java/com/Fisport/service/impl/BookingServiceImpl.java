@@ -259,7 +259,10 @@ public class BookingServiceImpl implements BookingService {
     public List<Integer> getAvailableDurationsBooking(Long id, LocalDate date, LocalTime startTime) {
         SubField subField = subFieldRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Subfield not found"));
 
-        List<Booking> bookings = bookingRepository.findBySubfieldAndBookingDate(subField, date);
+        List<Booking> bookings = bookingRepository.findBySubfieldAndBookingDate(subField, date)
+                .stream()
+                .filter(booking -> !booking.getBookingStatus().equals(EBookingStatus.CANCELLED))
+                .toList();
 
         List<Duration> durations = fieldTypeBookDurationRepository.findDurationByFieldTypeId(subField.getField().getFieldType().getId());
 

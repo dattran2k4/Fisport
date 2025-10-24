@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -61,27 +62,24 @@ public class FieldHasTimeSlotServiceImpl implements FieldHasTimeSlotService {
      */
     public BigDecimal calculateDynamicPrice(List<FieldHasTimeSlot> slots, LocalTime userStart, LocalTime userEnd) {
         BigDecimal totalPrice = BigDecimal.ZERO;
-        LocalTime currentTime = userStart;
+
+        slots.sort(Comparator.comparing(s -> s.getTimeSlot().getStartTime()));
 
         for (FieldHasTimeSlot slot : slots) {
             LocalTime slotStart = slot.getTimeSlot().getStartTime();
             LocalTime slotEnd = slotStart.plusHours(1); // slot duration mặc định = 1h
 
-            if (!slotEnd.isAfter(currentTime)) continue; // slot trước currentTime thì bỏ
-
-            LocalTime overlapStart = currentTime.isAfter(slotStart) ? currentTime : slotStart;
+            LocalTime overlapStart = userStart.isAfter(slotStart) ? userStart : slotStart;
             LocalTime overlapEnd = userEnd.isBefore(slotEnd) ? userEnd : slotEnd;
 
+            if (!overlapStart.isBefore(overlapEnd)) continue;
+
             long overlapMinutes = Duration.between(overlapStart, overlapEnd).toMinutes();
-            if (overlapMinutes > 0) {
                 BigDecimal priceForSlot = slot.getPrice()
                         .multiply(BigDecimal.valueOf(overlapMinutes))
                         .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
                 totalPrice = totalPrice.add(priceForSlot);
-            }
 
-            currentTime = overlapEnd;
-            if (!currentTime.isBefore(userEnd)) break;
         }
 
         return totalPrice;

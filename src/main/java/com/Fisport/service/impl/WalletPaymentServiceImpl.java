@@ -114,7 +114,6 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
     @Override
     public void payBooking(String paymentToken, String username) {
         Booking booking = paymentService.findByPaymentToken(paymentToken);
-        log.info("Booking: " + booking);
 
         if (!booking.getBookingStatus().equals(EBookingStatus.PENDING)) {
             throw new InvalidDataException("Payment paid already");

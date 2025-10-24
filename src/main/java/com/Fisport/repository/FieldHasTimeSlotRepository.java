@@ -12,8 +12,9 @@ import java.util.List;
 public interface FieldHasTimeSlotRepository extends JpaRepository<FieldHasTimeSlot,Long> {
     List<FieldHasTimeSlot> findByFieldId(Long id);
 
-    @Query("SELECT fts FROM FieldHasTimeSlot fts JOIN fts.timeSlot ts WHERE " +
-            "fts.field.id = ?1 AND ts.startTime >= ?2 AND ts.startTime < ?3 " +
+    @Query("SELECT fts FROM FieldHasTimeSlot fts JOIN fts.timeSlot ts " +
+            "WHERE fts.field.id = :fieldId " +
+            "AND ts.startTime < :end " +   // slot bắt đầu trước booking kết thúc
             "ORDER BY ts.startTime ASC")
     List<FieldHasTimeSlot> findSlotsForBooking(Long fieldId, LocalTime start, LocalTime end);
 }

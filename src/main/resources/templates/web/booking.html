@@ -224,6 +224,7 @@
                 let selectedDate = null;
                 let selectedSubFieldId = null;
                 const API_BASE = '/api/v1/bookings/occupied';
+                 let pricePreviewVal = 0;
 
                 const openTime = /*[[${field.openTime != null ? field.openTime : '06:00'}]]*/ '06:00';
                 const closeTime = /*[[${field.closeTime != null ? field.closeTime : '18:00'}]]*/ '18:00';
@@ -301,13 +302,15 @@
                             const openHour = parseInt(openTime.split(':')[0]);
                             const closeHour = parseInt(closeTime.split(':')[0]);
 
-                            for (let hour = openHour; hour < closeHour; hour++) {
-                                const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+                            for (let minutes = openHour * 60; minutes < closeHour * 60; minutes += 30) {
+                                const h = Math.floor(minutes / 60);
+                                const m = minutes % 60;
+                                const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
                                 const btn = $('<button>')
                                     .attr('type', 'button')
                                     .addClass('btn btn-outline-primary hour-btn px-3 py-2')
                                     .text(timeStr)
-                                    .data('hour', hour)
+                                    .data('hour', h)
                                     .data('time', timeStr);
 
                                 // kiểm tra theo phút chính xác
@@ -318,9 +321,8 @@
 
                                     const startMinutes = startH * 60 + startM;
                                     const endMinutes = endH * 60 + endM;
-                                    const currentMinutes = hour * 60;
 
-                                    if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+                                    if (minutes >= startMinutes && minutes < endMinutes) {
                                         matchedSlot = slot;
                                         break;
                                     }
@@ -336,7 +338,7 @@
                                     } else if (matchedSlot.bookingStatus === 'paid') {
                                         btn.removeClass('btn-outline-primary').addClass('btn-danger text-white');
                                     }
-                                } else if (isToday && hour < currentHour) {
+                                } else if (isToday && minutes < currentHour * 60) {
                                     // Nếu giờ đã qua hôm nay
                                     btn.prop('disabled', true)
                                         .addClass('text-muted text-decoration-line-through')
@@ -375,26 +377,21 @@
                     }
 
                     // call durations API
-                    $.getJSON(`/api/v1/field-types/${fieldTypeId}/durations`)
+                    $.getJSON(`/api/v1/sub-fields/${selectedSubFieldId}/available-durations`, {
+                        date: selectedDate,
+                        startTime: timeStr
+                    })
                         .done(function (resp) {
                             const durations = (resp && resp.data) ? resp.data : resp; // accommodate different shapes
                             const container = $('#durationContainer');
                             container.empty();
 
-                            if (!Array.isArray(durations) || durations.length === 0) {
-                                container.append('<div class="text-muted">Không có loại duration phù hợp.</div>');
-                                return;
-                            }
-
                             // render buttons durations
-                            durations.forEach(d => {
-                                // expected d has { id, name, minutes }
+                            durations.forEach(minutes => {
                                 const btn = $('<button>')
                                     .addClass('btn btn-outline-primary m-1 duration-btn')
-                                    .data('minutes', d.minutes)
-                                    .data('duration-id', d.id)
-                                    .data('duration-name', d.name)
-                                    .text(`${d.minutes} phút`)
+                                    .data('minutes', minutes)
+                                    .text(`${minutes} phút`)
                                     .attr('type', 'button');
 
                                 container.append(btn);
@@ -433,25 +430,26 @@
                     //Dynamic time pricing
                     const fieldId = /*[[${field.id}]]*/ 0;
 
+
                     $.ajax({
                         url: `/api/v1/bookings/preview-timingPrice?fieldId=${fieldId}&startTime=${start}&endTime=${endTime}`,
                         method: 'GET',
                         success: function (response) {
-                            const price = response.data || 0;
+                            pricePreviewVal = response.data || 0;
 
                             // Nếu chưa có vùng hiển thị giá thì tạo mới
-                            if ($('#pricePreview').length === 0) {
-                                $('#durationContainer').after('<div id="pricePreview" class="mt-3 fs-5 fw-bold text-success"></div>');
-                            }
+                            //if ($('#pricePreview').length === 0) {
+                            //    $('#durationContainer').after('<div id="pricePreview" class="mt-3 fs-5 fw-bold text-success"></div>');
+                            //}
 
-                            $('#pricePreview').text(`💰 Giá tạm tính: ${price.toLocaleString()}₫`);
+                            $('#pricePreview').text(`💰 Giá tạm tính: ${pricePreviewVal.toLocaleString()}₫`).show();
+
+                            updateAllTotals();
                         },
                         error: function (xhr) {
-                            console.error('Lỗi khi gọi API giá:', xhr);
-                            if ($('#pricePreview').length === 0) {
-                                $('#durationContainer').after('<div id="pricePreview" class="mt-3 text-danger"></div>');
-                            }
-                            $('#pricePreview').text('Không thể tính giá.');
+                            pricePreviewVal = 0;
+                            $('#pricePreview').text('Không thể tính giá.').show();
+                            updateAllTotals();
                         }
                     });
                 });
@@ -479,13 +477,9 @@
                 // Cập nhật tổng cho một item (hiển thị)
                 function updateServiceTotal(itemEl) {
                     const unitPrice = getUnitPrice(itemEl);
-                    const qtyInput = itemEl.find('.service-qty');
-                    const qty = parseInt(qtyInput.val()) || 0;
+                    const qty = parseInt(itemEl.find('.service-qty').val()) || 0;
                     const total = unitPrice * qty;
-                    const totalSpan = itemEl.find('.service-total');
-
-                    totalSpan.data('total', total); // lưu tạm
-                    totalSpan.text(formatCurrency(total));
+                    itemEl.find('.service-total').data('total', total).text(formatCurrency(total));
                 }
 
                 // Tính tổng tất cả service đã chọn
@@ -493,15 +487,8 @@
                     let sum = 0;
                     $('.list-group-item').each(function () {
                         const itemEl = $(this);
-                        const checkbox = itemEl.find('.service-checkbox');
-                        if (checkbox.is(':checked')) {
-                            // lấy total đã lưu (nếu chưa có, tính)
-                            let t = parseFloat(itemEl.find('.service-total').data('total'));
-                            if (isNaN(t)) {
-                                const unit = getUnitPrice(itemEl);
-                                const qty = parseInt(itemEl.find('.service-qty').val()) || 0;
-                                t = unit * qty;
-                            }
+                        if (itemEl.find('.service-checkbox').is(':checked')) {
+                            let t = parseFloat(itemEl.find('.service-total').data('total')) || 0;
                             sum += t;
                         }
                     });
@@ -510,31 +497,14 @@
 
                 // Update tất cả vùng hiển thị giá: pricePreview, servicesTotal, grandTotal
                 function updateAllTotals() {
-                    // pricePreview có thể chứa số (được set khi duration chọn)
-                    const previewText = $('#pricePreview').text().replace(/[^\d]/g, '');
-                    const pricePreviewVal = previewText ? parseInt(previewText) : 0;
 
                     const servicesTotalVal = calculateServicesTotal();
-
-                    // Hiển thị vùng
-                    if (pricePreviewVal > 0) {
-                        $('#pricePreview').show();
-                    } else {
-                        $('#pricePreview').hide();
-                    }
-
-                    if (servicesTotalVal > 0) {
-                        $('#servicesTotal').show().text('💼 Dịch vụ: ' + formatCurrency(servicesTotalVal));
-                    } else {
-                        $('#servicesTotal').hide().text('');
-                    }
+                    if (servicesTotalVal > 0) $('#servicesTotal').show().text('💼 Dịch vụ: ' + formatCurrency(servicesTotalVal));
+                    else $('#servicesTotal').hide().text('');
 
                     const grand = (pricePreviewVal || 0) + (servicesTotalVal || 0);
-                    if (grand > 0) {
-                        $('#grandTotal').show().text('💰 Tổng: ' + formatCurrency(grand));
-                    } else {
-                        $('#grandTotal').hide().text('');
-                    }
+                    if (grand > 0) $('#grandTotal').show().text('💰 Tổng: ' + formatCurrency(grand));
+                    else $('#grandTotal').hide().text('');
                 }
 
 
