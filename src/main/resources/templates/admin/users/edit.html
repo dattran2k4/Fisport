@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{layout/admin/admin}" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Chỉnh sửa người dùng</title>
+    <style>
+        .edit-form-card {
+            border-radius: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.3s;
+        }
+
+        .form-control {
+            border-radius: 0.5rem;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            transition: transform 0.3s;
+        }
+
+        .btn-save:hover {
+            transform: scale(1.05);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="display-6 fw-bold mb-2">
+                        <i class="bi bi-pencil-square me-2"></i>
+                        Chỉnh sửa người dùng
+                    </h1>
+                    <p class="mb-0 opacity-75">Cập nhật thông tin người dùng</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a th:href="@{/admin/users}" class="btn btn-light">
+                        <i class="bi bi-arrow-left me-2"></i>Quay lại
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container pb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="edit-form-card bg-white p-4">
+                    <form th:action="@{/admin/users/edit/{id}(id=${user.id})}" method="post" th:object="${user}">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Tên đăng nhập</label>
+                                <input type="text" class="form-control" th:value="${user.username}" readonly>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control" name="email" th:value="${user.email}" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Số điện thoại</label>
+                                <input type="tel" class="form-control" name="phone" th:value="${user.phone}">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Giới tính</label>
+                                <select class="form-control" name="gender">
+                                    <option value="">Chọn giới tính</option>
+                                    <option value="MALE" th:selected="${user.gender == 'MALE'}">Nam</option>
+                                    <option value="FEMALE" th:selected="${user.gender == 'FEMALE'}">Nữ</option>
+                                    <option value="OTHER" th:selected="${user.gender == 'OTHER'}">Khác</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Ngày sinh</label>
+                                <input type="date" class="form-control" name="birthday" th:value="${user.birthday}">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Vai trò</label>
+                                <select class="form-control" name="role" required>
+                                    <option th:each="role : ${roles}" 
+                                            th:value="${role}" 
+                                            th:text="${role}" 
+                                            th:selected="${role == user.roleName}">
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Trạng thái</label>
+                                <select class="form-control" name="status" required>
+                                    <option th:each="status : ${statuses}" 
+                                            th:value="${status}" 
+                                            th:text="${status == T(com.Fisport.common.EUserStatus).ACTIVE ? 'Hoạt động' : 'Không hoạt động'}" 
+                                            th:selected="${status == user.status}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12 text-center">
+                                <button type="submit" class="btn btn-primary btn-save">
+                                    <i class="bi bi-check-lg me-2"></i>Lưu thay đổi
+                                </button>
+                                <a th:href="@{/admin/users}" class="btn btn-secondary ms-2">
+                                    <i class="bi bi-x-lg me-2"></i>Hủy
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

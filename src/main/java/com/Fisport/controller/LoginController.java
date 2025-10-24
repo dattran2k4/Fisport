@@ -5,7 +5,6 @@ import com.Fisport.dto.request.TwoFARequest;
 import com.Fisport.dto.response.LoginResponse;
 import com.Fisport.service.AuthService;
 import com.Fisport.service.impl.SessionService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -14,7 +13,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.naming.AuthenticationException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @RequiredArgsConstructor
 @Controller
@@ -23,6 +24,7 @@ public class LoginController {
 
     private final AuthService authService;
     private final SessionService sessionService;
+    private final com.Fisport.service.UserService userService;
 
     @GetMapping("/login")
     public String getLoginPage(Model model) {
@@ -52,7 +54,9 @@ public class LoginController {
             return "login";
         }
 
-        return "redirect:" + (backLink != null ? backLink : "/");
+        // determine redirect based on role (use username to avoid timing issues with SecurityContext)
+        String target = determineRedirect(backLink, loginRequestDTO.getUsername());
+        return "redirect:" + target;
     }
 
     @GetMapping("/2fa/verify")
@@ -80,6 +84,32 @@ public class LoginController {
             return "2fa";
         }
 
-        return "redirect:" + (backLink != null ? backLink : "/");
+        String target = determineRedirect(backLink, twoFARequest.getUsername());
+        return "redirect:" + target;
+    }
+
+    private String determineRedirect(String backLink, String username) {
+        if (backLink != null && !backLink.isBlank()) return backLink;
+
+        try {
+            var user = userService.getUserByUserName(username);
+            if (user != null && user.getRoleName() != null) {
+                String role = user.getRoleName();
+                if ("ADMIN".equalsIgnoreCase(role)) return "/admin";
+                if ("OWNER".equalsIgnoreCase(role)) return "/owner";
+            }
+        } catch (Exception ignored) {
+            // fallback to security context if userService fails
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null) {
+                for (GrantedAuthority g : auth.getAuthorities()) {
+                    String role = g.getAuthority();
+                    if ("ROLE_ADMIN".equals(role) || "ADMIN".equals(role)) return "/admin";
+                    if ("ROLE_OWNER".equals(role) || "OWNER".equals(role)) return "/owner";
+                }
+            }
+        }
+
+        return "/";
     }
 }
