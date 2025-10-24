@@ -64,7 +64,7 @@ public class PaymentApiController {
                 .build();
     }
 
-    @PostMapping("/create-payment-wallet")
+    @PostMapping("/create-payment-wallet-topup")
     public ApiResponse<?> createWalletPaymentUrl(@Valid @RequestBody WalletTopUpRequest request, HttpServletRequest httpServletRequest) {
         String paymentUrl = paymentService.createWalletPayment(request, httpServletRequest);
         return ApiResponse.builder()
@@ -79,8 +79,18 @@ public class PaymentApiController {
         walletPaymentService.refundBooking(bookingId);
 
         return ApiResponse.builder()
-                .status(HttpStatus.ACCEPTED.value())
+                .status(200)
                 .message("Refunded booking")
+                .build();
+    }
+
+    @PostMapping("/booking-wallet-pay")
+    public ApiResponse<?> payBookingWallet(@RequestParam String paymentToken, Principal principal) {
+        walletPaymentService.payBooking(paymentToken, principal.getName());
+
+        return ApiResponse.builder()
+                .status(200)
+                .message("Payment successfully")
                 .build();
     }
 }

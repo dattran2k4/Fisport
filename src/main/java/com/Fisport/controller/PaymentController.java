@@ -4,6 +4,7 @@ import com.Fisport.common.EPaymentMethod;
 import com.Fisport.common.EPaymentStatus;
 import com.Fisport.dto.response.PaymentResponse;
 import com.Fisport.service.PaymentService;
+import com.Fisport.service.WalletService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -20,12 +22,13 @@ import java.util.Map;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final WalletService walletService;
 
     @GetMapping("/thanh-toan")
-    public String showMethodPayment(@RequestParam("token") String paymentToken, Model model) {
+    public String showMethodPayment(@RequestParam("token") String paymentToken, Model model, Principal principal) {
         model.addAttribute("paymentToken", paymentToken);
         model.addAttribute("methods", EPaymentMethod.values());
-
+        model.addAttribute("wallet", walletService.getWalletByUser(principal.getName()));
         return "web/payment";
     }
 

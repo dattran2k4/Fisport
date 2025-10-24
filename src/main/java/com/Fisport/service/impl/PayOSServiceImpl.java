@@ -43,8 +43,7 @@ public class PayOSServiceImpl implements PayOSService {
 
         CreatePaymentLinkResponse data = payOS.paymentRequests().create(paymentData);
 
-        String checkoutUrl = data.getCheckoutUrl();
-        return checkoutUrl;
+        return data.getCheckoutUrl();
     }
 
     @Override
@@ -69,7 +68,7 @@ public class PayOSServiceImpl implements PayOSService {
         long amount = payment.getAmount().longValue();
 
         PaymentLinkItem item = PaymentLinkItem.builder()
-                .name("Đặt sân trực tuyến Fisport")
+                .name("Nạp zô ví:")
                 .quantity(1)
                 .price(amount)
                 .build();
@@ -77,16 +76,15 @@ public class PayOSServiceImpl implements PayOSService {
         CreatePaymentLinkRequest paymentData = CreatePaymentLinkRequest.builder()
                 .orderCode(orderCode)
                 .amount(amount)
-                .description("Thanh toán đi mà")
-                .returnUrl(payOSConfig.getReturnSuccessUrl())
-                .cancelUrl(payOSConfig.getReturnCancelUrl())
+                .description("Nạp nạp nạp:")
+                .returnUrl(payOSConfig.getReturnPaymentWalletSuccessUrl())
+                .cancelUrl(payOSConfig.getReturnPaymentBooingCancelUrl())
                 .item(item)
                 .build();
 
         CreatePaymentLinkResponse data = payOS.paymentRequests().create(paymentData);
 
-        String checkoutUrl = data.getCheckoutUrl();
-        return checkoutUrl;
+        return data.getCheckoutUrl();
     }
 
 

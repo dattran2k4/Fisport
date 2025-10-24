@@ -39,8 +39,7 @@ public class Payment extends AbstractEntity {
     @JoinColumn(name = "booking_id")
     private Booking booking;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transaction_id")
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "payment")
     private Transaction transaction;
 
     @CreationTimestamp

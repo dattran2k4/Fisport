@@ -51,8 +51,9 @@ public class BookingController {
 
     @PostMapping("/booking")
     public String booking(@Valid @ModelAttribute("booking") BookingRequest request,
+                          BindingResult result,
                           @AuthenticationPrincipal CustomUserDetails customUserDetails,
-                          Model model, BindingResult result) {
+                          Model model) {
         if (result.hasErrors()) {
             model.addAttribute("error", result.getAllErrors().get(0).getDefaultMessage());
         }

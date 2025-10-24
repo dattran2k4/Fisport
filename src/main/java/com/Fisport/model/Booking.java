@@ -57,6 +57,9 @@ public class Booking extends AbstractEntity {
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookingServiceItem> bookingServiceItems = new HashSet<>();
 
+    @OneToOne(mappedBy = "booking")
+    private Transaction transaction;
+
     @OneToMany(mappedBy = "booking")
     private Set<Payment> payments = new HashSet<>();
 
