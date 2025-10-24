@@ -37,11 +37,11 @@ public class TransactionSpecification {
             }
 
             if (transactionType != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("transactionType"), transactionType));
+                predicate = cb.and(predicate, cb.equal(root.get("type"), transactionType));
             }
 
             if (transactionStatus != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("transactionStatus"), transactionStatus));
+                predicate = cb.and(predicate, cb.equal(root.get("status"), transactionStatus));
             }
 
             if (fromDate != null) {

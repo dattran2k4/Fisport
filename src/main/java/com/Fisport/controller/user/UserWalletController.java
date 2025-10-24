@@ -19,6 +19,8 @@ import java.math.BigDecimal;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Controller
@@ -53,8 +55,20 @@ public class UserWalletController {
             }
         }
 
+        if (sortField != null) {
+            Pattern pattern = Pattern.compile("^([a-zA-Z]+)_(asc|desc)$");
+            Matcher matcher = pattern.matcher(sortField);
+
+            if (matcher.matches()) {
+                sortField = matcher.group(1);
+                sortDir = matcher.group(2);
+            }
+        }
 
 
+        model.addAttribute("types", List.of(ETransactionType.values()));
+        model.addAttribute("status", List.of(ETransactionStatus.values()));
+        model.addAttribute("paymentMethods", List.of(EPaymentMethod.values()));
         model.addAttribute("wallet", walletService.getWalletByUser(principal.getName()));
         model.addAttribute("methods", List.of(EPaymentMethod.PAYOS, EPaymentMethod.VNPAY, EPaymentMethod.MOMO, EPaymentMethod.ZALOPAY));
         Page<TransactionResponse> transactions = transactionService.getTransactions(amount, paymentMethod, transactionType,

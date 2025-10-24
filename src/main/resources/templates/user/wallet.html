@@ -241,29 +241,34 @@
                             <form th:action="@{/user/wallet}" method="get" class="d-flex flex-wrap mb-3 align-items-center">
                                 <select name="transactionType" class="form-select me-2 mb-2" style="width: 150px;">
                                     <option value="">All Type</option>
-                                    <option value="TOPUP" th:selected="${transactionType == 'TOPUP'}">TOPUP</option>
-                                    <option value="PAYMENT" th:selected="${transactionType == 'PAYMENT'}">PAYMENT</option>
-                                    <option value="REFUND" th:selected="${transactionType == 'REFUND'}">REFUND</option>
+                                    <option th:each="type : ${types}"
+                                            th:value="${type}"
+                                            th:text="${type}"
+                                            th:selected="${type == transactionType}">
+                                    </option>
                                 </select>
 
                                 <select name="transactionStatus" class="form-select me-2 mb-2" style="width: 150px;">
                                     <option value="">All Status</option>
-                                    <option value="PENDING" th:selected="${transactionStatus == 'PENDING'}">PENDING</option>
-                                    <option value="SUCCESS" th:selected="${transactionStatus == 'SUCCESS'}">SUCCESS</option>
-                                    <option value="FAILED" th:selected="${transactionStatus == 'FAILED'}">FAILED</option>
+                                    <option th:each="status : ${status}"
+                                            th:value="${status}"
+                                            th:text="${status}"
+                                            th:selected="${status == transactionStatus}">
+                                    </option>
                                 </select>
 
                                 <select name="paymentMethod" class="form-select me-2 mb-2" style="width: 150px;">
                                     <option value="">All Method</option>
-                                    <option value="PAYOS" th:selected="${paymentMethod == 'PAYOS'}">PAYOS</option>
-                                    <option value="VNPAY" th:selected="${paymentMethod == 'VNPAY'}">VNPAY</option>
-                                    <option value="MOMO" th:selected="${paymentMethod == 'MOMO'}">MOMO</option>
-                                    <option value="ZALOPAY" th:selected="${paymentMethod == 'ZALOPAY'}">ZALOPAY</option>
+                                    <option th:each="method : ${paymentMethods}"
+                                            th:value="${method}"
+                                            th:text="${method}"
+                                            th:selected="${method == paymentMethod}">
+                                    </option>
                                 </select>
 
                                 <select name="sortField" class="form-select me-2 mb-2" style="width: 150px;">
-                                    <option value="createAt_desc" th:selected="${sortField == 'createAt' and sortDir == 'desc'}">Newest</option>
-                                    <option value="createAt_asc" th:selected="${sortField == 'createAt' and sortDir == 'asc'}">Oldest</option>
+                                    <option value="createdAt_desc" th:selected="${sortField == 'createAt' and sortDir == 'desc'}">Newest</option>
+                                    <option value="createdAt_asc" th:selected="${sortField == 'createAt' and sortDir == 'asc'}">Oldest</option>
                                     <option value="amount_desc" th:selected="${sortField == 'amount' and sortDir == 'desc'}">Amount High → Low</option>
                                     <option value="amount_asc" th:selected="${sortField == 'amount' and sortDir == 'asc'}">Amount Low → High</option>
                                 </select>

@@ -129,6 +129,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
                 .type(ETransactionType.PAYMENT)
                 .amount(booking.getTotalPrice())
                 .status(ETransactionStatus.PENDING)
+                .method(EPaymentMethod.WALLET)
                 .booking(booking)
                 .wallet(wallet)
                 .build();

@@ -13,6 +13,7 @@ import com.Fisport.repository.*;
 import com.Fisport.service.BookingService;
 import com.Fisport.service.FieldHasTimeSlotService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +25,7 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -35,6 +37,7 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final FieldHasTimeSlotService fieldHasTimeSlotService;
     private final FieldTypeBookDurationRepository fieldTypeBookDurationRepository;
+    private final TransactionRepository transactionRepository;
 
     @Override
     public List<BookingTimeResponse> getOccupiedSlots(Long subFieldId, LocalDate date) {
@@ -212,6 +215,7 @@ public class BookingServiceImpl implements BookingService {
         if (EBookingStatus.PENDING.equals(booking.getBookingStatus()) || EBookingStatus.PAID.equals(booking.getBookingStatus())) {
             booking.setBookingStatus(EBookingStatus.CANCELLED);
             bookingRepository.save(booking);
+            log.info("Canceled booking id: {}", booking.getId());
         } else {
             throw new BookingException("Cannot cancel booking with status: " + booking.getBookingStatus());
         }
@@ -228,10 +232,7 @@ public class BookingServiceImpl implements BookingService {
                 .fieldName(b.getSubfield().getField().getName())
                 .startTime(b.getStartTime())
                 .endTime(b.getEndTime())
-                .paymentMethod((b.getPayments() == null || b.getPayments().isEmpty()) &&
-                        (b.getBookingStatus().equals(EBookingStatus.PAID) || b.getBookingStatus().equals(EBookingStatus.COMPLETED))
-                        ? "WALLET" :
-                        b.getPayments().stream().map(Payment::getMethod).map(Object::toString).collect(Collectors.joining(",")))
+                .paymentMethod(b.getTransaction().getMethod().toString())
                 .status(String.valueOf(b.getBookingStatus()))
                 .cancel(b.getBookingStatus() == EBookingStatus.PENDING || b.getBookingStatus() == EBookingStatus.PAID)
                 .canReview(b.getBookingStatus() == EBookingStatus.COMPLETED && (b.getReview() == null || b.getReview().getRating() == null))

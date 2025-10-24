@@ -112,7 +112,7 @@
                         <img th:src="|/web/img/payment/${method.name().toLowerCase()}.png|" alt="" />
                         <span th:text="'Pay with ' + ${method}"></span>
                         <div th:if="${method.name() == 'WALLET'}" class="wallet-balance mt-1 fw-bold text-success"
-                            th:text="'Số dư: ' + ${#numbers.formatDecimal(balance, 0, 'COMMA', 0, 'POINT')} + ' VND'">>
+                            th:text="'Số dư: ' + ${#numbers.formatDecimal(wallet.balance, 0, 'COMMA', 0, 'POINT')} + ' VND'">>
                         </div>
                     </div>
                 </div>
