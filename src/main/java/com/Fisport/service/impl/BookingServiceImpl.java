@@ -40,6 +40,7 @@ public class BookingServiceImpl implements BookingService {
     private final FieldTypeBookDurationRepository fieldTypeBookDurationRepository;
     private final VoucherRepository voucherRepository;
     private final VoucherService voucherService;
+    private final int SLOT_INTERVAL = 30;
 
     @Override
     public List<BookingTimeResponse> getOccupiedSlots(Long subFieldId, LocalDate date) {
@@ -167,7 +168,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingListResponse> getAllBookings(String name) {
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
         List<Booking> bookings = user.getBookings().stream().toList();
         return bookings.stream().map(b -> BookingListResponse.builder()
                 .id(b.getId())
@@ -183,7 +184,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public void cancelBooking(Long id, String name) {
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không thấy user"));
 
         Booking booking = bookingRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy booking"));
@@ -279,6 +280,32 @@ public class BookingServiceImpl implements BookingService {
                 .toList();
 
         return availableDurations;
+    }
+
+    @Override
+    public List<SlotAvailableResponse> getAvailableSlots(Long id, LocalDate date) {
+
+        SubField subField = subFieldRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Subfield not found"));
+
+        List<Booking> bookings =  bookingRepository.findBySubfieldAndBookingDate(subField, date);
+
+        LocalTime openTime = subField.getField().getOpenTime();
+        LocalTime closeTime = subField.getField().getCloseTime();
+
+        List<SlotAvailableResponse> slots = new ArrayList<>();
+
+        for (LocalTime time = openTime; time.isBefore(closeTime.minusMinutes(SLOT_INTERVAL)); time =  time.plusMinutes(SLOT_INTERVAL)) {
+            LocalTime currentTime = time;
+            boolean isBooked = bookings.stream().anyMatch(b ->
+                    !b.getBookingStatus().equals(EBookingStatus.CANCELLED)
+                    && (currentTime.isBefore(b.getEndTime())
+                            && currentTime.plusMinutes(SLOT_INTERVAL).isAfter(b.getStartTime())));
+                    slots.add(SlotAvailableResponse.builder()
+                                                    .startTime(time)
+                                                    .isAvailable(!isBooked)
+                                                    .build());
+        }
+        return slots;
     }
 
     private boolean isDurationAvailable(List<Booking> bookings, LocalTime startTime, Integer d, SubField subField) {

@@ -1,10 +1,7 @@
 package com.Fisport.service;
 
 import com.Fisport.dto.request.BookingRequest;
-import com.Fisport.dto.response.BookingDetailResponse;
-import com.Fisport.dto.response.BookingForUserResponse;
-import com.Fisport.dto.response.BookingListResponse;
-import com.Fisport.dto.response.BookingTimeResponse;
+import com.Fisport.dto.response.*;
 import com.Fisport.model.Booking;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,4 +27,6 @@ public interface BookingService {
     void checkExpiredBooking(Booking booking);
 
     List<Integer> getAvailableDurationsBooking(Long id, LocalDate date, LocalTime startTime);
+
+    List<SlotAvailableResponse> getAvailableSlots(Long id, LocalDate date);
 }

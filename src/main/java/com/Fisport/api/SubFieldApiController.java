@@ -2,10 +2,7 @@ package com.Fisport.api;
 
 import com.Fisport.common.ESubFieldStatus;
 import com.Fisport.dto.request.SubFieldRequest;
-import com.Fisport.dto.response.ApiResponse;
-import com.Fisport.dto.response.ResponseData;
-import com.Fisport.dto.response.ResponseError;
-import com.Fisport.dto.response.SubFieldResponse;
+import com.Fisport.dto.response.*;
 import com.Fisport.service.BookingService;
 import com.Fisport.service.SubFieldService;
 import jakarta.validation.Valid;
@@ -84,6 +81,16 @@ public class SubFieldApiController {
                 .status(HttpStatus.FOUND.value())
                 .message("Get Available Durations Booking Success")
                 .data(durations)
+                .build();
+    }
+
+    @GetMapping("/{id}/available-slots")
+    public ApiResponse<?> getAvailableSlots(@PathVariable Long id, @RequestParam LocalDate date) {
+
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("slots")
+                .data(bookingService.getAvailableSlots(id, date))
                 .build();
     }
 }

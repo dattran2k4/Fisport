@@ -78,7 +78,6 @@ public class RegisterController {
             return "/confirm";
         }
 
-        String username = request.getUsername();
         String qrUrl = sessionService.get("qrUrl", String.class);
         if (qrUrl != null) {
             // Tạo lại QR code để hiển thị nếu OTP nhập sai
