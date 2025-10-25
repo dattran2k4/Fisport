@@ -51,4 +51,15 @@ public class ChallengeMatchApiController {
                 .build();
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse getChallengeMatch(@PathVariable Long id) {
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .data(challengeMatchService.getChallengeMatch(id))
+                .message("challenge match")
+                .build();
+    }
+
+
+
 }
