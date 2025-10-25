@@ -13,6 +13,7 @@ import com.Fisport.model.*;
 import com.Fisport.repository.*;
 import com.Fisport.service.BookingService;
 import com.Fisport.service.FieldHasTimeSlotService;
+import com.Fisport.service.VoucherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,8 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final FieldHasTimeSlotService fieldHasTimeSlotService;
     private final FieldTypeBookDurationRepository fieldTypeBookDurationRepository;
-    private final TransactionRepository transactionRepository;
+    private final VoucherRepository voucherRepository;
+    private final VoucherService voucherService;
 
     @Override
     public List<BookingTimeResponse> getOccupiedSlots(Long subFieldId, LocalDate date) {
@@ -147,14 +149,20 @@ public class BookingServiceImpl implements BookingService {
             }
         }
 
+
         //
         BigDecimal totalSlotPrice = fieldHasTimeSlotService.calculateDynamicPrice(slots, request.getStartTime(), request.getEndTime());
         BigDecimal totalServiceItem = booking.getBookingServiceItems().stream().map(BookingServiceItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal total = totalSlotPrice.add(totalServiceItem);
         booking.setTotalPrice(total);
 
-        bookingRepository.save(booking);
+        if (request.getVoucherId() != null) {
+            Voucher voucher = voucherRepository.findById(request.getVoucherId()).orElseThrow(() -> new ResourceNotFoundException("Voucher not found"));
+            booking.setTotalPrice(voucherService.applyDiscount(total, voucher));
 
+        }
+
+        bookingRepository.save(booking);
         return booking.getPaymentToken();
     }
 

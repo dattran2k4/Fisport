@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface VoucherRepository extends JpaRepository<Voucher, Long> {
@@ -23,4 +24,6 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
                        @Param("now") LocalDate now);
 
     List<Voucher> findByStatus(EVoucherStatus status);
+
+    Optional<Voucher> findByCode(String code);
 }
