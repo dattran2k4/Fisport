@@ -41,6 +41,7 @@ public class RegisterRequestDTO implements Serializable {
 
     @NotNull(message = "Ngày bạn đẻ đừng để trống mà!")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @Past(message = "Ngày sinh phải trước hôm nay")
 //    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthday;
 

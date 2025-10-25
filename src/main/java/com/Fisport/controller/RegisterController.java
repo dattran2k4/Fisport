@@ -63,6 +63,8 @@ public class RegisterController {
             model.addAttribute("success", "Xác nhận email thành công, thực hiện bước cuối để hoàn thành kích hoạt tài khoản");
             model.addAttribute("qrCode", qrCode);
             model.addAttribute("request", new TwoFARequest(username, null));
+
+            sessionService.set("qrUrl", qrUrl);
             return "2fa-register";
         }
         
@@ -76,10 +78,25 @@ public class RegisterController {
             return "/confirm";
         }
 
-        authService.verify2FARegister(request.getUsername(), request.getCode());
-        sessionService.remove("username");
-        redirectAttributes.addFlashAttribute("TwoFASuccess", "Xác thực 2FA thành công, đăng nhập lại để hiểu vấn đề");
-        return "redirect:/login";
+        String username = request.getUsername();
+        String qrUrl = sessionService.get("qrUrl", String.class);
+        if (qrUrl != null) {
+            // Tạo lại QR code để hiển thị nếu OTP nhập sai
+            String qrCode = qrCodeUtil.generateQRCodeBase64(qrUrl, 250, 250);
+            model.addAttribute("qrCode", qrCode);
+        }
+
+        try {
+            authService.verify2FARegister(request.getUsername(), request.getCode());
+            sessionService.remove("username");
+            sessionService.remove("qrUrl");
+            redirectAttributes.addFlashAttribute("TwoFASuccess", "Xác thực 2FA thành công, đăng nhập lại để hiểu vấn đề");
+            return "redirect:/login";
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            model.addAttribute("request", request); // giữ thông tin username
+            return "2fa-register"; // trả lại view 2FA để nhập lại
+        }
     }
 
 }

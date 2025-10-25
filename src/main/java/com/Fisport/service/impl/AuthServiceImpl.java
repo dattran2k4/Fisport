@@ -163,8 +163,13 @@ public class AuthServiceImpl implements AuthService {
     public void verify2FARegister(String username, String code) {
         int c = Integer.parseInt(code);
         User user = userRepository.findByUsername(username).orElse(null);
-        twoFAService.verifyCode(user.getTwoFASecret(), c);
-        user.setStatus(EUserStatus.ACTIVE);
+        if(twoFAService.verifyCode(user.getTwoFASecret(), c)) {
+            user.setStatus(EUserStatus.ACTIVE);
+
+            log.info("UserId {} registered 2FA",  user.getId());
+        } else {
+            throw new InvalidDataException("Nhập sai , vui lòng nhập lại");
+        }
         userRepository.save(user);
     }
 
@@ -240,7 +245,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String getRoleByUserName(String username) {
-        User user = userRepository.findByUsername(username).orElse(null);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("Not found"));
         return user.getRole().getName().toString();
     }
 
