@@ -2,6 +2,7 @@ package com.fisport.service.impl;
 
 import com.fisport.common.EBookingStatus;
 import com.fisport.common.EChallengeStatus;
+import com.fisport.common.ELevel;
 import com.fisport.dto.request.ChallengeMatchRequest;
 import com.fisport.dto.response.ChallengeMatchResponse;
 import com.fisport.dto.response.FieldTypeResponse;
@@ -14,12 +15,19 @@ import com.fisport.repository.ChallengeMatchRepository;
 import com.fisport.repository.UserRepository;
 import com.fisport.service.BookingService;
 import com.fisport.service.ChallengeMatchService;
+import com.fisport.service.ChallengeMatchSpecification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -46,15 +54,12 @@ public class ChallengeMatchImpl implements ChallengeMatchService {
 
         ChallengeMatch challengeMatch = ChallengeMatch.builder()
                 .creator(user)
-                .startTime(request.getBookingRequest().getStartTime())
                 .participationFee(request.getFee())
-                .endTime(request.getBookingRequest().getEndTime())
                 .title(request.getTitle())
                 .note(request.getNote())
                 .maxPlayers(request.getMaxPlayers())
                 .status(EChallengeStatus.OPEN)
                 .suggestedLevel(request.getLevel())
-                .date(request.getBookingRequest().getDate())
                 .booking(booking)
                 .build();
 
@@ -70,8 +75,19 @@ public class ChallengeMatchImpl implements ChallengeMatchService {
     }
 
     @Override
-    public Page<ChallengeMatchResponse> getAllChallengeMatch() {
-        return List.of();
+    public Page<ChallengeMatchResponse> getAllChallengeMatch(EChallengeStatus status, ELevel level,
+                                                             Integer maxPlayers, LocalDate date, BigDecimal fee, Long cityId, Long fieldTypeId,
+                                                             int page, int size) {
+        int pageNumber = 0;
+        if (page > 0) {
+            pageNumber = page - 1;
+        }
+
+        Specification<ChallengeMatch> spec = ChallengeMatchSpecification.filterChallengeMatch(status, level, maxPlayers, date, fee, cityId, fieldTypeId);
+
+        Pageable pageable = PageRequest.of(pageNumber, size, Sort.by(Sort.Direction.DESC, "booking.bookingDate"));
+
+        return challengeMatchRepository.findAll(spec, pageable).map(this::toChallengeMatchResponse);
     }
 
     private ChallengeMatch findChallengeMatch(Long id) {
@@ -83,13 +99,16 @@ public class ChallengeMatchImpl implements ChallengeMatchService {
                 .id(challengeMatch.getId())
                 .title(challengeMatch.getTitle())
                 .note(challengeMatch.getNote())
+                .fee(challengeMatch.getParticipationFee())
                 .maxPlayers(challengeMatch.getMaxPlayers())
                 .level(challengeMatch.getSuggestedLevel())
-                .fieldTypeResponse(FieldTypeResponse.builder()
-                        .id(challengeMatch.getFieldType().getId())
-                        .name(challengeMatch.getFieldType().getName())
-                        .slug(challengeMatch.getFieldType().getSlug())
-                        .build())
+                .cityName(challengeMatch.getBooking().getSubfield().getField().getWard().getCity().getName())
+                .wardName(challengeMatch.getBooking().getSubfield().getField().getWard().getName())
+                .challengeStatus(challengeMatch.getStatus())
+                .maxPlayers(challengeMatch.getMaxPlayers())
+                .date(challengeMatch.getBooking().getBookingDate())
+                .startTime(challengeMatch.getBooking().getStartTime())
+                .endTime(challengeMatch.getBooking().getEndTime())
                 .createdAt(challengeMatch.getCreatedAt())
                 .build();
     }

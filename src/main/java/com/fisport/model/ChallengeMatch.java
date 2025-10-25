@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,16 +21,17 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "challenge_match")
+@Table(name = "challenge_match", indexes = {
+        @Index(columnList = "status"),
+        @Index(columnList = "date"),
+        @Index(columnList = "start_time"),
+        @Index(columnList = "subfield_id")
+})
 public class ChallengeMatch extends AbstractEntity {
 
     @ManyToOne
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
-
-    @ManyToOne
-    @JoinColumn(name = "sport_id")
-    private FieldType fieldType;
 
     @Column(name = "title", length = 100)
     private String title;
@@ -38,24 +40,16 @@ public class ChallengeMatch extends AbstractEntity {
     private ELevel suggestedLevel;
 
     @Column(name = "fee")
-    @Min(1)
-    private BigDecimal participationFee = BigDecimal.ZERO;
+    @Min(0)
+    private BigDecimal participationFee;
 
     @Column(name = "max_players")
-    private int maxPlayers;
+    @Min(1)
+    private Integer maxPlayers;
 
     @ManyToOne
     @JoinColumn(name = "subfield_id")
     private SubField subField;
-
-    @Column(name = "date")
-    private LocalDate date;
-
-    @Column(name = "start_time")
-    private LocalTime startTime;
-
-    @Column(name = "end_time")
-    private LocalTime endTime;
 
     @Column(name = "note", length = 500)
     private String note;
@@ -78,7 +72,7 @@ public class ChallengeMatch extends AbstractEntity {
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
-    @CreationTimestamp
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 
 }

@@ -29,7 +29,7 @@ public class TransactionSpecification {
             Predicate predicate = cb.conjunction();
 
             if (amount != null) {
-                predicate = cb.and(predicate, cb.equal(cb.function("ROUND", BigDecimal.class, cb.literal(2)), amount));
+                predicate = cb.and(predicate, cb.equal(root.get("amount"), amount));
             }
 
             if (paymentMethod != null) {

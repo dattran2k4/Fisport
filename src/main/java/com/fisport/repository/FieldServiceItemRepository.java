@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface FieldServiceItemRepository extends JpaRepository<FieldServiceItem, Long> {
 
-    @Query("SELECT new com.Fisport.dto.response.FieldServiceItemResponse(fsi.id, si.id, fsi.quantity, si.name, s.name, fsi.price)" +
+    @Query("SELECT new com.fisport.dto.response.FieldServiceItemResponse(fsi.id, si.id, fsi.quantity, si.name, s.name, fsi.price)" +
             "FROM FieldServiceItem fsi " +
             "JOIN fsi.serviceItem si " +
             "JOIN si.service s " +

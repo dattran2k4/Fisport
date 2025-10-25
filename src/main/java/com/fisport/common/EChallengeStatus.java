@@ -3,7 +3,7 @@ package com.fisport.common;
 public enum EChallengeStatus {
     OPEN,
     PENDING,
-    CONFIRMED,
+    FULL,
     MATCHED,
     CANCELLED,
     EXPIRED

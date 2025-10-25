@@ -5,6 +5,7 @@ import com.fisport.common.ELevel;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
 import java.time.*;
 
 
@@ -17,7 +18,11 @@ public class ChallengeMatchResponse {
     private ELevel level;
     private EChallengeStatus challengeStatus;
     private int maxPlayers;
-    private FieldTypeResponse fieldTypeResponse;
+    private int currentPlayers;
+    private String wardName;
+    private String cityName;
+    private String fieldName;
+    private BigDecimal fee;
     private LocalTime startTime;
     private LocalTime endTime;
     private LocalDate date;
