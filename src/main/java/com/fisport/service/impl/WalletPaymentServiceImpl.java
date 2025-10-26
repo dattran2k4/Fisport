@@ -29,6 +29,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
     private final BookingRepository bookingRepository;
+    private final ChallengeMatchRepository  challengeMatchRepository;
 
     @Transactional
     @Override
@@ -153,6 +154,14 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         booking.setBookingStatus(EBookingStatus.PAID);
         bookingRepository.save(booking);
         log.info("Booking {} paid",  booking.getId());
+
+        ChallengeMatch match = challengeMatchRepository.findByBooking(booking).orElse(null);
+
+        if (match != null) {
+            match.setStatus(EChallengeStatus.PENDING);
+            challengeMatchRepository.save(match);
+            log.info("Challenge match {} update status: ", match.getId(), match.getStatus());
+        }
 
         log.info("wallet paid successfully: userId={}, bookingId={}", username, booking.getId());
     }
