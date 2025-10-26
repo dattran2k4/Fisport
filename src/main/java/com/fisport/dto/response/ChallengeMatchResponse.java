@@ -17,8 +17,8 @@ public class ChallengeMatchResponse {
     private String note;
     private ELevel level;
     private EChallengeStatus challengeStatus;
-    private int maxPlayers;
-    private int currentPlayers;
+    private Integer maxPlayers;
+    private Integer currentPlayers;
     private String wardName;
     private String cityName;
     private String fieldName;

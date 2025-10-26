@@ -3,8 +3,12 @@ package com.fisport.api;
 import com.fisport.common.EChallengeStatus;
 import com.fisport.common.ELevel;
 import com.fisport.dto.request.ChallengeMatchRequest;
+import com.fisport.dto.request.JoinMatchRequest;
+import com.fisport.dto.request.UpdateParticipantStatusRequest;
 import com.fisport.dto.response.ApiResponse;
 import com.fisport.service.ChallengeMatchService;
+import com.fisport.service.ChallengeParticipantService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,6 +26,7 @@ import java.time.LocalDate;
 public class ChallengeMatchApiController {
 
     private final ChallengeMatchService challengeMatchService;
+    private final ChallengeParticipantService challengeParticipantService;
 
     @PostMapping("/create")
     public ApiResponse createChallengeMatch(@RequestBody ChallengeMatchRequest request, Principal principal) {
@@ -60,6 +65,30 @@ public class ChallengeMatchApiController {
                 .build();
     }
 
+    @GetMapping("/{id}/participants-list")
+    public ApiResponse getParticipantsList(@PathVariable Long id, Principal principal) {
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("participants list")
+                .data(challengeParticipantService.getAllParticipantsByMatchAndCreator(id, principal.getName()))
+                .build();
+    }
 
+    @PostMapping("/{id}/participants-request")
+    public ApiResponse joinMatch(@PathVariable Long id, @Valid @RequestBody JoinMatchRequest request, Principal principal) {
+        challengeParticipantService.joinMatch(id, request, principal.getName());
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("Đã yêu cầu tham gia, đợi creator phản hồi")
+                .build();
+    }
+
+    @PutMapping("/{id}/update-result")
+    public ApiResponse updateResultMatch(@PathVariable Long id, Principal principal) {
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("OK")
+                .build();
+    }
 
 }

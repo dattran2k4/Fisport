@@ -3,6 +3,7 @@ package com.fisport.service.impl;
 import com.fisport.common.EBookingStatus;
 import com.fisport.common.EChallengeStatus;
 import com.fisport.common.ELevel;
+import com.fisport.common.EParticipantStatus;
 import com.fisport.dto.request.ChallengeMatchRequest;
 import com.fisport.dto.response.ChallengeMatchResponse;
 import com.fisport.dto.response.FieldTypeResponse;
@@ -95,6 +96,8 @@ public class ChallengeMatchImpl implements ChallengeMatchService {
     }
 
     private ChallengeMatchResponse toChallengeMatchResponse(ChallengeMatch challengeMatch) {
+        Integer currentPlayers = Math.toIntExact(challengeMatch.getParticipants().stream().filter(p -> p.getStatus() == EParticipantStatus.ACCEPTED).count());
+
         return ChallengeMatchResponse.builder()
                 .id(challengeMatch.getId())
                 .title(challengeMatch.getTitle())
@@ -106,10 +109,30 @@ public class ChallengeMatchImpl implements ChallengeMatchService {
                 .wardName(challengeMatch.getBooking().getSubfield().getField().getWard().getName())
                 .challengeStatus(challengeMatch.getStatus())
                 .maxPlayers(challengeMatch.getMaxPlayers())
+                .currentPlayers(currentPlayers)
                 .date(challengeMatch.getBooking().getBookingDate())
                 .startTime(challengeMatch.getBooking().getStartTime())
                 .endTime(challengeMatch.getBooking().getEndTime())
                 .createdAt(challengeMatch.getCreatedAt())
                 .build();
+    }
+
+    @Override
+    public void updateMatchStatus(ChallengeMatch match) {
+        long acceptedCount = match.getParticipants().stream()
+                .filter(p -> p.getStatus() == EParticipantStatus.ACCEPTED)
+                .count();
+
+        EChallengeStatus newStatus;
+        if (acceptedCount == 0) {
+            newStatus = EChallengeStatus.OPEN;
+        } else if (acceptedCount < match.getMaxPlayers()) {
+            newStatus = EChallengeStatus.PENDING;
+        } else {
+            newStatus = EChallengeStatus.FULL;
+        }
+
+        match.setStatus(newStatus);
+        challengeMatchRepository.save(match);
     }
 }
