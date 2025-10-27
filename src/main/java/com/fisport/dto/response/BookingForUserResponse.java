@@ -21,6 +21,7 @@ public class BookingForUserResponse {
     private Integer rating;
     private boolean cancel;
     private boolean canReview;
+    private boolean canCreateMatch;
     private String paymentMethod;
     private String serviceItemName;
     private BigDecimal subPrice;

@@ -219,6 +219,7 @@ public class BookingServiceImpl implements BookingService {
                 .status(String.valueOf(b.getBookingStatus()))
                 .cancel(b.getBookingStatus() == EBookingStatus.PENDING || b.getBookingStatus() == EBookingStatus.PAID)
                 .canReview(b.getBookingStatus() == EBookingStatus.COMPLETED && (b.getReview() == null || b.getReview().getRating() == null))
+                .canCreateMatch((b.getBookingStatus().equals(EBookingStatus.PAID) && b.getChallengeMatch() ==  null))
                 .totalPrice(b.getTotalPrice())
                 .rating(Optional.ofNullable(b.getReview())
                         .map(Review::getRating)
@@ -243,6 +244,7 @@ public class BookingServiceImpl implements BookingService {
                 .subFieldName(booking.getSubfield().getName())
                 .status(String.valueOf(booking.getBookingStatus()))
                 .price(booking.getBookingServiceItems().stream().map(BookingServiceItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add))
+                .canCreateMatch((booking.getBookingStatus().equals(EBookingStatus.PAID) && booking.getChallengeMatch() ==  null))
                 .serviceItemName(
                         booking.getBookingServiceItems().stream()
                                 .map(bsi -> Optional.ofNullable(bsi.getFieldServiceItem())
