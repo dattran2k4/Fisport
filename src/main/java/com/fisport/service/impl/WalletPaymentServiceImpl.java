@@ -158,7 +158,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         ChallengeMatch match = challengeMatchRepository.findByBooking(booking).orElse(null);
 
         if (match != null) {
-            match.setStatus(EChallengeStatus.PENDING);
+            match.setStatus(EChallengeStatus.OPEN);
             challengeMatchRepository.save(match);
             log.info("Challenge match {} update status: ", match.getId(), match.getStatus());
         }

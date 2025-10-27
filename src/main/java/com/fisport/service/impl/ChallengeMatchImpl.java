@@ -124,7 +124,9 @@ public class ChallengeMatchImpl implements ChallengeMatchService {
                 .count();
 
         EChallengeStatus newStatus;
-        if (acceptedCount < match.getMaxPlayers()) {
+        if (acceptedCount == 0) {
+            newStatus = EChallengeStatus.OPEN;
+        } else if (acceptedCount < match.getMaxPlayers()) {
             newStatus = EChallengeStatus.PENDING;
         } else {
             newStatus = EChallengeStatus.FULL;

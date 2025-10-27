@@ -21,12 +21,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "challenge_match", indexes = {
-        @Index(columnList = "status"),
-        @Index(columnList = "date"),
-        @Index(columnList = "start_time"),
-        @Index(columnList = "subfield_id")
-})
+@Table(name = "challenge_match")
 public class ChallengeMatch extends AbstractEntity {
 
     @ManyToOne

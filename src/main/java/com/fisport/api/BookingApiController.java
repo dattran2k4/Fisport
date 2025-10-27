@@ -72,7 +72,7 @@ public class BookingApiController {
     public ResponseData<?> cancelBooking(@PathVariable Long id, Principal principal) {
         try {
             bookingService.cancelBooking(id, principal.getName());
-            return new ResponseData(HttpStatus.ACCEPTED.value(), "Đã hủy booking T-T");
+            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đã hủy booking T-T");
         } catch (Exception e) {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
