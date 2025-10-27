@@ -18,7 +18,7 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     @Modifying
     @Query("UPDATE Voucher v SET v.status = :inactiveStatus " +
             "WHERE v.status = :activeStatus AND v.endDate < :now")
-    int expireVouchers(@Param("expiredStatus") EVoucherStatus inactiveStatus,
+    int expireVouchers(@Param("inactiveStatus") EVoucherStatus inactiveStatus,
                        @Param("activeStatus") EVoucherStatus activeStatus,
                        @Param("now") LocalDate now);
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,37 +27,43 @@
         <nav class="nav-menu">
             <a th:href="@{/owner/dashboard}"
                class="nav-link"
-               th:classappend="${currentUri.contains('/dashboard') ? 'active' : ''}">
+               th:classappend="${currentUri != null and currentUri.contains('/dashboard') ? 'active' : ''}">
                 <i class="fas fa-chart-line"></i>
                 <span>Dashboard</span>
             </a>
             <a th:href="@{/owner/fields}"
                class="nav-link"
-               th:classappend="${currentUri.contains('/fields') ? 'active' : ''}">
+               th:classappend="${currentUri != null and currentUri.contains('/fields') ? 'active' : ''}">
                 <i class="fas fa-map-location-dot"></i>
                 <span>Manage Fields</span>
             </a>
             <a th:href="@{/owner/bookings}"
                class="nav-link"
-               th:classappend="${currentUri.contains('/bookings') ? 'active' : ''}">
+               th:classappend="${currentUri != null and currentUri.contains('/bookings') ? 'active' : ''}">
                 <i class="fas fa-calendar-check"></i>
                 <span>Bookings</span>
             </a>
             <a th:href="@{/owner/vouchers}"
                class="nav-link"
-               th:classappend="${currentUri.contains('/vouchers') ? 'active' : ''}">
+               th:classappend="${currentUri != null and currentUri.contains('/vouchers') ? 'active' : ''}">
                 <i class="fas fa-ticket"></i>
                 <span>Vouchers</span>
             </a>
+            <a th:href="@{/owner/services}"
+               class="nav-link"
+               th:classappend="${currentUri != null and currentUri.contains('/services') ? 'active' : ''}">
+                <i class="fas fa-cogs"></i>
+                <span>Manage Service</span>
+            </a>
             <a th:href="@{/owner/news}"
                class="nav-link"
-               th:classappend="${currentUri.contains('/news') ? 'active' : ''}">
+               th:classappend="${currentUri != null and currentUri.contains('/news') ? 'active' : ''}">
                 <i class="fas fa-newspaper"></i>
                 <span>News</span>
             </a>
             <a th:href="@{/owner/tournaments}"
                class="nav-link"
-               th:classappend="${currentUri.contains('/tournaments') ? 'active' : ''}">
+               th:classappend="${currentUri != null and currentUri.contains('/tournaments') ? 'active' : ''}">
                 <i class="fas fa-trophy"></i>
                 <span>Tournaments</span>
             </a>
@@ -101,10 +107,19 @@
                 <div th:replace="owner/dashboard :: content"></div>
             </div>
             <div th:if="${content.contains('fields-list')}">
-                <div  th:replace="owner/fields/list :: content"></div>
+                <div th:replace="owner/fields/list :: content"></div>
             </div>
             <div th:if="${content.contains('fields-create')}" >
                 <div th:replace="owner/fields/create :: content"></div>
+            </div>
+            <div th:if="${content.contains('vouchers')}">
+                <div th:replace="~{${content} :: content}"></div>
+            </div>
+            <div th:if="${content.contains('services') and !content.contains('items')}">
+                <div th:replace="~{${content} :: content}"></div>
+            </div>
+            <div th:if="${content.contains('items')}">
+                <div th:replace="~{${content} :: content}"></div>
             </div>
         </div>
     </main>

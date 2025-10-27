@@ -1,11 +1,15 @@
 package com.Fisport.service;
 
-import com.Fisport.dto.request.ServiceItemsRequest;
+import com.Fisport.dto.request.ServiceItemRequest;
 import com.Fisport.dto.response.ServiceItemResponse;
 
 import java.util.List;
 
 public interface ServiceItemService {
     List<ServiceItemResponse> findAll();
-    void save(ServiceItemsRequest serviceItemsRequest);
+    List<ServiceItemResponse> findAllByServiceId(Long serviceId);
+    ServiceItemResponse findById(Long id);
+    ServiceItemResponse createServiceItem(ServiceItemRequest request);
+    ServiceItemResponse updateServiceItem(Long id, ServiceItemRequest request);
+    void deleteServiceItem(Long id);
 }

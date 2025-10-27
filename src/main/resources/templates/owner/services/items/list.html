@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Service Items</title>
+</head>
+<body>
+<div th:fragment="content" class="p-6">
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    <style>
+        :where([class^="ri-"])::before {
+            content: "\f3c2";
+        }
+    </style>
+    <!-- Breadcrumb -->
+    <div class="mb-6">
+        <div class="flex items-center gap-2 text-sm text-gray-600 mb-4">
+            <a th:href="@{/owner/services}" class="hover:text-blue-600 transition-colors">Quản lý Dịch vụ</a>
+            <i class="ri-arrow-right-s-line text-xs"></i>
+            <span class="text-gray-900 font-medium" th:text="${service.name}">Tên loại dịch vụ</span>
+        </div>
+        <h1 class="text-2xl font-bold text-gray-900" th:text="'Sản phẩm thuộc: ' + ${service.name}">Sản phẩm thuộc: Đồ uống</h1>
+    </div>
+
+    <!-- Alert messages -->
+    <div th:if="${successMessage}" class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg">
+        <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center gap-4">
+            <div class="relative">
+                <input type="text" id="searchInput" placeholder="Tìm kiếm sản phẩm..." 
+                       class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-80 text-sm">
+                <div class="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 flex items-center justify-center">
+                    <i class="ri-search-line text-gray-400 text-sm"></i>
+                </div>
+            </div>
+        </div>
+        <a th:href="@{/owner/services/{id}/items/create(id=${service.id})}" 
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center whitespace-nowrap text-sm">
+            <div class="w-4 h-4 flex items-center justify-center mr-2">
+                <i class="ri-add-line text-sm"></i>
+            </div>
+            Thêm sản phẩm mới
+        </a>
+    </div>
+
+    <div class="mb-6">
+        <p class="text-sm text-gray-600" th:text="'Hiện thị ' + ${serviceItems.size()} + ' sản phẩm'">Hiện thị 0 sản phẩm</p>
+    </div>
+
+    <!-- Empty state -->
+    <div th:if="${serviceItems.isEmpty()}" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+        <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="ri-inbox-line text-5xl text-gray-400"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Chưa có sản phẩm nào</h3>
+        <p class="text-gray-600 mb-6">Hãy thêm sản phẩm đầu tiên cho loại dịch vụ này</p>
+        <a th:href="@{/owner/services/{id}/items/create(id=${service.id})}" 
+           class="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+            <i class="ri-add-line mr-2"></i>
+            Thêm sản phẩm mới
+        </a>
+    </div>
+
+    <!-- Product grid -->
+    <div th:if="${!serviceItems.isEmpty()}" class="grid grid-cols-4 gap-6">
+        <div th:each="item : ${serviceItems}" class="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+            <div class="p-6">
+                <div class="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg mb-4 mx-auto">
+                    <i class="ri-product-hunt-line text-3xl text-blue-600"></i>
+                </div>
+                <h3 class="font-semibold text-gray-900 text-center mb-2 text-lg" th:text="${item.name}">Tên sản phẩm</h3>
+                <div class="text-center mb-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700" 
+                          th:text="${item.serviceName}">Loại dịch vụ</span>
+                </div>
+                <div class="flex items-center justify-center gap-2 pt-4 border-t border-gray-200">
+                    <a th:href="@{/owner/services/{serviceId}/items/edit/{itemId}(serviceId=${service.id},itemId=${item.id})}" 
+                       class="flex-1 flex items-center justify-center p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors">
+                        <i class="ri-edit-line text-sm mr-1"></i>
+                        <span class="text-sm">Sửa</span>
+                    </a>
+                    <button type="button"
+                            th:onclick="'confirmDeleteItem(' + ${service.id} + ', ' + ${item.id} + ')'" 
+                            class="flex-1 flex items-center justify-center p-2 text-red-500 hover:bg-red-50 rounded transition-colors">
+                        <i class="ri-delete-bin-line text-sm mr-1"></i>
+                        <span class="text-sm">Xóa</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Delete functionality
+    function confirmDeleteItem(serviceId, itemId) {
+        if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/owner/services/' + serviceId + '/items/delete/' + itemId;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+    
+    // Search functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const productCards = document.querySelectorAll('[th\\:each*="item"]');
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                productCards.forEach(card => {
+                    const productName = card.querySelector('h3').textContent.toLowerCase();
+                    if (productName.includes(searchTerm)) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+    });
+    
+</script>
+</body>
+</html>

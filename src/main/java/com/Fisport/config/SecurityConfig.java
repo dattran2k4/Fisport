@@ -3,6 +3,7 @@ package com.Fisport.config;
 import com.Fisport.constant.SecurityWhiteList;
 import com.Fisport.security.CustomAccessDeniedHandler;
 import com.Fisport.security.CustomAuthenticationFailureHandler;
+import com.Fisport.security.CustomSuccessHandler;
 import com.Fisport.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomSuccessHandler customSuccessHandler;
     private final TwoFactorAuthFilter twoFactorAuthFilter;
 
     @Bean
@@ -74,7 +76,13 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
 //                .addFilterBefore(twoFactorAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(form -> form.disable())
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/perform_login")
+                        .successHandler(customSuccessHandler)
+                        .failureHandler(customAuthenticationFailureHandler)
+                        .permitAll()
+                )
                 .exceptionHandling(ex -> ex.accessDeniedHandler(customAccessDeniedHandler))
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)

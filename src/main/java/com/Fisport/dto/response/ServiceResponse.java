@@ -3,11 +3,13 @@ package com.Fisport.dto.response;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.List;
+
 @Builder
 @Getter
-public class ServiceItemResponse {
+public class ServiceResponse {
     private Long id;
     private String name;
-    private Long service_id;
-    private String serviceName;
+    private List<ServiceItemResponse> serviceItems;
 }
+

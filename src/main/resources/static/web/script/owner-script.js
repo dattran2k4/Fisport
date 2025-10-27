@@ -30,6 +30,7 @@ function updatePageTitle() {
         '/owner/fields': 'Manage Fields',
         '/owner/bookings': 'Bookings',
         '/owner/vouchers': 'Vouchers',
+        '/owner/services': 'Manage Service',
         '/owner/news': 'News',
         '/owner/tournaments': 'Tournaments'
     };

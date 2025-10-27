@@ -1,202 +1,183 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="vi">
-<div class="dashboard"  th:fragment="content">
-    <!-- Stats Cards -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                <i class="fas fa-map-location-dot"></i>
-            </div>
-            <div class="stat-content">
-                <h3>Total Fields</h3>
-                <p class="stat-number">12</p>
-                <small class="stat-change positive">+2 this month</small>
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - Quản trị hệ thống</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background: #f6f8fa; font-family: "Segoe UI", sans-serif; }
+        .dashboard { background: #fff; border-radius: 10px; padding: 30px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
+        .title { font-weight: 700; font-size: 24px; color: #dc3545; }
+        .subtitle { color: #777; margin-bottom: 25px; }
+        .table th, .table td { vertical-align: middle; }
+        .btn-red { background-color: #dc3545; color: white; }
+        .btn-blue { background-color: #007bff; color: white; }
+        .btn-red:hover { background-color: #c82333; }
+        .btn-blue:hover { background-color: #0069d9; }
+        .action-icons i { cursor: pointer; margin: 0 6px; font-size: 18px; }
+        .view { color: #0d6efd; }
+        .edit { color: #28a745; }
+        .delete { color: #dc3545; }
+        .stats-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .stats-card-success { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .stats-card-warning { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .stats-card-info { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+    </style>
+</head>
+<body>
+
+<div class="container mt-5 dashboard">
+    <h2 class="title"><i class="bi bi-shield-check"></i> Admin Dashboard</h2>
+    <p class="subtitle">Quản trị và giám sát toàn bộ hệ thống Fisport</p>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card stats-card text-center p-3">
+                <i class="bi bi-people fs-3 mb-2"></i>
+                <h6>Tổng Users</h6>
+                <h4>1,234</h4>
             </div>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                <i class="fas fa-calendar-check"></i>
-            </div>
-            <div class="stat-content">
-                <h3>Total Bookings</h3>
-                <p class="stat-number">284</p>
-                <small class="stat-change positive">+45 this week</small>
+        <div class="col-md-3">
+            <div class="card stats-card-success text-center p-3">
+                <i class="bi bi-building fs-3 mb-2"></i>
+                <h6>Sân đã duyệt</h6>
+                <h4>56</h4>
             </div>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                <i class="fas fa-dollar-sign"></i>
-            </div>
-            <div class="stat-content">
-                <h3>Revenue</h3>
-                <p class="stat-number">$12,450</p>
-                <small class="stat-change positive">+12% this month</small>
+        <div class="col-md-3">
+            <div class="card stats-card-warning text-center p-3">
+                <i class="bi bi-clock-history fs-3 mb-2"></i>
+                <h6>Chờ duyệt</h6>
+                <h4>12</h4>
             </div>
         </div>
-
-        <div class="stat-card">
-            <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                <i class="fas fa-users"></i>
-            </div>
-            <div class="stat-content">
-                <h3>Total Users</h3>
-                <p class="stat-number">456</p>
-                <small class="stat-change positive">+28 this week</small>
-            </div>
-        </div>
-    </div>
-
-    <!-- Charts & Tables Row -->
-    <div class="dashboard-row">
-        <!-- Revenue Chart -->
-        <div class="card chart-card">
-            <div class="card-header">
-                <h3>Revenue Overview</h3>
-                <div class="period-selector">
-                    <button class="btn-small active">Week</button>
-                    <button class="btn-small">Month</button>
-                    <button class="btn-small">Year</button>
-                </div>
-            </div>
-            <div class="card-body">
-                <canvas id="revenueChart"></canvas>
-            </div>
-        </div>
-
-        <!-- Recent Bookings -->
-        <div class="card">
-            <div class="card-header">
-                <h3>Recent Bookings</h3>
-                <a href="#" class="link-view-all">View All</a>
-            </div>
-            <div class="card-body">
-                <div class="mini-table">
-                    <table>
-                        <thead>
-                        <tr>
-                            <th>Field</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Status</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <td>Field 1 - Court A</td>
-                            <td>Jan 15, 2024</td>
-                            <td>14:00 - 15:30</td>
-                            <td><span class="badge badge-success">Confirmed</span></td>
-                        </tr>
-                        <tr>
-                            <td>Field 2 - Court B</td>
-                            <td>Jan 15, 2024</td>
-                            <td>16:00 - 17:30</td>
-                            <td><span class="badge badge-warning">Pending</span></td>
-                        </tr>
-                        <tr>
-                            <td>Field 1 - Court C</td>
-                            <td>Jan 16, 2024</td>
-                            <td>10:00 - 11:30</td>
-                            <td><span class="badge badge-success">Confirmed</span></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <div class="col-md-3">
+            <div class="card stats-card-info text-center p-3">
+                <i class="bi bi-currency-dollar fs-3 mb-2"></i>
+                <h6>Doanh thu</h6>
+                <h4>₫45.2M</h4>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Row -->
-    <div class="dashboard-row">
-        <!-- Top Fields -->
-        <div class="card">
-            <div class="card-header">
-                <h3>Top Fields</h3>
+    <!-- Pending Fields Management -->
+    <div class="row">
+        <div class="col-12">
+            <h4><i class="bi bi-list-check"></i> Quản lý sân chờ duyệt</h4>
+            <p class="text-muted">Duyệt và quản lý các sân thể thao đang chờ phê duyệt</p>
+            
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex gap-2">
+                    <input type="text" class="form-control" placeholder="Tìm kiếm sân..." style="width: 300px;">
+                    <select class="form-select" style="width: 150px;">
+                        <option>Tất cả</option>
+                        <option>Bóng đá</option>
+                        <option>Tennis</option>
+                        <option>Cầu lông</option>
+                    </select>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-blue"><i class="bi bi-download"></i> Export</button>
+                    <button class="btn btn-red"><i class="bi bi-trash"></i> Xóa hàng loạt</button>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="field-list">
-                    <div class="field-item">
-                        <div class="field-info">
-                            <h4>Field 1 - Premium Court</h4>
-                            <p>48 bookings this month</p>
-                        </div>
-                        <div class="field-rating">
-                            <span class="stars">★★★★★</span>
-                            <span class="rating">4.8</span>
-                        </div>
-                    </div>
-                    <div class="field-item">
-                        <div class="field-info">
-                            <h4>Field 2 - Standard Court</h4>
-                            <p>36 bookings this month</p>
-                        </div>
-                        <div class="field-rating">
-                            <span class="stars">★★★★☆</span>
-                            <span class="rating">4.5</span>
+
+            <!-- Table -->
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                <tr>
+                    <th>
+                        <input type="checkbox" class="form-check-input">
+                    </th>
+                    <th>TÊN SÂN</th>
+                    <th>CHỦ SỞ HỮU</th>
+                    <th>LOẠI SÂN</th>
+                    <th>ĐỊA CHỈ</th>
+                    <th>NGÀY TẠO</th>
+                    <th class="text-center">HÀNH ĐỘNG</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><input type="checkbox" class="form-check-input"></td>
+                    <td>
+                        <strong>Khu thể thao Nguyễn Văn Cừ</strong><br>
+                        <small class="text-muted">Sân bóng đá chất lượng cao</small>
+                    </td>
+                    <td>Nguyễn Văn A</td>
+                    <td>Bóng đá</td>
+                    <td>123 Nguyễn Văn Cừ, Q5</td>
+                    <td>15/12/2024</td>
+                    <td class="text-center action-icons">
+                        <i class="bi bi-eye view" title="Xem chi tiết"></i>
+                        <i class="bi bi-check-circle text-success" title="Duyệt"></i>
+                        <i class="bi bi-x-circle text-danger" title="Từ chối"></i>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" class="form-check-input"></td>
+                    <td>
+                        <strong>Sân Tennis Quận 1</strong><br>
+                        <small class="text-muted">Sân tennis trong nhà</small>
+                    </td>
+                    <td>Trần Thị B</td>
+                    <td>Tennis</td>
+                    <td>456 Lê Lợi, Q1</td>
+                    <td>14/12/2024</td>
+                    <td class="text-center action-icons">
+                        <i class="bi bi-eye view" title="Xem chi tiết"></i>
+                        <i class="bi bi-check-circle text-success" title="Duyệt"></i>
+                        <i class="bi bi-x-circle text-danger" title="Từ chối"></i>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- System Management -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <h4><i class="bi bi-gear"></i> Quản lý hệ thống</h4>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="bi bi-people fs-1 text-primary mb-3"></i>
+                            <h5>Quản lý Users</h5>
+                            <p class="text-muted">Xem và quản lý người dùng</p>
+                            <button class="btn btn-blue">Truy cập</button>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="card">
-            <div class="card-header">
-                <h3>Quick Actions</h3>
-            </div>
-            <div class="card-body quick-actions">
-                <a href="/owner/fields/create" class="action-button">
-                    <i class="fas fa-plus"></i>
-                    <span>Add New Field</span>
-                </a>
-                <a href="/owner/vouchers/create" class="action-button">
-                    <i class="fas fa-ticket"></i>
-                    <span>Create Voucher</span>
-                </a>
-                <a href="/owner/news/create" class="action-button">
-                    <i class="fas fa-newspaper"></i>
-                    <span>Post News</span>
-                </a>
-                <a href="/owner/tournaments/create" class="action-button">
-                    <i class="fas fa-trophy"></i>
-                    <span>Create Tournament</span>
-                </a>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="bi bi-building fs-1 text-success mb-3"></i>
+                            <h5>Quản lý Sân</h5>
+                            <p class="text-muted">Duyệt và quản lý sân thể thao</p>
+                            <button class="btn btn-blue">Truy cập</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <i class="bi bi-graph-up fs-1 text-warning mb-3"></i>
+                            <h5>Báo cáo</h5>
+                            <p class="text-muted">Thống kê và báo cáo hệ thống</p>
+                            <button class="btn btn-blue">Truy cập</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            datasets: [{
-                label: 'Revenue',
-                data: [1200, 1900, 1500, 2500, 2200, 2800, 3200],
-                borderColor: '#667eea',
-                backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-</script>

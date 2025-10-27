@@ -22,6 +22,6 @@ public class ServiceItem extends AbstractEntity {
     @JoinColumn(name = "service_id")
     private Service service;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "serviceItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "serviceItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FieldServiceItem> fieldServiceItems = new HashSet<FieldServiceItem>();
 }

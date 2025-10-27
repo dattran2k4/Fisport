@@ -8,6 +8,10 @@ import com.Fisport.service.impl.SessionService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.naming.AuthenticationException;
+import java.security.Principal;
+import java.util.Collection;
 
 @RequiredArgsConstructor
 @Controller
@@ -52,6 +58,20 @@ public class LoginController {
             return "login";
         }
 
+        // Kiểm tra role và redirect phù hợp
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+            
+            if (authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                return "redirect:/admin/dashboard";
+            } else if (authorities.contains(new SimpleGrantedAuthority("ROLE_OWNER"))) {
+                return "redirect:/owner/dashboard";
+            } else {
+                return "redirect:/user";
+            }
+        }
+
         return "redirect:" + (backLink != null ? backLink : "/");
     }
 
@@ -78,6 +98,20 @@ public class LoginController {
             model.addAttribute("username", sessionService.get("PRE_AUTH_USER", String.class));
             model.addAttribute("errorCode", "Mã xác thực không đúng hoặc phiên đã hết hạn");
             return "2fa";
+        }
+
+        // Kiểm tra role và redirect phù hợp sau khi xác thực 2FA
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+            
+            if (authorities.contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                return "redirect:/admin/dashboard";
+            } else if (authorities.contains(new SimpleGrantedAuthority("ROLE_OWNER"))) {
+                return "redirect:/owner/dashboard";
+            } else {
+                return "redirect:/user";
+            }
         }
 
         return "redirect:" + (backLink != null ? backLink : "/");
