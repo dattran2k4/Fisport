@@ -45,23 +45,6 @@ public class FieldServiceImpl implements FieldService {
         return fieds.stream().map(this::toDto).toList();
     }
 
-//    @Override
-//    public List<FieldResponse> getFieldByFieldTypeId(long fieldTypeId) {
-//        List<Field> fields = fieldRepository.findByFieldTypeId(fieldTypeId);
-//        return fields.stream()
-//                .map(this::toDto)
-//                .toList();
-//    }
-
-//    @Override
-//    public List<FieldResponse> getFieldByOwner(String name) {
-//        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
-//
-//        List<Field> fields = fieldRepository.findByOwnerId(user.getId());
-//        return fields.stream()
-//                .map(this::toDto)
-//                .toList();
-//    }
 
     @Override
     public void createFieldByOwnerId(FieldRequest fieldRequest, String name) {
@@ -109,22 +92,6 @@ public class FieldServiceImpl implements FieldService {
         fieldRepository.save(field);
     }
 
-    //    @Override
-//    @Transactional
-//    public void createFieldByOwner(FieldCreateRequest req, String username) {
-//        User owner = getUser(username);
-//        Ward ward = getWard(req.getWard());
-//        FieldType fieldType = getFieldType(req.getField_type());
-//
-//        validateOpeningHours(req);
-//
-//        Field field = buildField(req, owner, ward, fieldType);
-//        fieldRepository.save(field);
-//
-//        saveFeatures(req, field);
-//        saveSubFields(req, field);
-//        saveServiceItems(req, field);
-//    }
     @Override
     @Transactional
     public void createFieldByOwner(FieldCreateRequest fieldCreateRequest, String name) {

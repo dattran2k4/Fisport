@@ -30,11 +30,10 @@ public class ChallengeMatchApiController {
 
     @PostMapping("/create")
     public ApiResponse createChallengeMatch(@RequestBody ChallengeMatchRequest request, Principal principal) {
-        String paymentToken = challengeMatchService.createChallengeMatch(request,principal.getName());
+        challengeMatchService.createChallengeMatch(request, principal.getName());
         return ApiResponse.builder()
                 .status(HttpStatus.CREATED.value())
-                .data(paymentToken)
-                .message("Đã tạo thách đấu, chuyển hướng đến thanh toán")
+                .message("Tạo trân đấu thành công!")
                 .build();
     }
 

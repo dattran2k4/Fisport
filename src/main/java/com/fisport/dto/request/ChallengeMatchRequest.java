@@ -22,8 +22,8 @@ public class ChallengeMatchRequest {
     @NotNull(message = "Nhập số người chơi tối đa trong 1 trận đấu")
     private int maxPlayers;
 
-    @NotNull(message = "Vui lòng đặt lịch thi đấu để tạo trận thách đấu")
-    private BookingRequest bookingRequest;
+    @NotNull(message = "Chưa có booking")
+    private Long bookingId;
 
     @NotBlank(message = "Nhập ghi chú cho trận đấu")
     private String note;

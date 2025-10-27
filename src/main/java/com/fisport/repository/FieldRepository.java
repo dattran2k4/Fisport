@@ -12,8 +12,6 @@ import java.util.List;
 
 public interface FieldRepository extends JpaRepository<Field,Long>, JpaSpecificationExecutor<Field> {
 
-    List<Field> findByWardIdAndFieldTypeId(long wardId, long fieldTypeId);
-    List<Field> findByFieldTypeId(long fieldTypeId);
     List<Field> findByOwnerId(Long ownerId);
     List<Field> findByFieldStatus(EFieldStatus fieldStatus);
     List<Field> findByFieldStatusAndOwner_Username(EFieldStatus fieldStatus, String userName);

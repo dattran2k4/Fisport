@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 public interface ChallengeMatchService {
 
-    String createChallengeMatch(ChallengeMatchRequest request, String username);
+    void createChallengeMatch(ChallengeMatchRequest request, String username);
 
     ChallengeMatchResponse getChallengeMatch(Long id);
 

@@ -1,12 +1,10 @@
 package com.fisport.service.impl;
 
-import com.fisport.common.EBookingStatus;
 import com.fisport.common.EChallengeStatus;
 import com.fisport.common.ELevel;
 import com.fisport.common.EParticipantStatus;
 import com.fisport.dto.request.ChallengeMatchRequest;
 import com.fisport.dto.response.ChallengeMatchResponse;
-import com.fisport.dto.response.FieldTypeResponse;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.Booking;
 import com.fisport.model.ChallengeMatch;
@@ -29,13 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 
-public class ChallengeMatchImpl implements ChallengeMatchService {
+public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
     private final ChallengeMatchRepository challengeMatchRepository;
     private final BookingService bookingService;
@@ -44,21 +41,18 @@ public class ChallengeMatchImpl implements ChallengeMatchService {
 
     @Override
     @Transactional
-    public String createChallengeMatch(ChallengeMatchRequest request, String username) {
-
+    public void createChallengeMatch(ChallengeMatchRequest request, String username) {
+        log.info("create challenge match");
         User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        String paymentToken = bookingService.createBooking(request.getBookingRequest(), user.getId());
-
-        Booking booking = bookingRepository.findByPaymentTokenAndBookingStatus(paymentToken, List.of(EBookingStatus.PENDING, EBookingStatus.FAILED)).orElseThrow(() -> new ResourceNotFoundException("Booking not found or paid already"));
-        log.info("Find bookingId {}",  booking.getId());
+        Booking booking = bookingRepository.findById(request.getBookingId()).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
+        log.info("bookingId for match: ",  booking.getId());
 
         ChallengeMatch challengeMatch = ChallengeMatch.builder()
                 .creator(user)
                 .participationFee(request.getFee())
                 .title(request.getTitle())
                 .note(request.getNote())
-                .maxPlayers(request.getMaxPlayers())
                 .status(EChallengeStatus.OPEN)
                 .suggestedLevel(request.getLevel())
                 .booking(booking)
@@ -66,7 +60,6 @@ public class ChallengeMatchImpl implements ChallengeMatchService {
 
         challengeMatchRepository.save(challengeMatch);
         log.info("Created challengeId {}",  challengeMatch.getId());
-        return paymentToken;
     }
 
     @Override

@@ -78,4 +78,9 @@ public class BookingApiController {
         }
     }
 
+    @GetMapping("/{id}/match-type")
+    public ApiResponse getMatchType(@PathVariable Long id) {
+        return ApiResponse.builder().build();
+    }
+
 }
