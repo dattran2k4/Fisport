@@ -8,5 +8,7 @@ public enum ETransactionType {
     @JsonProperty("payment")
     PAYMENT,
     @JsonProperty("refund")
-    REFUND
+    REFUND,
+    @JsonProperty("received")
+    RECEIVED
 }

@@ -5,6 +5,7 @@ import lombok.Getter;
 
 import java.math.BigDecimal;
 import java.time.*;
+import java.util.List;
 
 @Getter
 @Builder
@@ -22,6 +23,7 @@ public class BookingForUserResponse {
     private boolean cancel;
     private boolean canReview;
     private boolean canCreateMatch;
+    private List<ChallengeMatchTypeResponse> challengeMatchTypeResponse;
     private String paymentMethod;
     private String serviceItemName;
     private BigDecimal subPrice;

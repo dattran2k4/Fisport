@@ -13,4 +13,6 @@ public interface WalletPaymentService {
     void payBooking(String paymentToken, String username);
 
     void refundBooking(Long bookingId);
+
+    void payChallengeMatch(Long matchId, String username);
 }

@@ -100,7 +100,9 @@
         </div>
         <div class="row">
             <div class="col-5 label">Số tiền:</div>
-            <div class="col-7 value" th:text="${#numbers.formatDecimal(response.amount, 0, 'COMMA', 2, 'POINT')} + ' ₫'">500,000 ₫</div>
+            <div class="col-7 value"
+                 th:text="${#numbers.formatDecimal(response.amount, 0, 'COMMA', 2, 'POINT')} + ' ₫'">500,000 ₫
+            </div>
         </div>
         <div class="row">
             <div class="col-5 label">Phương thức:</div>
@@ -109,17 +111,19 @@
         <div class="row">
             <div class="col-5 label">Trạng thái:</div>
             <div class="col-7 value">
-                <span th:text="${response.status}" 
+                <span th:text="${response.status}"
                       th:classappend="${response.status.name() == 'SUCCESS' ? 'text-success' : 'text-danger'}">SUCCESS</span>
             </div>
         </div>
         <div class="row">
             <div class="col-5 label">Thời gian:</div>
-            <div class="col-7 value" th:text="${#temporals.format(response.paymentAt, 'dd/MM/yyyy HH:mm:ss')}">15/10/2025 19:45</div>
+            <div class="col-7 value" th:text="${#temporals.format(response.paymentAt, 'dd/MM/yyyy HH:mm:ss')}">
+                15/10/2025 19:45
+            </div>
         </div>
     </div>
 
-    <a href="/" class="btn btn-home"><i class="bi bi-house-door"></i> Trang chủ</a>
+    <a href="/user/bookings" class="btn btn-home"><i class="bi bi-house-door"></i> Trở về danh sách bookings</a>
 </div>
 
 <!-- Bootstrap JS -->

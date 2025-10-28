@@ -11,6 +11,7 @@ import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.*;
 import com.fisport.repository.*;
 import com.fisport.service.BookingService;
+import com.fisport.service.ChallengeMatchTypeService;
 import com.fisport.service.FieldHasTimeSlotService;
 import com.fisport.service.VoucherService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class BookingServiceImpl implements BookingService {
     private final FieldTypeBookDurationRepository fieldTypeBookDurationRepository;
     private final VoucherRepository voucherRepository;
     private final VoucherService voucherService;
+    private final ChallengeMatchTypeService challengeMatchTypeService;
     private final int SLOT_INTERVAL = 30;
 
     @Override
@@ -208,7 +210,6 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingForUserResponse> getBookingsForUser(String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         List<Booking> bookings = user.getBookings().stream().toList();
-
         return bookings.stream().map(b -> BookingForUserResponse.builder()
                 .id(b.getId())
                 .date(b.getBookingDate())
@@ -219,7 +220,8 @@ public class BookingServiceImpl implements BookingService {
                 .status(String.valueOf(b.getBookingStatus()))
                 .cancel(b.getBookingStatus() == EBookingStatus.PENDING || b.getBookingStatus() == EBookingStatus.PAID)
                 .canReview(b.getBookingStatus() == EBookingStatus.COMPLETED && (b.getReview() == null || b.getReview().getRating() == null))
-                .canCreateMatch((b.getBookingStatus().equals(EBookingStatus.PAID) && b.getChallengeMatch() ==  null))
+                .canCreateMatch((b.getBookingStatus().equals(EBookingStatus.PAID) && b.getChallengeMatch() == null))
+                .challengeMatchTypeResponse(challengeMatchTypeService.getAllChallengeMatchTypesByFieldType(b.getSubfield().getField().getFieldType().getId()))
                 .totalPrice(b.getTotalPrice())
                 .rating(Optional.ofNullable(b.getReview())
                         .map(Review::getRating)
@@ -244,7 +246,7 @@ public class BookingServiceImpl implements BookingService {
                 .subFieldName(booking.getSubfield().getName())
                 .status(String.valueOf(booking.getBookingStatus()))
                 .price(booking.getBookingServiceItems().stream().map(BookingServiceItem::getSubTotal).reduce(BigDecimal.ZERO, BigDecimal::add))
-                .canCreateMatch((booking.getBookingStatus().equals(EBookingStatus.PAID) && booking.getChallengeMatch() ==  null))
+                .canCreateMatch((booking.getBookingStatus().equals(EBookingStatus.PAID) && booking.getChallengeMatch() == null))
                 .serviceItemName(
                         booking.getBookingServiceItems().stream()
                                 .map(bsi -> Optional.ofNullable(bsi.getFieldServiceItem())
@@ -289,23 +291,23 @@ public class BookingServiceImpl implements BookingService {
 
         SubField subField = subFieldRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Subfield not found"));
 
-        List<Booking> bookings =  bookingRepository.findBySubfieldAndBookingDate(subField, date);
+        List<Booking> bookings = bookingRepository.findBySubfieldAndBookingDate(subField, date);
 
         LocalTime openTime = subField.getField().getOpenTime();
         LocalTime closeTime = subField.getField().getCloseTime();
 
         List<SlotAvailableResponse> slots = new ArrayList<>();
 
-        for (LocalTime time = openTime; time.isBefore(closeTime.minusMinutes(SLOT_INTERVAL)); time =  time.plusMinutes(SLOT_INTERVAL)) {
+        for (LocalTime time = openTime; time.isBefore(closeTime.minusMinutes(SLOT_INTERVAL)); time = time.plusMinutes(SLOT_INTERVAL)) {
             LocalTime currentTime = time;
             boolean isBooked = bookings.stream().anyMatch(b ->
                     !b.getBookingStatus().equals(EBookingStatus.CANCELLED)
-                    && (currentTime.isBefore(b.getEndTime())
+                            && (currentTime.isBefore(b.getEndTime())
                             && currentTime.plusMinutes(SLOT_INTERVAL).isAfter(b.getStartTime())));
-                    slots.add(SlotAvailableResponse.builder()
-                                                    .startTime(time)
-                                                    .isAvailable(!isBooked)
-                                                    .build());
+            slots.add(SlotAvailableResponse.builder()
+                    .startTime(time)
+                    .isAvailable(!isBooked)
+                    .build());
         }
         return slots;
     }

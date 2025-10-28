@@ -38,29 +38,29 @@ public class ChallengeMatch extends AbstractEntity {
     @Min(0)
     private BigDecimal participationFee;
 
-    @Column(name = "max_players")
-    @Min(1)
-    private Integer maxPlayers;
-
-    @ManyToOne
-    @JoinColumn(name = "subfield_id")
-    private SubField subField;
-
     @Column(name = "note", length = 500)
     private String note;
 
     @Enumerated(EnumType.STRING)
     private EChallengeStatus status;
 
+    @Column
+    private Long sportId;
+
     @OneToOne
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
 
-    @OneToMany(mappedBy = "match")
-    private List<ChallengeParticipant> participants = new ArrayList<>();
+    @ManyToOne
+    @JoinColumn(name = "challenge_match_type_id")
+    private ChallengeMatchType challengeMatchType;
 
     @OneToMany(mappedBy = "match")
-    private List<ChallengeResult> results;
+    @Builder.Default
+    private List<ChallengeParticipant> participants = new ArrayList<>();
+
+    @OneToOne(mappedBy = "match")
+    private ChallengeResult result;
 
     @Column(name = "created_at")
     @CreationTimestamp

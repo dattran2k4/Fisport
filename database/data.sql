@@ -526,23 +526,23 @@ VALUES
 (500000, NOW(), NOW(), 4);
 
 INSERT INTO challenge_match
-(creator_id, title, suggested_level, fee, max_players, subfield_id, note, status, booking_id, created_at, updated_at)
+(creator_id, title, suggested_level, fee, note, status, booking_id, created_at, updated_at)
 VALUES
-(1, 'Thách đấu giao hữu sân 5', 'TRUNGBINH', 50000, 10, 1, 'Giao hữu vui vẻ, không phân biệt trình độ.', 'PENDING', 1, NOW(), NOW()),
+(1, 'Thách đấu giao hữu sân 5', 'TRUNGBINH', 50000,   'Giao hữu vui vẻ, không phân biệt trình độ.', 'PENDING', 1, NOW(), NOW()),
 
-(2, 'Giao hữu chiều thứ 4', 'KHA', 80000, 14, 2, 'Ưu tiên các bạn đá cánh nhanh nhẹn.', 'MATCHED', 2, NOW(), NOW()),
+(2, 'Giao hữu chiều thứ 4', 'KHA', 80000,  'Ưu tiên các bạn đá cánh nhanh nhẹn.', 'MATCHED', 2, NOW(), NOW()),
 
-(3, 'Trận test sân mới', 'TRUNGBINH_KHA', 0, 12, 3, 'Test sân trước giải đấu nội bộ.', 'DRAFT', 3, NOW(), NOW());
+(3, 'Trận test sân mới', 'TRUNGBINH_KHA', 0,   'Test sân trước giải đấu nội bộ.', 'DRAFT', 3, NOW(), NOW());
 
 INSERT INTO challenge_participant
-(match_id, user_id, status, request_message, paid, created_at, updated_at)
+(match_id, user_id, team, status, request_message, paid, created_at, updated_at)
 VALUES
-(1, 2, 'PENDING', 'Cho mình tham gia nhé!', FALSE, NOW(), NOW()),
-(1, 3, 'ACCEPTED', 'Rất mong được đá chung!', TRUE, NOW(), NOW()),
+(1, 2, 'TEAM_A', 'PENDING', 'Cho mình tham gia nhé!', FALSE, NOW(), NOW()),
+(1, 3, 'TEAM_A', 'ACCEPTED', 'Rất mong được đá chung!', TRUE, NOW(), NOW()),
 
-(2, 2, 'ACCEPTED', 'Cho mình tham gia trận này.', TRUE, NOW(), NOW());
+(2, 2, 'TEAM_A', 'ACCEPTED', 'Cho mình tham gia trận này.', TRUE, NOW(), NOW()),
+(2, 3, 'TEAM_B', 'ACCEPTED', 'Hi.', TRUE, NOW(), NOW());
 
-INSERT INTO challenge_result (match_id, player_id, score, created_at)
+INSERT INTO challenge_result (match_id, team_a_scort, team_b_scort, created_at)
 VALUES
-(2, 1, 2, NOW()),   -- Creator:
-(2, 2, 3, NOW());   -- Player:
+--(2, 1, 2, NOW()),   -- Creator:

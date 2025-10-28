@@ -14,16 +14,16 @@ public class ChallengeMatchSpecification {
     private ChallengeMatchSpecification() {
     }
 
-    public static Specification<ChallengeMatch> filterChallengeMatch(EChallengeStatus status, ELevel level,
-                                                                     Integer maxPlayers, LocalDate date, BigDecimal fee, Long cityId, Long fieldTypeId) {
+    public static Specification<ChallengeMatch> filterChallengeMatch(EChallengeStatus status, ELevel level, String matchType,
+                                                                     LocalDate date, BigDecimal fee, Long cityId, Long fieldTypeId) {
 
-        return (Root<ChallengeMatch> root, CriteriaQuery<?> query, CriteriaBuilder cb  ) -> {
+        return (Root<ChallengeMatch> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             Join<?, ?> bookingJoin = root.join("booking");
             Join<?, ?> subFieldJoin = bookingJoin.join("subfield");
             Join<?, ?> fieldJoin = subFieldJoin.join("field");
-            Join<?, ?> fieldTypeJoin = fieldJoin.join("fieldType");
             Join<?, ?> wardJoin = fieldJoin.join("ward");
             Join<?, ?> cityJoin = wardJoin.join("city");
+            Join<?, ?> matchTypeJoin = root.join("challengeMatchType");
 
             Predicate predicate = cb.conjunction();
 
@@ -35,8 +35,8 @@ public class ChallengeMatchSpecification {
                 predicate = cb.and(predicate, cb.equal(root.get("suggestedLevel"), level));
             }
 
-            if (maxPlayers != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("maxPlayers"), maxPlayers));
+            if (matchType != null) {
+                predicate = cb.and(predicate, cb.equal(matchTypeJoin.get("name"), matchType));
             }
 
             if (date != null) {
@@ -52,7 +52,7 @@ public class ChallengeMatchSpecification {
             }
 
             if (fieldTypeId != null) {
-                predicate = cb.and(predicate, cb.equal(fieldTypeJoin.get("id"), fieldTypeId));
+                predicate = cb.and(predicate, cb.equal(root.get("sportId"), fieldTypeId));
             }
 
             return predicate;

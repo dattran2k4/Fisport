@@ -6,5 +6,4 @@ public enum EChallengeStatus {
     FULL,
     MATCHED,
     CANCELLED,
-    EXPIRED
 }

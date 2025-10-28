@@ -40,7 +40,7 @@ public class ChallengeMatchApiController {
     @GetMapping
     public ApiResponse getAllChallengeMatches(@RequestParam(required = false) EChallengeStatus status,
                                               @RequestParam(required = false) ELevel level,
-                                              @Min(1)@RequestParam(required = false) Integer maxPlayers,
+                                              @RequestParam(required = false) String matchType,
                                               @RequestParam(required = false) LocalDate date,
                                               @RequestParam(required = false) BigDecimal fee,
                                               @RequestParam(required = false) Long cityId,
@@ -51,15 +51,15 @@ public class ChallengeMatchApiController {
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())
                 .message("challenge matches")
-                .data(challengeMatchService.getAllChallengeMatch(status, level, maxPlayers, date, fee, cityId, fieldTypeId, page, size))
+                .data(challengeMatchService.getAllChallengeMatch(status, level, matchType, date, fee, cityId, fieldTypeId, page, size))
                 .build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/detail")
     public ApiResponse getChallengeMatch(@PathVariable Long id) {
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())
-                .data(challengeMatchService.getChallengeMatch(id))
+                .data(challengeMatchService.getChallengeMatchDetail(id))
                 .message("challenge match")
                 .build();
     }

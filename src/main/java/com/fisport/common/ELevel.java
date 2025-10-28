@@ -3,15 +3,15 @@ package com.fisport.common;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum ELevel {
-    @JsonProperty("Yếu")
+    @JsonProperty("yeu")
     YEU("Yếu"),
-    @JsonProperty("Trung bình yếu")
+    @JsonProperty("trungbinh_yeu")
     TRUNGBINH_YEU("Trung bình yếu"),
-    @JsonProperty("Trung bình")
+    @JsonProperty("trungbinh")
     TRUNGBINH("Trung bình"),
-    @JsonProperty("Trung bình khá")
+    @JsonProperty("trungbinh_kha")
     TRUNGBINH_KHA("Trung bình khá"),
-    @JsonProperty("Khá")
+    @JsonProperty("kha")
     KHA("Khá");
 
     private final String displayName;
