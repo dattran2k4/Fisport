@@ -525,14 +525,21 @@ VALUES
 (0, NOW(), NOW(), 3),
 (500000, NOW(), NOW(), 4);
 
-INSERT INTO challenge_match
-(creator_id, title, suggested_level, fee, note, status, booking_id, created_at, updated_at)
+INSERT INTO challenge_match_type(name, max_players, sport_id)
 VALUES
-(1, 'Thách đấu giao hữu sân 5', 'TRUNGBINH', 50000,   'Giao hữu vui vẻ, không phân biệt trình độ.', 'PENDING', 1, NOW(), NOW()),
+("Đơn", 2, 6),
+("Đôi nam", 4, 6),
+("Đôi nữ", 4, 6),
+("Đôi nam nữ", 4, 6);
 
-(2, 'Giao hữu chiều thứ 4', 'KHA', 80000,  'Ưu tiên các bạn đá cánh nhanh nhẹn.', 'MATCHED', 2, NOW(), NOW()),
+INSERT INTO challenge_match
+(creator_id, challenge_match_type_id, sport_id, title, suggested_level, fee, note, status, booking_id, created_at, updated_at)
+VALUES
+(1, null, 6,  'Thách đấu giao hữu sân 5', 'TRUNGBINH', 50000,   'Giao hữu vui vẻ, không phân biệt trình độ.', 'PENDING', 1, NOW(), NOW()),
 
-(3, 'Trận test sân mới', 'TRUNGBINH_KHA', 0,   'Test sân trước giải đấu nội bộ.', 'DRAFT', 3, NOW(), NOW());
+(2, 2, 6,  'Giao hữu chiều thứ 4', 'KHA', 80000,  'Ưu tiên các bạn đá cánh nhanh nhẹn.', 'MATCHED', 2, NOW(), NOW()),
+
+(3, null, 1,  'Trận test sân mới', 'TRUNGBINH_KHA', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
 
 INSERT INTO challenge_participant
 (match_id, user_id, team, status, request_message, paid, created_at, updated_at)
@@ -546,3 +553,8 @@ VALUES
 INSERT INTO challenge_result (match_id, team_a_scort, team_b_scort, created_at)
 VALUES
 --(2, 1, 2, NOW()),   -- Creator:
+INSERT INTO user_sport_elo(user_id, sport_id, level, elo)
+VALUES
+(2, 6, "TRUNGBINH", 1200),
+(3, 6, "TRUNGBINH", 1300);
+

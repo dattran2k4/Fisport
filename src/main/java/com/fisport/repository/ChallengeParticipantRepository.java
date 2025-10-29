@@ -1,5 +1,6 @@
 package com.fisport.repository;
 
+import com.fisport.common.ETeam;
 import com.fisport.dto.response.ChallengeParticipantsInfoResponse;
 import com.fisport.model.ChallengeParticipant;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -22,9 +23,13 @@ public interface ChallengeParticipantRepository extends JpaRepository<ChallengeP
             "JOIN UserSportElo use " +
             "ON use.user.id = u.id " +
             "AND use.sport.id = m.sportId " +
-            "WHERE cp.status = 'ACCEPTED'")
+            "WHERE cp.status = 'ACCEPTED' AND m.id = :matchId")
     List<ChallengeParticipantsInfoResponse> findAllAcceptedParticipantsInfo(Long matchId);
 
     @Query("SELECT p FROM ChallengeParticipant p JOIN FETCH p.match m WHERE p.user.username = :username")
     List<ChallengeParticipant> findAllWithMatchByUser(@Param("username") String username);
+
+    boolean existsByMatchIdAndUserId(Long matchId, Long id);
+
+    List<ChallengeParticipant> findByMatchIdAndTeam(Long matchId, ETeam team);
 }

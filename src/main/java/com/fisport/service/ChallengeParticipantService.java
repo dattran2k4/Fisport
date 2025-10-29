@@ -6,6 +6,7 @@ import com.fisport.dto.request.UpdateParticipantStatusRequest;
 import com.fisport.dto.response.ChallengeParticipantForCreatorResponse;
 import com.fisport.dto.response.ChallengeParticipantsForUserResponse;
 import com.fisport.dto.response.ChallengeParticipantsInfoResponse;
+import com.fisport.model.ChallengeParticipant;
 
 import java.util.List;
 import java.util.Map;
@@ -24,5 +25,8 @@ public interface ChallengeParticipantService {
 
     List<ChallengeParticipantsForUserResponse> getAllPariticipantsByUser(String username);
 
+    Integer getAcceptedCurrentPlayers(Long matchId);
+
+    List<ChallengeParticipant> getParticipantsByMatchAndTeam(Long matchId, ETeam team);
     
 }

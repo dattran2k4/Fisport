@@ -22,7 +22,7 @@ public class UserSportElo extends AbstractEntity {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "field_type_id")
+    @JoinColumn(name = "sport_id")
     private FieldType sport;
 
     @Column(name = "elo")

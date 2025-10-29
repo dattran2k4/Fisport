@@ -97,10 +97,11 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
                 .sport(challengeMatch.getBooking().getSubfield().getField().getFieldType().getName())
                 .cityName(challengeMatch.getBooking().getSubfield().getField().getWard().getCity().getName())
                 .wardName(challengeMatch.getBooking().getSubfield().getField().getWard().getName())
+                .fieldName(challengeMatch.getBooking().getSubfield().getField().getName())
                 .challengeStatus(challengeMatch.getStatus())
                 .maxPlayers(challengeMatchTypeService.maxPlayer(challengeMatch.getChallengeMatchType().getId()))
                 .matchType(challengeMatch.getChallengeMatchType().getName())
-                .currentPlayers(getCurrentPlayers(challengeMatch.getId()))
+                .currentPlayers(challengeParticipantService.getAcceptedCurrentPlayers(challengeMatch.getId()))
                 .date(challengeMatch.getBooking().getBookingDate())
                 .startTime(challengeMatch.getBooking().getStartTime())
                 .endTime(challengeMatch.getBooking().getEndTime())
@@ -136,7 +137,7 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
                 .ward(m.getBooking().getSubfield().getField().getWard().getName())
                 .fieldName(m.getBooking().getSubfield().getField().getName())
                 .sport(m.getBooking().getSubfield().getField().getFieldType().getName())
-                .currentPlayers(getCurrentPlayers(m.getId()))
+                .currentPlayers(challengeParticipantService.getAcceptedCurrentPlayers(m.getId()))
                 .date(m.getBooking().getBookingDate())
                 .level(m.getSuggestedLevel().getDisplayName())
                 .maxPlayers(challengeMatchTypeService.maxPlayer(m.getChallengeMatchType().getId()))
@@ -149,7 +150,7 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
     @Override
     public void updateMatchStatus(ChallengeMatch match) {
-        Integer currentPlayers = getCurrentPlayers(match.getId());
+        Integer currentPlayers = challengeParticipantService.getAcceptedCurrentPlayers(match.getId());
 
         EChallengeStatus newStatus;
         if (currentPlayers == 0) {
@@ -162,13 +163,6 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
         match.setStatus(newStatus);
         challengeMatchRepository.save(match);
-    }
-
-    @Override
-    public Integer getCurrentPlayers(Long matchId) {
-        ChallengeMatch match = findChallengeMatch(matchId);
-
-        return Math.toIntExact(match.getParticipants().stream().filter(p -> p.getStatus().equals(EParticipantStatus.ACCEPTED)).count());
     }
 
     @Override

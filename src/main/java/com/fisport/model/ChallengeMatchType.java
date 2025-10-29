@@ -19,12 +19,9 @@ public class ChallengeMatchType extends AbstractEntity {
     @Column(name = "name")
     private String name;
 
-    @Column(name = "players_per_team")
+    @Column(name = "max_players")
     @Min(1)
-    private Integer playersPerTeam;
-
-    @Column(name = "teams")
-    private Integer teams;
+    private Integer maxPlayers;
 
     @ManyToOne
     @JoinColumn(name = "sport_id")

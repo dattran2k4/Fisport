@@ -9,5 +9,4 @@ public class ChallengeMatchTypeResponse {
     private Long id;
     private String name;
     private Integer playersPerTeam;
-    private Integer teams;
 }

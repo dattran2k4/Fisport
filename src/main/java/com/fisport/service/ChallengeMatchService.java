@@ -22,7 +22,5 @@ public interface ChallengeMatchService {
 
     void updateMatchStatus(ChallengeMatch challengeMatch);
 
-    Integer getCurrentPlayers(Long matchId);
-
     void checkMatchFinished(Long matchId);
 }

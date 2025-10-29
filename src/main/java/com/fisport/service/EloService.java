@@ -9,7 +9,7 @@ public interface EloService {
 
     Integer averageTeamElo(List<UserSportElo> team);
 
-    Double actualScore(int scortTeamA, int scortTeamB);
+    Double actualScore(int scoreTeamA, int scoreTeamB);
 
-    
+    void updateTeamElo(List<UserSportElo> teamA, List<UserSportElo> teamB, int scoreA, int scoreB);
 }

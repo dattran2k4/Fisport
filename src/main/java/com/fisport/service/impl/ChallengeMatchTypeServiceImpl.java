@@ -25,7 +25,7 @@ public class ChallengeMatchTypeServiceImpl implements ChallengeMatchTypeService 
     public Integer maxPlayer(Long id) {
         ChallengeMatchType c = challengeMatchTypeRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Challenge Match Type Not Found"));
 
-        return c.getPlayersPerTeam() * c.getTeams();
+        return c.getMaxPlayers();
     }
 
     @Override
@@ -37,7 +37,6 @@ public class ChallengeMatchTypeServiceImpl implements ChallengeMatchTypeService 
         return matchTypes.stream().map(t -> ChallengeMatchTypeResponse.builder()
                 .id(t.getId())
                 .name(t.getName())
-                .teams(t.getTeams())
                 .build()).toList();
     }
 }
