@@ -13,5 +13,5 @@ import java.util.Optional;
 public interface ChallengeMatchRepository extends JpaRepository<ChallengeMatch, Long>, JpaSpecificationExecutor<ChallengeMatch> {
     Optional<ChallengeMatch> findByBooking(Booking booking);
 
-    List<ChallengeMatch> findByUserId(Long id);
+    List<ChallengeMatch> findByCreatorId(Long id);
 }

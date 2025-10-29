@@ -1,52 +1,226 @@
 <!DOCTYPE html>
 <html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layout/web/web}">
+    layout:decorate="~{layout/web/web}">
+
 <head>
     <meta charset="UTF-8">
     <title>Thách đấu</title>
     <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f8; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        h1 { font-size: 2rem; font-weight: bold; margin-bottom: 20px; color: #333; }
+        body {
+            background-color: #f4f6f8;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
 
         /* Filter bar */
-        .filter-bar { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
-        .filter-bar select, .filter-bar input { padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; outline:none; font-size: 0.9rem; }
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .filter-bar select,
+        .filter-bar input {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            outline: none;
+            font-size: 0.9rem;
+        }
 
         /* Grid card */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
 
         /* Card */
-        .card { background-color: #fff; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); padding: 20px; display:flex; flex-direction:column; justify-content:space-between; transition: transform 0.2s, box-shadow 0.2s; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .card {
+            background-color: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
 
-        .card-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-        .card-header h2 { font-size: 1.25rem; font-weight:600; color:#111; }
-        .badge { padding:5px 10px; border-radius:12px; font-size:0.8rem; font-weight:600; text-transform:uppercase; color:#fff; }
-        .badge-new { background-color: #6c757d; }
-        .badge-pending { background-color: #ffc107; color:#333; }
-        .badge-confirmed { background-color: #28a745; }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
 
-        .card p { font-size:0.9rem; color:#555; margin-bottom:6px; display:flex; align-items:center; gap:5px; }
-        .fee { font-weight:bold; color:#111; margin-bottom:10px; }
-        .icon { color:#22c55e; }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #111;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .card-footer {
+            margin-top: auto;
+        }
+
+
+        .badge {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #fff;
+        }
+
+        .badge-new {
+            background-color: #6c757d;
+        }
+
+        .badge-pending {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .badge-confirmed {
+            background-color: #28a745;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .fee {
+            font-weight: bold;
+            color: #111;
+            margin-bottom: 10px;
+        }
+
+        .icon {
+            color: #22c55e;
+        }
 
         /* Progress bar */
-        .progress-container { background-color:#e2e8f0; border-radius:12px; height:12px; overflow:hidden; margin-bottom:10px; }
-        .progress-bar { height:12px; border-radius:12px; background: linear-gradient(90deg, #4ade80, #22c55e); width:0%; transition: width 0.5s ease-in-out; }
-        .progress-text { font-size:0.8rem; color:#555; margin-bottom:10px; text-align:right; }
+        .progress-container {
+            background-color: #e2e8f0;
+            border-radius: 12px;
+            height: 12px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            height: 12px;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: #555;
+            text-align: right;
+        }
 
         /* Button */
-        .btn { padding:10px; border:none; border-radius:12px; font-weight:600; cursor:pointer; transition:all 0.2s; width:100%; }
-        .btn-join { background: linear-gradient(90deg, #4ade80, #22c55e); color:#fff; }
-        .btn-join:hover { opacity:0.9; }
-        .btn-full { background-color: #d1d5db; color:#555; cursor:not-allowed; }
+        .btn {
+            padding: 10px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
 
-        @media(max-width:768px){ .grid{grid-template-columns:1fr;} .filter-bar{flex-direction:column;} }
+        .btn-join {
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            color: #fff;
+        }
+
+        .btn-join:hover {
+            opacity: 0.9;
+        }
+
+        .btn-full {
+            background-color: #d1d5db;
+            color: #555;
+            cursor: not-allowed;
+        }
+
+        .btn-detail {
+            display: inline-block;
+            padding: 10px;
+            border-radius: 12px;
+            background-color: #22c55e;
+            color: #fff;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            width: 100%;
+            transition: all 0.2s;
+        }
+
+        /* Card hover effect */
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-detail:hover {
+            opacity: 0.9;
+        }
+
+        @media(max-width:768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-bar {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
+
 <body>
     <div layout:fragment="content">
         <div class="container">
@@ -79,7 +253,7 @@
                     <option value="6">6</option>
                 </select>
                 <select>
-                    <option value="">Sport Type</option>
+                    <option value="">All Sports</option>
                     <option value="Football">Football</option>
                     <option value="Basketball">Basketball</option>
                 </select>
@@ -87,47 +261,49 @@
 
             <!-- Match Grid -->
             <div class="grid">
-                <!-- Example Card -->
-                <div class="card">
+                <div class="card" th:each="match : ${matches.data}">
                     <div class="card-header">
-                        <h2>Sunday Football Match</h2>
-                        <span class="badge badge-pending">Pending</span>
+                        <h2 th:text="${match.title}">Match Title</h2>
+                        <span th:text="${match.status}"
+                            th:classappend="${match.status == 'OPEN' ? ' badge-pending' : (match.status == 'PENDING' ? ' badge-confirmed' : ' badge-other')}">
+                        </span>
                     </div>
-                    <p><i class="fas fa-map-marker-alt icon"></i> Ward 1, City A</p>
-                    <p><i class="fas fa-calendar-alt icon"></i> 25-10-2025</p>
-                    <p class="fee"><i class="fas fa-money-bill-wave icon"></i> 100,000 VND</p>
-                    <p><i class="fas fa-users icon"></i> 2 / 4 players</p>
-                    <p><i class="fas fa-futbol icon"></i> Football</p>
 
-                    <!-- Progress bar -->
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width:50%;"></div>
+                    <div class="card-body">
+                        <p><i class="fas fa-map-marker-alt icon"></i>
+                            <span th:text="${match.ward + ', ' + match.city}">Ward, City</span>
+                        </p>
+                        <p><i class="fas fa-calendar-alt icon"></i>
+                            <span th:text="${#temporals.format(match.date, 'dd-MM-yyyy')}">Date</span>
+                        </p>
+                        <p class="fee"><i class="fas fa-money-bill-wave icon"></i>
+                            <span
+                                th:text="${#numbers.formatDecimal(match.fee, 0, 'COMMA', 0, 'POINT') + ' VND'}">Fee</span>
+                        </p>
+                        <p><i class="fas fa-users icon"></i>
+                            <span
+                                th:text="${match.currentPlayers + ' / ' + match.maxPlayers + ' players'}">Players</span>
+                        </p>
+                        <p><i class="fas fa-futbol icon"></i>
+                            <span th:text="${match.sport}">Sport</span>
+                        </p>
+
+                        <!-- Progress bar -->
+                        <div class="progress-container">
+                            <div class="progress-bar"
+                                th:style="'width:' + (${match.currentPlayers} * 100 / ${match.maxPlayers}) + '%'"></div>
+                        </div>
+                        <div class="progress-text"
+                            th:text="${match.currentPlayers + ' / ' + match.maxPlayers + ' players'}"></div>
                     </div>
-                    <div class="progress-text">2 / 4 players</div>
 
-                    <button class="btn btn-join">Join Match</button>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h2>Saturday Friendly Match</h2>
-                        <span class="badge badge-confirmed">Confirmed</span>
+                    <div class="card-footer">
+                        <a th:href="@{'/thach-dau/' + ${match.id}}" class="btn btn-detail">Xem chi tiết</a>
                     </div>
-                    <p><i class="fas fa-map-marker-alt icon"></i> Ward 2, City B</p>
-                    <p><i class="fas fa-calendar-alt icon"></i> 26-10-2025</p>
-                    <p class="fee"><i class="fas fa-money-bill-wave icon"></i> 150,000 VND</p>
-                    <p><i class="fas fa-users icon"></i> 4 / 4 players</p>
-                    <p><i class="fas fa-basketball-ball icon"></i> Basketball</p>
-
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width:100%;"></div>
-                    </div>
-                    <div class="progress-text">4 / 4 players</div>
-
-                    <button class="btn btn-full">Full</button>
                 </div>
             </div>
         </div>
     </div>
 </body>
+
 </html>

@@ -40,7 +40,6 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-    private final UserSportEloService userSportEloService;
     private final ChallengeParticipantRepository challengeParticipantRepository;
     private final ChallengeParticipantService challengeParticipantService;
     private final WalletPaymentService walletPaymentService;
@@ -104,6 +103,7 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
                 .city(challengeMatch.getBooking().getSubfield().getField().getWard().getCity().getName())
                 .ward(challengeMatch.getBooking().getSubfield().getField().getWard().getName())
                 .field(challengeMatch.getBooking().getSubfield().getField().getName())
+                .subField(challengeMatch.getBooking().getSubfield().getName())
                 .challengeStatus(challengeMatch.getStatus())
                 .maxPlayers(challengeMatch.getChallengeMatchType().getMaxPlayers())
                 .matchType(challengeMatch.getChallengeMatchType().getName())
@@ -134,7 +134,8 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
                 .ward(m.getBooking().getSubfield().getField().getWard().getName())
                 .fieldName(m.getBooking().getSubfield().getField().getName())
                 .sport(m.getBooking().getSubfield().getField().getFieldType().getName())
-                .currentPlayers(m.getChallengeMatchType().getMaxPlayers())
+                .currentPlayers(challengeParticipantService.getAcceptedCurrentPlayers(m.getId()))
+                .matchType(m.getChallengeMatchType().getName())
                 .date(m.getBooking().getBookingDate())
                 .level(m.getSuggestedLevel().getValue())
                 .maxPlayers(m.getChallengeMatchType().getMaxPlayers())
@@ -224,7 +225,7 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
     public List<ChallengeMatchManagementResponse> getListMatchForManagement(String username) {
         Optional<User> user = userService.findByUsername(username);
 
-        List<ChallengeMatch> matches = challengeMatchRepository.findByUserId(user.get().getId());
+        List<ChallengeMatch> matches = challengeMatchRepository.findByCreatorId(user.get().getId());
 
         return matches.stream().map(m -> ChallengeMatchManagementResponse.builder()
                 .id(m.getId())

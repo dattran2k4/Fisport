@@ -541,6 +541,14 @@ VALUES
 
 (3, 3, 1,  'Trận test sân mới', 'TRUNGBINH_KHA', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
 
+--(1, 3, 1,  'Trận test sân mới', 'TRUNGBINH', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
+--
+--(3, 3, 1,  'Trận test sân mới', 'YEU', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
+--
+--(4, 3, 1,  'Trận test sân mới', 'YEU', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
+--
+--(4, 3, 1,  'Trận test sân mới', 'YEU', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
+
 INSERT INTO challenge_participant
 (match_id, user_id, team, status, request_message, paid, created_at, updated_at)
 VALUES

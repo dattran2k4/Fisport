@@ -51,7 +51,7 @@ public class ChallengeMatchController {
     public String challengeMatchDetail(@PathVariable Long id, Model model) {
         ChallengeMatch match = challengeMatchService.findChallengeMatch(id);
 
-        model.addAttribute("creator", userSportEloService.getUserSportEloResponse(match.getCreator().getId(), match.getSportId()));
+        model.addAttribute("creator", userSportEloService.getUserSportEloResponse(match.getCreator().getId(), match.getFieldTypeId()));
 
         model.addAttribute("match", challengeMatchService.getChallengeMatchDetail(id));
 
