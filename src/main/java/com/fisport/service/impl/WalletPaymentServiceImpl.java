@@ -222,6 +222,9 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
             throw new InvalidDataException("Bạn chưa được chấp nhận tham gia trận đấu");
         }
 
+        if (pariticipant.isPaid()) {
+            throw new InvalidDataException("Bạn đã trả tiền rồi");
+        }
 
         if (player.getWallet().getBalance().compareTo(match.getParticipationFee()) < 0) {
             throw new InvalidDataException("Số dư không đủ");

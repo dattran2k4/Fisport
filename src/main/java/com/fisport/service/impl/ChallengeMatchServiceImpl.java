@@ -4,6 +4,7 @@ import com.fisport.common.*;
 import com.fisport.dto.request.ChallengeMatchRequest;
 import com.fisport.dto.response.ChallengeMatchDetailResponse;
 import com.fisport.dto.response.ChallengeMatchSummaryResponse;
+import com.fisport.dto.response.PageResponse;
 import com.fisport.exception.InvalidDataException;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.*;
@@ -23,6 +24,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -115,13 +117,10 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
     }
 
     @Override
-    public Page<ChallengeMatchSummaryResponse> getAllChallengeMatch(EChallengeStatus status, ELevel level,
-                                                                    String matchType, LocalDate date, BigDecimal fee, Long cityId, Long fieldTypeId,
-                                                                    int page, int size) {
-        int pageNumber = 0;
-        if (page > 0) {
-            pageNumber = page - 1;
-        }
+    public PageResponse<ChallengeMatchSummaryResponse> getAllChallengeMatch(EChallengeStatus status, ELevel level,
+                                                                            String matchType, LocalDate date, BigDecimal fee, Long cityId, Long fieldTypeId,
+                                                                            int page, int size) {
+        int pageNumber = (page > 0) ? page - 1 : 0;
 
         Specification<ChallengeMatch> spec = ChallengeMatchSpecification.filterChallengeMatch(status, level, matchType, date, fee, cityId, fieldTypeId);
 
@@ -129,7 +128,7 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
         Page<ChallengeMatch> matchPage = challengeMatchRepository.findAll(spec, pageable);
 
-        return matchPage.map(m -> ChallengeMatchSummaryResponse.builder()
+        List<ChallengeMatchSummaryResponse> response = matchPage.stream().map(m -> ChallengeMatchSummaryResponse.builder()
                 .id(m.getId())
                 .title(m.getTitle())
                 .status(m.getStatus())
@@ -137,11 +136,19 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
                 .ward(m.getBooking().getSubfield().getField().getWard().getName())
                 .fieldName(m.getBooking().getSubfield().getField().getName())
                 .sport(m.getBooking().getSubfield().getField().getFieldType().getName())
-                .currentPlayers(challengeParticipantService.getAcceptedCurrentPlayers(m.getId()))
+                .currentPlayers(m.getChallengeMatchType().getMaxPlayers())
                 .date(m.getBooking().getBookingDate())
-                .level(m.getSuggestedLevel().getDisplayName())
-                .maxPlayers(challengeMatchTypeService.maxPlayer(m.getChallengeMatchType().getId()))
-                .build());
+                .level(m.getSuggestedLevel().getValue())
+                .maxPlayers(m.getChallengeMatchType().getMaxPlayers())
+                .build()).toList();
+
+        return PageResponse.<ChallengeMatchSummaryResponse>builder()
+                .pageNumber(pageNumber)
+                .pageSize(size)
+                .totalElements(matchPage.getTotalElements())
+                .totalPages(matchPage.getTotalPages())
+                .data(response)
+                .build();
     }
 
     private ChallengeMatch findChallengeMatch(Long id) {
