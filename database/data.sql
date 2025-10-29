@@ -179,11 +179,11 @@ VALUES
 ('Sân Pickleball 3', 'san-pickleball-3', '44 Lý Thường Kiệt, Hải Châu', 6, 3, 6, 'Sân Pickleball 2 người, nền gỗ chất lượng', '/web/img/field/pickleball/san-pickleball-3.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0513, 108.2346, NOW(), NOW()),
 ('Sân Pickleball 4', 'san-pickleball-4', '66 Nguyễn Trãi, Hải Châu', 6, 3, 6, 'Sân Pickleball trong nhà, có đèn chiếu sáng', '/web/img/field/pickleball/san-pickleball-4.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0585, 108.2748, NOW(), NOW()),
 ('Sân Pickleball 5', 'san-pickleball-5', '88 Trần Hưng Đạo, Sơn Trà', 6, 3, 6, 'Sân Pickleball 4 người, sàn gỗ cao cấp', '/web/img/field/pickleball/san-pickleball-5.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0690, 108.6160, NOW(), NOW()),
-('Sân Pickleball 6', 'san-pickleball-6', '100 Hoàng Văn Thụ, Hải Châu', 6, 3, 6, 'Sân Pickleball tiêu chuẩn, nền gỗ', '/web/img/field/pickleball/san-pickleball-1.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0613, 108.2762, NOW(), NOW()),
-('Sân Pickleball 7', 'san-pickleball-7', '122 Lê Lợi, Hải Châu', 6, 3, 6, 'Sân Pickleball trong nhà, có điều hòa', '/web/img/field/pickleball/san-pickleball-2.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0914, 108.2064, NOW(), NOW()),
-('Sân Pickleball 8', 'san-pickleball-8', '144 Nguyễn Huệ, Hải Châu', 6, 3, 6, 'Sân Pickleball 2 người, nền gỗ chất lượng', '/web/img/field/pickleball/san-pickleball-3.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0316, 108.5666, NOW(), NOW()),
-('Sân Pickleball 9', 'san-pickleball-9', '166 Phạm Ngọc Thạch, Hải Châu', 6, 3, 6, 'Sân Pickleball trong nhà, có đèn chiếu sáng', '/web/img/field/pickleball/san-pickleball-4.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.9818, 108.7868, NOW(), NOW()),
-('Sân Pickleball 10', 'san-pickleball-10', '188 Trần Phú, Hải Châu', 6, 3, 6, 'Sân Pickleball 4 người, sàn gỗ cao cấp', '/web/img/field/pickleball/san-pickleball-5.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.8620, 108.2270, NOW(), NOW());
+('Sân Pickleball 6', 'san-pickleball-6', '100 Hoàng Văn Thụ, Hải Châu', 6, 3, 6, 'Sân Pickleball tiêu chuẩn, nền gỗ', '/web/img/field/pickleball/san-pickleball-6.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0613, 108.2762, NOW(), NOW()),
+('Sân Pickleball 7', 'san-pickleball-7', '122 Lê Lợi, Hải Châu', 6, 3, 6, 'Sân Pickleball trong nhà, có điều hòa', '/web/img/field/pickleball/san-pickleball-7.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0914, 108.2064, NOW(), NOW()),
+('Sân Pickleball 8', 'san-pickleball-8', '144 Nguyễn Huệ, Hải Châu', 6, 3, 6, 'Sân Pickleball 2 người, nền gỗ chất lượng', '/web/img/field/pickleball/san-pickleball-8.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0316, 108.5666, NOW(), NOW()),
+('Sân Pickleball 9', 'san-pickleball-9', '166 Phạm Ngọc Thạch, Hải Châu', 6, 3, 6, 'Sân Pickleball trong nhà, có đèn chiếu sáng', '/web/img/field/pickleball/san-pickleball-9.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.9818, 108.7868, NOW(), NOW()),
+('Sân Pickleball 10', 'san-pickleball-10', '188 Trần Phú, Hải Châu', 6, 3, 6, 'Sân Pickleball 4 người, sàn gỗ cao cấp', '/web/img/field/pickleball/san-pickleball-10.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.8620, 108.2270, NOW(), NOW());
 
 
 INSERT INTO field_feature (field_id, feature_id) VALUES
@@ -491,9 +491,6 @@ VALUES
 
 INSERT INTO booking (booking_date, start_time, end_time, duration, total_price, status, subfield_id, user_id, created_at)
 VALUES
-(DATE_ADD(CURDATE(), INTERVAL -1 DAY), '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 1, NOW()),
-(DATE_ADD(CURDATE(), INTERVAL -2 DAY), '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 2, NOW())
-(DATE_ADD(CURDATE(), INTERVAL -3 DAY), '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 3, NOW())
 (DATE_ADD(CURDATE(), INTERVAL 5 DAY), '07:00:00', '08:30:00', 90, 180000.00, 'PENDING', 3, 2, NOW()),
 (DATE_ADD(CURDATE(), INTERVAL 6 DAY), '18:00:00', '19:30:00', 90, 200000.00, 'PAID', 4, 2, NOW()),
 (DATE_ADD(CURDATE(), INTERVAL 5 DAY), '09:00:00', '10:00:00', 60, 150000.00, 'CANCELLED', 5, 2, NOW());
