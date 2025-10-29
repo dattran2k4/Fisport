@@ -12,7 +12,5 @@ public interface UserSportEloService {
 
     void updateSportElo(List<UserSportElo> teamA, List<UserSportElo> teamB, int scoreA, int scoreB);
 
-    void updateSportLevel(Long userId, Integer elo);
-
     List<UserSportElo> getUserSportEloByUserIds(List<Long> ids);
 }

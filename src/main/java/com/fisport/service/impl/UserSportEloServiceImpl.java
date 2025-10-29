@@ -30,14 +30,14 @@ public class UserSportEloServiceImpl implements UserSportEloService {
     @Override
     public void updateSportElo(List<UserSportElo> teamA, List<UserSportElo> teamB, int scoreA, int scoreB) {
         eloService.updateTeamElo(teamA, teamB, scoreA, scoreB);
+
+        teamA.forEach(t -> t.setLevel(ELevel.fromElo(t.getElo())));
+        teamB.forEach(t -> t.setLevel(ELevel.fromElo(t.getElo())));
+
         userSportEloRepository.saveAll(teamA);
         userSportEloRepository.saveAll(teamB);
     }
 
-    @Override
-    public void updateSportLevel(Long userId, Integer elo) {
-        
-    }
 
     @Override
     public List<UserSportElo> getUserSportEloByUserIds(List<Long> userIds) {
