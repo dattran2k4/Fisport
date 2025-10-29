@@ -45,6 +45,6 @@ public class UserSportEloServiceImpl implements UserSportEloService {
     }
 
     private UserSportElo getUserSportElo(Long userId, Long sportId) {
-        return userSportEloRepository.findByUserIdAndSportId(userId, sportId).orElse(null);
+        return userSportEloRepository.findByUserIdAndFieldTypeId(userId, sportId).orElse(null);
     }
 }

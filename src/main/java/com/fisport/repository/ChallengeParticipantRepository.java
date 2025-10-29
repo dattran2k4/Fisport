@@ -22,7 +22,7 @@ public interface ChallengeParticipantRepository extends JpaRepository<ChallengeP
             "JOIN cp.match m " +
             "JOIN UserSportElo use " +
             "ON use.user.id = u.id " +
-            "AND use.sport.id = m.sportId " +
+            "AND use.fieldType.id = m.fieldTypeId " +
             "WHERE cp.status = 'ACCEPTED' AND m.id = :matchId")
     List<ChallengeParticipantsInfoResponse> findAllAcceptedParticipantsInfo(Long matchId);
 

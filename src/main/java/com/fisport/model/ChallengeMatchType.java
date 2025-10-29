@@ -24,9 +24,9 @@ public class ChallengeMatchType extends AbstractEntity {
     private Integer maxPlayers;
 
     @ManyToOne
-    @JoinColumn(name = "sport_id")
-    private FieldType sport;
+    @JoinColumn(name = "field_type_id")
+    private FieldType fieldType;
 
-    @OneToMany
+    @OneToMany(mappedBy = "challengeMatchType")
     private Set<ChallengeMatch> challengeMatch = new HashSet<>();
 }

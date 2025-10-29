@@ -44,8 +44,8 @@ public class ChallengeMatch extends AbstractEntity {
     @Enumerated(EnumType.STRING)
     private EChallengeStatus status;
 
-    @Column
-    private Long sportId;
+    @Column(name = "field_type_id")
+    private Long fieldTypeId;
 
     @OneToOne
     @JoinColumn(name = "booking_id", nullable = false)

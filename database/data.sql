@@ -493,8 +493,8 @@ INSERT INTO booking (booking_date, payment_method, start_time, end_time, duratio
 VALUES
 (DATE_ADD(CURDATE(), INTERVAL -1 DAY), 'VNPAY', '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 2, DATE_ADD(CURDATE(), INTERVAL -2 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 15 MINUTE)),
 (DATE_ADD(CURDATE(), INTERVAL -3 DAY), 'PAYOS', '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 2, DATE_ADD(CURDATE(), INTERVAL -4 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -4 DAY), INTERVAL 15 MINUTE)),
-(DATE_ADD(CURDATE(), INTERVAL 6 DAY), 'MOMO', '18:00:00', '19:30:00', 90, 200000.00, 'PAID', 4, 2, DATE_ADD(CURDATE(), INTERVAL 5 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 5 DAY), INTERVAL 15 MINUTE)),
-(DATE_ADD(CURDATE(), INTERVAL -1 DAY), 'ZALOPAY', '19:00:00', '20:00:00', 60, 120000.00, 'COMPLETED', 26, 2, DATE_ADD(CURDATE(), INTERVAL -5 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 5 DAY), INTERVAL 15 MINUTE)),
+(DATE_ADD(CURDATE(), INTERVAL 6 DAY), 'MOMO', '18:00:00', '19:30:00', 90, 200000.00, 'PAID', 27, 2, DATE_ADD(CURDATE(), INTERVAL -2 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 5 DAY), INTERVAL 15 MINUTE)),
+(DATE_ADD(CURDATE(), INTERVAL 2 DAY), 'ZALOPAY', '19:00:00', '20:00:00', 60, 120000.00, 'PAID', 26, 2, DATE_ADD(CURDATE(), INTERVAL -1 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 5 DAY), INTERVAL 15 MINUTE)),
 
 (DATE_ADD(CURDATE(), INTERVAL -2 DAY), 'PAYOS', '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 4, DATE_ADD(CURDATE(), INTERVAL -3 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -3 DAY), INTERVAL 15 MINUTE)),
 (DATE_ADD(CURDATE(), INTERVAL 5 DAY), 'VNPAY', '18:00:00', '19:30:00', 90, 180000.00, 'PENDING', 3, 4, DATE_SUB(NOW(), INTERVAL 3 MINUTE), DATE_SUB(NOW(), INTERVAL 15 MINUTE)),
@@ -525,7 +525,7 @@ VALUES
 (0, NOW(), NOW(), 3),
 (500000, NOW(), NOW(), 4);
 
-INSERT INTO challenge_match_type(name, max_players, sport_id)
+INSERT INTO challenge_match_type(name, max_players, field_type_id)
 VALUES
 ("Đơn", 2, 6),
 ("Đôi nam", 4, 6),
@@ -533,7 +533,7 @@ VALUES
 ("Đôi nam nữ", 4, 6);
 
 INSERT INTO challenge_match
-(creator_id, challenge_match_type_id, sport_id, title, suggested_level, fee, note, status, booking_id, created_at, updated_at)
+(creator_id, challenge_match_type_id, field_type_id, title, suggested_level, fee, note, status, booking_id, created_at, updated_at)
 VALUES
 (1, null, 6,  'Thách đấu giao hữu sân 5', 'TRUNGBINH', 50000,   'Giao hữu vui vẻ, không phân biệt trình độ.', 'PENDING', 1, NOW(), NOW()),
 
@@ -550,11 +550,12 @@ VALUES
 (2, 2, 'TEAM_A', 'ACCEPTED', 'Cho mình tham gia trận này.', TRUE, NOW(), NOW()),
 (2, 3, 'TEAM_B', 'ACCEPTED', 'Hi.', TRUE, NOW(), NOW());
 
-INSERT INTO challenge_result (match_id, team_a_scort, team_b_scort, created_at)
-VALUES
---(2, 1, 2, NOW()),   -- Creator:
-INSERT INTO user_sport_elo(user_id, sport_id, level, elo)
+
+INSERT INTO user_sport_elo(user_id, field_type_id, level, elo)
 VALUES
 (2, 6, "TRUNGBINH", 1200),
 (3, 6, "TRUNGBINH", 1300);
 
+INSERT INTO challenge_result (match_id, team_a_scort, team_b_scort, created_at)
+VALUES
+--(2, 1, 2, NOW()),   -- Creator:

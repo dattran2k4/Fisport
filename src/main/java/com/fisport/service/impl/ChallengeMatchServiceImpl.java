@@ -65,9 +65,12 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
                 .challengeMatchType(type)
                 .suggestedLevel(request.getLevel())
                 .booking(booking)
-                .sportId(booking.getSubfield().getField().getFieldType().getId())
+                .fieldTypeId(booking.getSubfield().getField().getFieldType().getId())
                 .build();
         challengeMatchRepository.save(challengeMatch);
+
+        booking.setChallengeMatch(challengeMatch);
+        bookingRepository.save(booking);
 
         ChallengeParticipant participant = ChallengeParticipant.builder()
                 .team(ETeam.TEAM_A)
@@ -87,8 +90,8 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
         ChallengeMatch challengeMatch = findChallengeMatch(id);
         User user = challengeMatch.getCreator();
 
-        ELevel creatorLevel = userSportEloService.getLevel(user.getId(), challengeMatch.getSportId());
-        Integer creatorElo = userSportEloService.getElo(user.getId(), challengeMatch.getSportId());
+        ELevel creatorLevel = userSportEloService.getLevel(user.getId(), challengeMatch.getFieldTypeId());
+        Integer creatorElo = userSportEloService.getElo(user.getId(), challengeMatch.getFieldTypeId());
 
         return ChallengeMatchDetailResponse.builder()
                 .id(challengeMatch.getId())

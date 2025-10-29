@@ -30,13 +30,13 @@ public class ChallengeMatchTypeServiceImpl implements ChallengeMatchTypeService 
 
     @Override
     public List<ChallengeMatchTypeResponse> getAllChallengeMatchTypesByFieldType(Long fieldTypeId) {
-        FieldType fieldType = fieldTypeRepository.findById(fieldTypeId).orElseThrow(() -> new ResourceNotFoundException("Field Type Not Found"));
 
-        List<ChallengeMatchType> matchTypes = fieldType.getChallengeMatchTypes();
+        List<ChallengeMatchType> matchTypes = challengeMatchTypeRepository.findByFieldTypeId(fieldTypeId);
 
         return matchTypes.stream().map(t -> ChallengeMatchTypeResponse.builder()
                 .id(t.getId())
                 .name(t.getName())
+                .maxPlayers(t.getMaxPlayers())
                 .build()).toList();
     }
 }

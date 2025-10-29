@@ -25,9 +25,9 @@ public class FieldType extends AbstractEntity {
     @OneToMany(mappedBy = "fieldType")
     private Set<FieldTypeBookDuration> fieldTypeBookDuration = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "sport")
+    @OneToMany(mappedBy = "fieldType")
     private Set<UserSportElo> sportElos = new HashSet<>();
 
-    @OneToMany(mappedBy = "sport")
+    @OneToMany(mappedBy = "fieldType")
     private List<ChallengeMatchType> challengeMatchTypes = new ArrayList<>();
 }
