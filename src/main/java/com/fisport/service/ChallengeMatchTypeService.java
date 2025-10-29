@@ -8,4 +8,5 @@ public interface ChallengeMatchTypeService {
     Integer maxPlayer(Long id);
 
     List<ChallengeMatchTypeResponse> getAllChallengeMatchTypesByFieldType(Long fieldTypeId);
+
 }

@@ -3,6 +3,7 @@ package com.fisport.service.impl;
 import com.fisport.common.*;
 import com.fisport.dto.request.ChallengeMatchRequest;
 import com.fisport.dto.response.ChallengeMatchDetailResponse;
+import com.fisport.dto.response.ChallengeMatchManagementResponse;
 import com.fisport.dto.response.ChallengeMatchSummaryResponse;
 import com.fisport.dto.response.PageResponse;
 import com.fisport.exception.InvalidDataException;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -37,9 +39,11 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
     private final ChallengeMatchTypeRepository challengeMatchTypeRepository;
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     private final UserSportEloService userSportEloService;
     private final ChallengeParticipantRepository challengeParticipantRepository;
     private final ChallengeParticipantService challengeParticipantService;
+    private final WalletPaymentService walletPaymentService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -87,8 +91,8 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
         ChallengeMatch challengeMatch = findChallengeMatch(id);
         User user = challengeMatch.getCreator();
 
-        ELevel creatorLevel = userSportEloService.getLevel(user.getId(), challengeMatch.getSportId());
-        Integer creatorElo = userSportEloService.getElo(user.getId(), challengeMatch.getSportId());
+//        ELevel creatorLevel = userSportEloService.getLevel(user.getId(), challengeMatch.getSportId());
+//        Integer creatorElo = userSportEloService.getElo(user.getId(), challengeMatch.getSportId());
 
         return ChallengeMatchDetailResponse.builder()
                 .id(challengeMatch.getId())
@@ -97,22 +101,16 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
                 .fee(challengeMatch.getParticipationFee())
                 .level(challengeMatch.getSuggestedLevel())
                 .sport(challengeMatch.getBooking().getSubfield().getField().getFieldType().getName())
-                .cityName(challengeMatch.getBooking().getSubfield().getField().getWard().getCity().getName())
-                .wardName(challengeMatch.getBooking().getSubfield().getField().getWard().getName())
-                .fieldName(challengeMatch.getBooking().getSubfield().getField().getName())
+                .city(challengeMatch.getBooking().getSubfield().getField().getWard().getCity().getName())
+                .ward(challengeMatch.getBooking().getSubfield().getField().getWard().getName())
+                .field(challengeMatch.getBooking().getSubfield().getField().getName())
                 .challengeStatus(challengeMatch.getStatus())
-                .maxPlayers(challengeMatchTypeService.maxPlayer(challengeMatch.getChallengeMatchType().getId()))
+                .maxPlayers(challengeMatch.getChallengeMatchType().getMaxPlayers())
                 .matchType(challengeMatch.getChallengeMatchType().getName())
                 .currentPlayers(challengeParticipantService.getAcceptedCurrentPlayers(challengeMatch.getId()))
                 .date(challengeMatch.getBooking().getBookingDate())
                 .startTime(challengeMatch.getBooking().getStartTime())
                 .endTime(challengeMatch.getBooking().getEndTime())
-                .creatorUsername(user.getUsername())
-                .creatorGender(user.getGender())
-                .creatorElo(creatorElo)
-                .creatorLevel(creatorLevel)
-                .createdAt(challengeMatch.getCreatedAt())
-                .participants(challengeParticipantService.getAllAcceptedParticipantsInfo(challengeMatch.getId()))
                 .build();
     }
 
@@ -151,7 +149,8 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
                 .build();
     }
 
-    private ChallengeMatch findChallengeMatch(Long id) {
+    @Override
+    public ChallengeMatch findChallengeMatch(Long id) {
         return challengeMatchRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Challenge match not found"));
     }
 
@@ -162,7 +161,7 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
         EChallengeStatus newStatus;
         if (currentPlayers == 0) {
             newStatus = EChallengeStatus.OPEN;
-        } else if (currentPlayers < challengeMatchTypeService.maxPlayer(match.getChallengeMatchType().getId())) {
+        } else if (currentPlayers < match.getChallengeMatchType().getMaxPlayers()) {
             newStatus = EChallengeStatus.PENDING;
         } else {
             newStatus = EChallengeStatus.FULL;
@@ -180,5 +179,60 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
             challengeMatchRepository.save(match);
         }
         throw new InvalidDataException("Trận đấu chưa hoàn thành");
+    }
+
+    @Override
+    @Transactional
+    public void cancelMatch(Long matchId) {
+        ChallengeMatch match = findChallengeMatch(matchId);
+
+        if (canCancel(matchId)) {
+
+            //Refund
+            if (match.getParticipants() != null) {
+                for (ChallengeParticipant c : match.getParticipants()) {
+                    Long playerId = c.getUser().getId();
+                    walletPaymentService.refund(match.getCreator().getId(), playerId, match.getParticipationFee());
+                }
+            }
+            match.setStatus(EChallengeStatus.CANCELLED);
+            challengeMatchRepository.save(match);
+            log.info("MatchId {} changed status {}", matchId, EChallengeStatus.CANCELLED);
+        }
+    }
+
+    @Override
+    public boolean canCancel(Long matchId) {
+        ChallengeMatch challengeMatch = findChallengeMatch(matchId);
+
+        LocalDate date = challengeMatch.getBooking().getBookingDate();
+        LocalTime startTime = challengeMatch.getBooking().getStartTime();
+
+        LocalDateTime start = LocalDateTime.of(date, startTime);
+
+        EChallengeStatus status = challengeMatch.getStatus();
+
+        if ((status.equals(EChallengeStatus.OPEN) || status.equals(EChallengeStatus.FULL) || status.equals(EChallengeStatus.PENDING))
+                && LocalDateTime.now().plusHours(12).isBefore(start)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    @Override
+    public List<ChallengeMatchManagementResponse> getListMatchForManagement(String username) {
+        Optional<User> user = userService.findByUsername(username);
+
+        List<ChallengeMatch> matches = challengeMatchRepository.findByUserId(user.get().getId());
+
+        return matches.stream().map(m -> ChallengeMatchManagementResponse.builder()
+                .id(m.getId())
+                .title(m.getTitle())
+                .status(m.getStatus())
+                .maxPlayers(m.getChallengeMatchType().getMaxPlayers())
+                .playersInMatch(challengeParticipantService.getAcceptedCurrentPlayers(m.getId()))
+                .playersPending(challengeParticipantService.getPendingCurrentPlayers(m.getId()))
+                .build()).toList();
     }
 }

@@ -26,18 +26,14 @@ public class ChallengeMatchDetailResponse {
     private Integer maxPlayers;
     private Integer currentPlayers;
     private String matchType;
-    private String wardName;
-    private String cityName;
-    private String fieldName;
+    private String ward;
+    private String city;
+    private String field;
+    private String subField;
     private BigDecimal fee;
     private LocalTime startTime;
     private LocalTime endTime;
     private LocalDate date;
     private LocalDateTime createdAt;
-    private String creatorUsername;
-    private Integer creatorElo;
-    private EGender creatorGender;
-    private ELevel creatorLevel;
     private String sport;
-    private Map<ETeam, List<ChallengeParticipantsInfoResponse>> participants = new HashMap<>();
 }

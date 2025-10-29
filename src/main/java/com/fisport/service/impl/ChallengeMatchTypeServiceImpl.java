@@ -37,6 +37,7 @@ public class ChallengeMatchTypeServiceImpl implements ChallengeMatchTypeService 
         return matchTypes.stream().map(t -> ChallengeMatchTypeResponse.builder()
                 .id(t.getId())
                 .name(t.getName())
+                .maxPlayers(t.getMaxPlayers())
                 .build()).toList();
     }
 }
