@@ -13,11 +13,14 @@ import com.Fisport.service.FieldService;
 import com.Fisport.common.EFieldStatus;
 import com.Fisport.service.FieldSpecification;
 import com.Fisport.util.SlugUtils;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +39,9 @@ public class FieldServiceImpl implements FieldService {
     private final ServiceItemRepository serviceItemRepository;
     private final SubFieldRepository subFieldRepository;
     private final FieldServiceItemRepository fieldServiceItemRepository;
+    private final FieldTypeRepository fieldTypeRepository;
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, Long... featureIds) {
@@ -134,7 +140,19 @@ public class FieldServiceImpl implements FieldService {
             throw new IllegalArgumentException("Giờ mở cửa phải sớm hơn giờ đóng cửa");
         }
         String slug = SlugUtils.slugify(fieldCreateRequest.getName());
-        Field field = Field.builder().name(fieldCreateRequest.getName()).banner(fieldCreateRequest.getBanner()).address(fieldCreateRequest.getAddress()).slug(slug).openTime(fieldCreateRequest.getOpeningTime()).closeTime(fieldCreateRequest.getClosingTime()).fieldStatus(EFieldStatus.INACTIVE).ward(ward).longitude(Double.parseDouble(fieldCreateRequest.getLongitude())).latitude(Double.parseDouble(fieldCreateRequest.getLatitude())).owner(user).fieldType(fieldType).description(fieldCreateRequest.getDescription()).build();
+        Field field = Field.builder().name(fieldCreateRequest
+                        .getName())
+                .banner(fieldCreateRequest.getBanner())
+                .address(fieldCreateRequest.getAddress())
+                .slug(slug)
+                .openTime(fieldCreateRequest.getOpeningTime())
+                .closeTime(fieldCreateRequest.getClosingTime())
+                .fieldStatus(EFieldStatus.INACTIVE)
+                .ward(ward).longitude(Double.parseDouble(fieldCreateRequest.getLongitude()))
+                .latitude(Double.parseDouble(fieldCreateRequest.getLatitude()))
+                .owner(user).fieldType(fieldType)
+                .description(fieldCreateRequest.getDescription())
+                .build();
         fieldRepository.save(field);
         if (fieldCreateRequest.getFeatures() != null && !fieldCreateRequest.getFeatures().isEmpty()) {
             List<Long> featureIds = fieldCreateRequest.getFeatures().stream().map(Long::parseLong).toList();
@@ -197,6 +215,35 @@ public class FieldServiceImpl implements FieldService {
                 .slug(f.getSlug())
                 .build()).collect(Collectors.toSet());
     }
+
+    @Transactional
+    @Override
+    public void deleteFieldByOwner(Long fieldId, String username) {
+        User owner = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+
+        Field field = fieldRepository.findById(fieldId)
+                .orElseThrow(() -> new ResourceNotFoundException("Field not found"));
+
+        if (!field.getOwner().getId().equals(owner.getId())) {
+            throw new IllegalArgumentException("Bạn không có quyền xóa sân này!");
+        }
+
+        fieldHasFeatureRepository.deleteAllByField(field);
+        fieldServiceItemRepository.deleteAllByField_Id(field.getId());
+        subFieldRepository.deleteAllByField(field);
+        reviewRepository.deleteByFieldId(field.getId());
+
+        String oldImagePath = new File("src/main/resources/static" + field.getBanner()).getAbsolutePath();
+        File oldFile = new File(oldImagePath);
+        if (oldFile.exists()) {
+            boolean deleted = oldFile.delete();
+        }
+
+        fieldRepository.deleteOneById(field.getId());
+
+    }
+
 
     @Override
     public List<FieldResponse> getAllPendingFields() {
@@ -273,6 +320,106 @@ public class FieldServiceImpl implements FieldService {
                 .build()).toList();
     }
 
+    @Override
+    public FieldResponse getFieldByIdAndOwnerName(Long id, String name) {
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        Field _f = fieldRepository.findByOwnerIdAndId(user.getId(), id);
+        return toDto(_f);
+    }
+    @Override
+    @Transactional
+    public void updateFieldByOwner(FieldCreateRequest fieldCreateRequest, String username, Long id) {
+        User owner = userRepository.findByUsername(username) .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        Field field = fieldRepository.findById(id) .orElseThrow(() -> new ResourceNotFoundException("Field not found"));
+        Ward ward = wardRepository.findById(Long.parseLong(fieldCreateRequest.getWard()))
+                .orElseThrow(() -> new ResourceNotFoundException("Ward not found"));
+        FieldType fieldType = fieldTypeRepository.findById(Long.parseLong(fieldCreateRequest.getField_type()))
+                .orElseThrow(() -> new ResourceNotFoundException("Field type not found"));
+        if (!fieldCreateRequest.getOpeningTime().isBefore(fieldCreateRequest.getClosingTime()))
+            {   throw new IllegalArgumentException("Giờ mở cửa phải sớm hơn giờ đóng cửa"); }
+        // Update thông tin cơ bản
+        field.setName(fieldCreateRequest.getName());
+        field.setAddress(fieldCreateRequest.getAddress());
+        field.setDescription(fieldCreateRequest.getDescription());
+        field.setOpenTime(fieldCreateRequest.getOpeningTime());
+        field.setCloseTime(fieldCreateRequest.getClosingTime());
+        field.setWard(ward);
+        field.setLatitude(Double.parseDouble(fieldCreateRequest.getLatitude()));
+        field.setLongitude(Double.parseDouble(fieldCreateRequest.getLongitude()));
+        field.setFieldType(fieldType);
+        field.setSlug(SlugUtils.slugify(fieldCreateRequest.getName()));
+        // Nếu có ảnh mới thì update
+        if (fieldCreateRequest.getBanner() != null && !fieldCreateRequest.getBanner().isEmpty()) {
+            String oldImagePath = new File("src/main/resources/static" + field.getBanner()).getAbsolutePath();
+            File oldFile = new File(oldImagePath);
+            if (oldFile.exists()) {
+                boolean deleted = oldFile.delete();
+            }
+            field.setBanner(fieldCreateRequest.getBanner());
+        }
+
+        fieldRepository.save(field);
+
+        // --- Cập nhật Features ---
+        fieldHasFeatureRepository.deleteAllByField(field);
+        entityManager.flush();
+        entityManager.clear();
+
+        if (fieldCreateRequest.getFeatures() != null && !fieldCreateRequest.getFeatures().isEmpty()) {
+            List<Long> featureIds = fieldCreateRequest.getFeatures().stream().map(Long::parseLong).toList();
+            List<Feature> features = featureRepository.findAllById(featureIds);
+            List<FieldHasFeature> newFeatures = features.stream()
+                    .map(f -> FieldHasFeature.builder().feature(f).field(field).build())
+                    .toList();
+            fieldHasFeatureRepository.saveAll(newFeatures);
+        }
+
+        // --- Cập nhật SubFields ---
+        subFieldRepository.deleteAllByField(field);
+        entityManager.flush();
+        entityManager.clear();
+
+        if (fieldCreateRequest.getSub_fields() != null && !fieldCreateRequest.getSub_fields().isEmpty()) {
+            List<SubField> newSubFields = fieldCreateRequest.getSub_fields().stream()
+                    .map(name -> SubField.builder()
+                            .field(field)
+                            .name(name)
+                            .status(ESubFieldStatus.AVAILABLE)
+                            .build())
+                    .toList();
+            subFieldRepository.saveAll(newSubFields);
+        }
+
+        // --- Cập nhật Service Items ---
+        fieldServiceItemRepository.deleteAllByField_Id(field.getId());
+        entityManager.flush();
+        entityManager.clear();
+
+        if (fieldCreateRequest.getServiceItems() != null && !fieldCreateRequest.getServiceItems().isEmpty()) {
+            List<Long> serviceItemIds = fieldCreateRequest.getServiceItems().stream()
+                    .map(ServiceItemsRequest::getId)
+                    .toList();
+
+            List<ServiceItem> serviceItems = serviceItemRepository.findAllById(serviceItemIds);
+            Map<Long, ServiceItem> serviceItemMap = serviceItems.stream()
+                    .collect(Collectors.toMap(ServiceItem::getId, s -> s, (a, b) -> a)); // tránh duplicate key
+
+            List<FieldServiceItem> fieldServiceItems = fieldCreateRequest.getServiceItems().stream().map(reqItem -> {
+                FieldServiceItem fsi = new FieldServiceItem();
+                fsi.setServiceItem(serviceItemMap.get(reqItem.getId()));
+                fsi.setPrice(BigDecimal.valueOf(reqItem.getPrice()));
+                fsi.setQuantity(reqItem.getQuantity());
+                fsi.setField(field);
+                fsi.setStatus(EFieldServiceItem.ACTIVE);
+                return fsi;
+            }).toList();
+
+            fieldServiceItemRepository.saveAll(fieldServiceItems);
+        }
+    }
+
+
+
 
     private FieldTypeResponse toFieldTypeResponseDto(FieldType fieldType) {
         return FieldTypeResponse.builder()
@@ -287,6 +434,10 @@ public class FieldServiceImpl implements FieldService {
                 .id(ward.getId())
                 .name(ward.getName())
                 .slug(ward.getSlug())
+                .cityResponse(CityResponse.builder()
+                        .name(ward.getCity().getName())
+                        .id(ward.getCity().getId())
+                        .build())
                 .build();
     }
 
@@ -299,8 +450,12 @@ public class FieldServiceImpl implements FieldService {
                 .banner(f.getBanner())
                 .slug(f.getSlug())
                 .openTime(f.getOpenTime())
+                .description(f.getDescription())
+                .fieldTypeId(Long.toString(f.getFieldType().getId()))
                 .closeTime(f.getCloseTime())
                 .status(f.getFieldStatus())
+                .latitude(f.getLatitude())
+                .longitude(f.getLongitude())
                 .rating(reviewRepository.findAverageByFieldId(f.getId()))
                 .wardResponse(toWardDto(f.getWard()))
                 .fieldTypeResponse(toFieldTypeResponseDto(f.getFieldType()))

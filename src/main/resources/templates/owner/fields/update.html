@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="vn" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layout/owner/owner}">
+<div class="update-section" th:fragment="content">
+    <!-- Header -->
+    <div class="section-header">
+        <h2>Cập nhật thông tin sân</h2>
+    </div>
+
+    <!-- Form -->
+    <div class="form-container">
+        <form th:action="@{/owner/fields/update}" method="post" id="fieldUpdateForm" enctype="multipart/form-data" class="form">
+            <input type="hidden" name="id" th:value="${field.id}"/>
+
+            <div class="form-grid">
+                <!-- Basic Information -->
+                <div class="form-group-section">
+                    <h3>Thông tin cơ bản</h3>
+
+                    <div class="form-group">
+                        <label>Tên sân *</label>
+                        <input type="text" name="name" required placeholder="Nhập tên sân" th:value="${field.name}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Địa điểm *</label>
+                        <input type="text" name="address" required placeholder="Nhập địa điểm" th:value="${field.address}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Tỉnh/Thành phố *</label>
+                        <select id="city" name="city" required>
+                            <option value="">Chọn thành phố</option>
+                            <option th:each="city : ${cities}"
+                                    th:value="${city.id}"
+                                    th:text="${city.name}"
+                                    th:selected="${city.id == field.wardResponse.cityResponse.id}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Mô tả</label>
+                        <input name="description" placeholder="Miêu tả về sân" th:value="${field.description}">
+                    </div>
+                </div>
+
+                <!-- Details -->
+                <div class="form-group-section">
+                    <h3>Chi tiết</h3>
+
+                    <div class="form-group">
+                        <label>Loại sân *</label>
+                        <select name="field_type" required>
+                            <option value="">Chọn loại sân</option>
+                            <option th:each="type : ${fieldTypes}"
+                                    th:value="${type.id}"
+                                    th:text="${type.name}"
+                                    th:selected="${type.id == T(java.lang.Long).parseLong(field.fieldTypeId)}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Thời gian hoạt động</label>
+                        <div class="time-inputs">
+                            <input type="time" name="openingTime" th:value="${field.openTime}" required>
+                            <span> đến </span>
+                            <input type="time" name="closingTime" th:value="${field.closeTime}" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="wardSelect" class="visually-hidden">Phường/Xã</label>
+                        <select class="form-select" id="wardSelect" name="ward" required>
+                            <option th:value="${wards.id}" th:text="${wards.name}" value=""></option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Facilities -->
+                <div class="form-group-section">
+                    <h3>Tiện ích</h3>
+                    <div class="checkbox-group" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
+                        <div class="checkbox" th:each="feature : ${features}">
+                            <input type="checkbox"
+                                   name="features"
+                                   th:id="${feature.slug}"
+                                   th:value="${feature.id}"
+                                   th:checked="${#lists.contains(selectedFeatureIds, feature.id)}">
+                            <label th:for="${feature.slug}" th:text="${feature.name}"></label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Images -->
+                <div class="form-group-section">
+                    <h3>Ảnh sân hiện tại</h3>
+                    <div class="image-preview" id="existingImages">
+                        <img
+                             th:src="@{${field.banner}}"
+                             alt="Field Image">
+                    </div>
+
+                    <div class="file-upload">
+                        <input type="file" name="image" multiple accept="image/*" id="imageInput">
+                        <label for="imageInput" class="upload-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Nhấn để chọn ảnh mới</span>
+                        </label>
+                        <div class="image-preview" id="imagePreview"></div>
+                    </div>
+                </div>
+
+                <!-- Sub Fields -->
+                <div class="form-group-section">
+                    <h3>Sân con</h3>
+
+                    <div class="form-group" id="subFieldsContainer" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
+                        <div class="sub-field-item"
+                             th:each="sub, iterStat : ${subFields}"
+                             style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <input type="text" name="sub_fields" th:value="${sub.name}" placeholder="Nhập tên sân con" required>
+                            <button type="button" class="remove-btn" th:if="${!iterStat.first}">−</button>
+                        </div>
+                    </div>
+
+                    <button class="upload-label" type="button" id="addSubField" style="max-height: 32px;">＋ Thêm sân con</button>
+                </div>
+
+
+                <!-- Service Items -->
+                <div class="form-group-section">
+                    <h3>Dịch vụ đi kèm</h3>
+                    <div class="checkbox-group" style="max-height: 350px; overflow-y: auto; padding-right: 5px;">
+                        <div th:each="si : ${serviceItems}">
+                            <div class="service-item">
+                                <input type="checkbox"
+                                       class="service-checkbox"
+                                       th:data-id="${si.id}"
+                                       th:checked="${selectedServiceIds.contains(si.id)}">
+                                <label th:for="${si.id}" th:text="${si.name}"></label>
+
+                                <div class="form-group">
+                                    <input type="number"
+                                           class="quantity"
+                                           th:value="${fieldServiceItemMap[si.id]?.quantity}"
+                                           placeholder="Số lượng" min="1">
+
+                                    <input type="number"
+                                           class="price"
+                                           th:value="${fieldServiceItemMap[si.id]?.price}"
+                                           placeholder="Đơn giá" min="0" step="1000">
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <input type ="hidden" name="serviceItemsJson" id="serviceItemsJson">
+
+                </div>
+            </div>
+
+                <!-- Map -->
+                <div class="form-group-section" style="margin-bottom: 12px">
+                    <h3>Vị trí sân</h3>
+                    <div id="field-map" style="height: 400px; border-radius: 10px; overflow: hidden;"></div>
+                    <input type="text" id="latitude" name="latitude" th:value="${field.latitude}" readonly hidden="hidden">
+                    <input type="text" id="longitude" name="longitude" th:value="${field.longitude}" readonly hidden="hidden">
+                </div>
+
+            <!-- Actions -->
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Cập nhật sân
+                </button>
+                <a href="/owner/fields" class="btn btn-secondary">Hủy</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<section layout:fragment="scripts">
+    <script th:inline="javascript">
+        //DYANMIC INPUT
+        const citySelect = document.getElementById('city');
+        const wardSelect = document.getElementById('wardSelect');
+        const selectedWardId = [[${field.wardResponse.id}]];
+        citySelect.addEventListener('change', async function () {
+            const cityId = this.value;
+            wardSelect.disabled = true;
+            wardSelect.innerHTML = ''; // Xóa các option cũ
+
+            if (!cityId) return;
+
+            try {
+                const response = await fetch(`/api/v1/wards?cityId=${cityId}`);
+                if (!response.ok) throw new Error('Lỗi tải danh sách phường/xã');
+
+                const res = await response.json();
+                const wards = Array.isArray(res) ? res : (res.data || []);
+
+                if (wards.length > 0) {
+                    wards.forEach(w => {
+                        const option = document.createElement('option');
+                        option.value = w.id;
+                        option.textContent = w.name;
+                        option.dataset.name = w.slug;
+                        if (w.id === selectedWardId) {
+                            option.selected = true;
+                        }
+                        wardSelect.appendChild(option);
+                    });
+                    wardSelect.disabled = false;
+                } else {
+                    const opt = document.createElement('option');
+                    opt.textContent = 'Không có phường/xã';
+                    opt.disabled = true;
+                    wardSelect.appendChild(opt);
+                }
+            } catch (error) {
+                console.error('Không thể tải danh sách phường/xã', error);
+            }
+        });
+
+
+        // JSON service items
+        document.getElementById("fieldUpdateForm").addEventListener("submit", function (e) {
+            const selectedItems = [];
+            document.querySelectorAll(".service-item").forEach(item => {
+                const checkbox = item.querySelector(".service-checkbox");
+                if (checkbox.checked) {
+                    const id = checkbox.dataset.id;
+                    const quantity = item.querySelector(".quantity").value || 0;
+                    const price = item.querySelector(".price").value || 0;
+                    selectedItems.push({ id, quantity, price });
+                }
+            });
+            document.getElementById("serviceItemsJson").value = JSON.stringify(selectedItems);
+        });
+
+        // Image preview (new upload)
+        const input = document.getElementById('imageInput');
+        const preview = document.getElementById('imagePreview');
+        input.addEventListener('change', function(e) {
+            preview.innerHTML = '';
+            Array.from(e.target.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        // Map init
+        document.addEventListener("DOMContentLoaded", function() {
+            const container = document.getElementById("subFieldsContainer");
+            const addButton = document.getElementById("addSubField");
+
+            container.addEventListener("click", function (e) {
+                if (e.target.classList.contains("remove-btn")) {
+                    e.target.closest(".sub-field-item").remove();
+                }
+            });
+
+            addButton.addEventListener("click", function() {
+                const newDiv = document.createElement("div");
+                newDiv.className = "sub-field-item";
+                newDiv.style.cssText = "display: flex; align-items: center; gap: 8px; margin-bottom: 8px;";
+
+                const input = document.createElement("input");
+                input.type = "text";
+                input.name = "sub_fields";
+                input.placeholder = "Nhập tên sân con";
+                input.required = true;
+
+                const removeBtn = document.createElement("button");
+                removeBtn.type = "button";
+                removeBtn.textContent = "−";
+                removeBtn.className = "remove-btn";
+
+                newDiv.appendChild(input);
+                newDiv.appendChild(removeBtn);
+
+                container.appendChild(newDiv);
+            });
+
+
+
+
+            let lat = document.getElementById('latitude').value;
+            let lng = document.getElementById('longitude').value;
+            const defaultLat = 16.05222;
+            const defaultLng = 108.18556;
+            const defaultZoom = 15;
+
+            const map = L.map('field-map', {scrollWheelZoom: false})
+                .setView([lat || defaultLat, lng || defaultLng], defaultZoom);
+
+            // Bản đồ nền
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            let marker = null;
+
+            if (lat && lng) {
+                marker = L.marker([lat, lng]).addTo(map)
+                    .bindPopup(`Lat: ${lat}, Lng: ${lng}`).openPopup();
+            }
+
+            // Khi người dùng click
+            map.on('click', function (e) {
+                const lat = e.latlng.lat.toFixed(6);
+                const lng = e.latlng.lng.toFixed(6);
+
+                document.getElementById('latitude').value = lat;
+                document.getElementById('longitude').value = lng;
+
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng).addTo(map);
+                }
+
+                marker.bindPopup(`Lat: ${lat}, Lng: ${lng}`).openPopup();
+            });
+        });
+    </script>
+</section>
+</html>

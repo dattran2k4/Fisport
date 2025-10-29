@@ -2,6 +2,8 @@ package com.Fisport.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Getter
 @Setter
@@ -17,6 +19,8 @@ public class FieldHasFeature extends AbstractEntity {
     private Feature feature;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "field_id")
+    @JoinColumn(name = "field_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Field field;
+
 }

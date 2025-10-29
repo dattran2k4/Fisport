@@ -78,10 +78,42 @@
 
 </div>
 
-<script>
-    function deleteField(id) {
-        if (confirm('Are you sure you want to delete this field?')) {
-            window.location.href = '/owner/fields/' + id + '/delete';
+<section layout:fragment="scripts">
+    <script th:inline="javascript">
+        function deleteField(id) {
+            Swal.fire({
+                title: 'Xóa sân này?',
+                text: "Hành động này không thể hoàn tác!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Xóa ngay',
+                cancelButtonText: 'Hủy bỏ'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/owner/fields/${id}/delete`, {
+                        method: 'DELETE'
+                    })
+                        .then(response => {
+                            if (response.ok) {
+                                Swal.fire({
+                                    title: 'Đã xóa!',
+                                    text: 'Sân đã được xóa thành công.',
+                                    icon: 'success',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire('Lỗi', 'Không thể xóa sân này.', 'error');
+                            }
+                        })
+                        .catch(() => Swal.fire('Lỗi', 'Có lỗi xảy ra khi gửi yêu cầu.', 'error'));
+                }
+            });
         }
-    }
+
 </script>
+</section>

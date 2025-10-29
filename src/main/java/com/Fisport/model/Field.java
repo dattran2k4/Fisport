@@ -67,10 +67,10 @@ public class Field extends AbstractEntity {
     @JoinColumn(name = "field_type_id")
     private FieldType fieldType;
 
-    @OneToMany(mappedBy = "field")
+    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<SubField> subFields = new HashSet<>();
 
-    @OneToMany(mappedBy = "field")
+    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FieldHasFeature> fieldHasFeatures = new HashSet<>();
 
     public Set<Feature> getFeatures() {

@@ -1,5 +1,6 @@
 package com.Fisport.service.impl;
 
+import com.Fisport.dto.response.CityResponse;
 import com.Fisport.dto.response.WardResponse;
 import com.Fisport.model.Ward;
 import com.Fisport.repository.WardRepository;
@@ -17,11 +18,21 @@ public class WardServiceImpl implements WardService {
 
     @Override
     public List<WardResponse> getAllWardsByCityId(long cityId) {
-        List<Ward>  wards = wardRepository.findByCityId(cityId);
+        List<Ward> wards = wardRepository.findByCityId(cityId);
         return wards.stream()
-                .map(w -> new WardResponse(w.getId(), w.getName(), w.getSlug()))
+                .map(w -> WardResponse.builder()
+                        .id(w.getId())
+                        .name(w.getName())
+                        .slug(w.getSlug())
+                        .cityResponse(CityResponse.builder()
+                                .id(w.getCity().getId())
+                                .name(w.getCity().getName())
+                                .slug(w.getCity().getSlug())
+                                .build())
+                        .build())
                 .toList();
     }
+
 
     @Override
     public WardResponse getWardBySlug(String slug) {

@@ -8,6 +8,7 @@
     <link rel="stylesheet" th:href="@{/web/css/owner-style.css}">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </head>
 <body>
@@ -112,6 +113,9 @@
             <div th:if="${content.contains('fields-create')}" >
                 <div th:replace="owner/fields/create :: content"></div>
             </div>
+            <div th:if="${content.contains('fields-update')}" >
+                <div th:replace="owner/fields/update :: content"></div>
+            </div>
             <div th:if="${content.contains('vouchers')}">
                 <div th:replace="~{${content} :: content}"></div>
             </div>
@@ -120,7 +124,6 @@
             </div>
             <div th:if="${content.contains('items')}">
                 <div th:replace="~{${content} :: content}"></div>
-            </div>
         </div>
     </main>
 </div>
