@@ -1,6 +1,7 @@
 package com.fisport.service.impl;
 
 import com.fisport.common.ELevel;
+import com.fisport.dto.response.UserSportEloResponse;
 import com.fisport.model.UserSportElo;
 import com.fisport.repository.UserSportEloRepository;
 import com.fisport.service.EloService;
@@ -42,6 +43,12 @@ public class UserSportEloServiceImpl implements UserSportEloService {
     @Override
     public List<UserSportElo> getUserSportEloByUserIds(List<Long> userIds) {
         return userSportEloRepository.findByUserIdIn(userIds);
+    }
+
+    @Override
+    public UserSportEloResponse getUserSportEloResponse(Long userId, Long sportId) {
+        UserSportElo userSportElo = getUserSportElo(userId, sportId);
+        return UserSportEloResponse.builder().elo(userSportElo.getElo()).level(userSportElo.getLevel()).build();
     }
 
     private UserSportElo getUserSportElo(Long userId, Long sportId) {

@@ -27,6 +27,9 @@ public interface ChallengeParticipantService {
 
     Integer getAcceptedCurrentPlayers(Long matchId);
 
+    Integer getPendingCurrentPlayers(Long matchId);
+
+
     List<ChallengeParticipant> getParticipantsByMatchAndTeam(Long matchId, ETeam team);
-    
+
 }

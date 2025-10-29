@@ -144,6 +144,13 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
     }
 
     @Override
+    public Integer getPendingCurrentPlayers(Long matchId) {
+        ChallengeMatch match = challengeMatchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException("Match not found"));
+
+        return Math.toIntExact(match.getParticipants().stream().filter(p -> p.getStatus().equals(EParticipantStatus.PENDING)).count());
+    }
+
+    @Override
     public List<ChallengeParticipant> getParticipantsByMatchAndTeam(Long matchId, ETeam team) {
         return challengeParticipantRepository.findByMatchIdAndTeam(matchId, team);
     }

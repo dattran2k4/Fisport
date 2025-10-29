@@ -12,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import vn.payos.model.webhooks.WebhookData;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -263,4 +265,38 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
 
         log.info("PlayerId {} pay success for MatchId {}", player.getId(), matchId);
     }
+
+    @Override
+    @Transactional
+    public void refund(Long fromUserId, Long toUserId, BigDecimal amount) {
+        User userFrom = userRepository.findById(fromUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        User toUser = userRepository.findById(toUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Transaction userFromTransaction = Transaction.builder()
+                .status(ETransactionStatus.SUCCESS)
+                .method(EPaymentMethod.WALLET)
+                .amount(amount)
+                .type(ETransactionType.REFUND)
+                .wallet(userFrom.getWallet())
+                .build();
+
+
+        walletService.debitWallet(userFrom.getWallet().getId(), userFromTransaction);
+        transactionRepository.save(userFromTransaction);
+
+        Transaction toUserTransaction = Transaction.builder()
+                .status(ETransactionStatus.SUCCESS)
+                .method(EPaymentMethod.WALLET)
+                .amount(amount)
+                .type(ETransactionType.RECEIVED)
+                .wallet(toUser.getWallet())
+                .build();
+
+        walletService.creditWallet(toUserTransaction);
+        transactionRepository.save(toUserTransaction);
+
+    }
+
+
 }
