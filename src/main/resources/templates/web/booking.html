@@ -2,86 +2,182 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     layout:decorate="~{layout/web/web}">
 
+<head>
+    <title>Đặt sân nhanh chóng</title>
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+
+        .card {
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .section-title {
+            font-weight: 600;
+            color: #333;
+            border-left: 4px solid #0d6efd;
+            padding-left: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .hour-btn, .duration-btn, .voucher-btn {
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .hour-btn.active, .duration-btn.active {
+            background-color: #0d6efd;
+            color: #fff;
+            font-weight: 600;
+        }
+        .voucher-btn.active {
+            background-color: #198754 !important;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        #price-summary .price-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        #grandTotal {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0d6efd;
+        }
+        .sticky-summary {
+            position: sticky;
+            top: 20px;
+        }
+
+        .service-qty {
+            width: 60px !important;
+            text-align: center;
+            border-radius: 6px;
+        }
+
+        .service-total {
+            font-weight: 600;
+            color: #0d6efd;
+        }
+
+        .day-btn, .hour-btn, .duration-btn {
+            margin: 2px;
+        }
+
+        .hour-btn.disabled, .hour-btn:disabled {
+            background-color: #e9ecef !important;
+            color: #6c757d !important;
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+
 <body>
     <div layout:fragment="content">
-        <div class="container mt-4">
+    <div class="container mt-4">
+        <h2 class="mb-3">Đặt sân: <span th:text="${field.name}"></span></h2>
+        <p>Địa chỉ: <span th:text="${field.address + ', ' + field.ward + ', ' + field.city}"></span></p>
 
-            <h2>Đặt sân: <span th:text="${field.name}"></span></h2>
-            <p>Địa chỉ: <span th:text="${field.address + ', ' + field.ward + ', ' + field.city}"></span></p>
+        <!-- Lỗi chung -->
+        <div th:if="${error != null}" class="alert alert-danger">
+            <span th:text="${error}"></span>
+        </div>
 
-            <form th:action="@{/booking}" th:object="${booking}" method="POST" id="bookingForm">
-                <!-- CSRF nếu dùng Spring Security -->
-                <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
+        <form th:action="@{/san/{fieldTypeSlug}/{fieldNameSlug}/dat-san(fieldTypeSlug=${field.typeSlug}, fieldNameSlug=${field.slug})}" th:object="${booking}" method="POST" id="bookingForm">
+            <div class="row g-4">
+                <!-- Left Column -->
+                <div class="col-lg-8">
 
-                <!-- 8 ngày + calendar picker -->
-                <div class="d-flex flex-wrap mb-3" id="day-container"></div>
-                <div class="mb-3">
-                    <input type="date" class="form-control" id="customDate">
-                </div>
-
-                <!-- Subfields -->
-                <div class="mb-3">
-                    <label class="form-label fw-semibold mb-2">Chọn sân con:</label>
-                    <div class="list-group">
-                        <label
-                            class="list-group-item d-flex justify-content-between align-items-center border rounded-3 mb-2"
-                            th:each="sub, iter : ${subField}">
-                            <span th:text="${sub.name}" class="fw-medium text-dark">Sân bóng</span>
-                            <input type="radio" class="form-check-input subfield-radio" th:field="*{subFieldId}"
-                                th:value="${sub.id}" />
-                        </label>
+                    <!-- Chọn ngày -->
+                    <div class="card p-3 mb-3">
+                        <h4 class="section-title">Chọn ngày</h4>
+                        <div class="d-flex flex-wrap mb-3" id="day-container"></div>
+                        <input type="date" class="form-control mb-3" id="customDate">
                     </div>
-                </div>
 
-                <!-- Khung giờ bắt đầu -->
-                <div class="mb-3">
-                    <label>Các khung giờ có thể chọn:</label>
-                    <div class="d-flex flex-wrap" id="hours-container"></div>
-                </div>
+                    <!-- Chọn sân con -->
+                    <div class="card p-3 mb-3">
+                        <h4 class="section-title">Chọn sân con</h4>
+                        <div class="list-group">
+                            <label class="list-group-item rounded-3 border shadow-sm mb-2" th:each="sub, iter : ${subField}">
+                                <span th:text="${sub.name}"></span>
+                                <input type="radio" class="form-check-input subfield-radio" th:field="*{subFieldId}" th:value="${sub.id}" />
+                            </label>
+                        </div>
+                    </div>
 
-                <!-- Durations -->
-                <div id="durationContainer" class="mt-3"></div>
+                    <!-- Chọn khung giờ -->
+                    <div class="card p-3 mb-3">
+                        <h4 class="section-title">Chọn khung giờ</h4>
+                        <div id="hours-container" class="d-flex flex-wrap gap-2 mb-3"></div>
+                        <div id="durationContainer"></div>
+                    </div>
 
-                <!-- Field Service Items (giữ nguyên layout) -->
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Dịch vụ kèm theo:</label>
-                    <div class="list-group">
-                        <div class="list-group-item d-flex align-items-center justify-content-between"
-                            th:each="item, iter : ${items}">
-                            <div>
-                                <input class="form-check-input me-2 service-checkbox" type="checkbox"
-                                    th:id="${'item-' + item.id}" th:value="${item.serviceItemId}"
-                                    th:data-index="${iter.index}" />
-                                <label class="form-check-label" th:for="${'item-' + item.id}">
-                                    <span th:text="${item.serviceItemName}"></span>
-                                    <small class="text-muted" th:text="'(' + ${item.serviceName} + ')'"></small>
-                                </label>
-                            </div>
-                            <div class="text-end d-flex align-items-center gap-2">
-                                <input type="number" class="form-control form-control-sm service-qty" min="1"
-                                    th:max="${item.quantity}" value="1" style="width: 70px; display: none;"
-                                    th:data-index="${iter.index}">
-                                <span class="text-success fw-bold"
-                                    th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                    <!-- Chọn dịch vụ -->
+                    <div class="card p-3 mb-3">
+                        <h4 class="section-title">Dịch vụ kèm theo</h4>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2" th:each="item, iter : ${items}">
+                                <div>
+                                    <input class="form-check-input me-2 service-checkbox" type="checkbox"
+                                           th:id="${'item-' + item.id}" th:value="${item.serviceItemId}" />
+                                    <label th:for="${'item-' + item.id}">
+                                        <span th:text="${item.serviceItemName}"></span>
+                                        <small class="text-muted" th:text="'(' + ${item.serviceName} + ')'"></small>
+                                    </label>
+                                </div>
+                                <div class="text-end d-flex align-items-center gap-2">
+                                    <input type="number" class="form-control form-control-sm service-qty" min="1" value="1" style="display:none;">
+                                    <span class="fw-bold service-total" th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + '₫'"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div id="service-hidden-inputs"></div>
+
                 </div>
 
-                <button type="submit" class="btn btn-success"><i class="fa fa-check"></i> Đặt sân</button>
+                <!-- Right Column: Summary -->
+                <div class="col-lg-4">
+                    <div class="card p-3 shadow-sm sticky-summary">
+                        <h4 class="section-title">Tóm tắt</h4>
+                        <div id="pricePreview" class="fs-5 fw-bold text-success mb-2"></div>
+                        <div id="servicesTotal" class="fs-6 fw-semibold text-info mb-2"></div>
+                        <div id="voucherFeedback" class="fs-6 text-success mb-2"></div>
+                        <div id="grandTotal" class="fs-4 fw-bold text-primary mb-3"></div>
 
-                <!-- Hidden fields để Spring bind -->
-                <input type="hidden" th:field="*{startTime}" id="startTime">
-                <input type="hidden" th:field="*{endTime}" id="endTime">
-                <input type="hidden" th:field="*{duration}" id="duration">
-                <input type="hidden" th:field="*{date}" id="date">
-                <input type="hidden" th:field="*{subFieldId}" id="subFieldId">
-                <!-- Lưu fieldTypeId để gọi API durations -->
-                <input type="hidden" id="fieldTypeId" th:value="${field.typeId}">
-            </form>
-        </div>
+                        <h5>Chọn voucher:</h5>
+                        <div id="voucher-list" class="d-flex flex-wrap gap-2 mb-3">
+                            <button type="button" th:each="v : ${vouchers}" th:data-discount="${v.discount}"
+                                    th:data-id="${v.id}" th:text="${v.code + ' - ' + v.discount + '%'}"
+                                    class="btn btn-outline-success btn-sm voucher-btn"></button>
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100"><i class="fa fa-check"></i> Đặt sân</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hidden fields -->
+            <input type="hidden" th:field="*{startTime}" id="startTime">
+            <input type="hidden" th:field="*{endTime}" id="endTime">
+            <input type="hidden" th:field="*{duration}" id="duration">
+            <input type="hidden" th:field="*{date}" id="date">
+            <input type="hidden" th:field="*{subFieldId}" id="subFieldId">
+            <input type="hidden" id="fieldTypeId" th:value="${field.typeId}">
+            <div id="service-hidden-inputs"></div>
+
+        </form>
     </div>
+</div>
     <section layout:fragment="scripts">
         <script th:inline="javascript">
             $(document).ready(function () {
@@ -89,7 +185,10 @@
                 const hoursContainer = $('#hours-container');
                 let selectedDate = null;
                 let selectedSubFieldId = null;
+                let selectedVoucher = null;
+                let voucherDiscountVal = 0;
                 const API_BASE = '/api/v1/bookings/occupied';
+                let pricePreviewVal = 0;
 
                 const openTime = /*[[${field.openTime != null ? field.openTime : '06:00'}]]*/ '06:00';
                 const closeTime = /*[[${field.closeTime != null ? field.closeTime : '18:00'}]]*/ '18:00';
@@ -148,6 +247,7 @@
                     const container = $('#hours-container');
                     container.empty().append('<div class="text-muted">Đang tải giờ...</div>');
 
+
                     if (!date || !subFieldId) {
                         container.empty().append('<div class="text-muted">Vui lòng chọn ngày và sân con.</div>');
                         return;
@@ -155,19 +255,26 @@
 
                     $.getJSON(`${API_BASE}?subFieldId=${subFieldId}&date=${date}`)
                         .done(function (response) {
+                            // Lấy thời gian hiện tại
+                            const today = new Date();
+                            const selectedDateObj = new Date(date);
+                            const isToday = selectedDateObj.toDateString() === today.toDateString();
+                            const currentHour = today.getHours();
                             const bookedSlots = (response && response.data) ? response.data : [];
                             container.empty();
 
                             const openHour = parseInt(openTime.split(':')[0]);
                             const closeHour = parseInt(closeTime.split(':')[0]);
 
-                            for (let hour = openHour; hour < closeHour; hour++) {
-                                const timeStr = `${hour.toString().padStart(2, '0')}:00`;
+                            for (let minutes = openHour * 60; minutes < closeHour * 60; minutes += 30) {
+                                const h = Math.floor(minutes / 60);
+                                const m = minutes % 60;
+                                const timeStr = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
                                 const btn = $('<button>')
                                     .attr('type', 'button')
                                     .addClass('btn btn-outline-primary hour-btn px-3 py-2')
                                     .text(timeStr)
-                                    .data('hour', hour)
+                                    .data('hour', h)
                                     .data('time', timeStr);
 
                                 // kiểm tra theo phút chính xác
@@ -178,9 +285,8 @@
 
                                     const startMinutes = startH * 60 + startM;
                                     const endMinutes = endH * 60 + endM;
-                                    const currentMinutes = hour * 60;
 
-                                    if (currentMinutes >= startMinutes && currentMinutes < endMinutes) {
+                                    if (minutes >= startMinutes && minutes < endMinutes) {
                                         matchedSlot = slot;
                                         break;
                                     }
@@ -196,6 +302,11 @@
                                     } else if (matchedSlot.bookingStatus === 'paid') {
                                         btn.removeClass('btn-outline-primary').addClass('btn-danger text-white');
                                     }
+                                } else if (isToday && minutes < currentHour * 60) {
+                                    // Nếu giờ đã qua hôm nay
+                                    btn.prop('disabled', true)
+                                        .addClass('text-muted text-decoration-line-through')
+                                        .append(' ⏰');
                                 }
 
                                 container.append(btn);
@@ -230,26 +341,21 @@
                     }
 
                     // call durations API
-                    $.getJSON(`/api/v1/field-types/${fieldTypeId}/durations`)
+                    $.getJSON(`/api/v1/sub-fields/${selectedSubFieldId}/available-durations`, {
+                        date: selectedDate,
+                        startTime: timeStr
+                    })
                         .done(function (resp) {
                             const durations = (resp && resp.data) ? resp.data : resp; // accommodate different shapes
                             const container = $('#durationContainer');
                             container.empty();
 
-                            if (!Array.isArray(durations) || durations.length === 0) {
-                                container.append('<div class="text-muted">Không có loại duration phù hợp.</div>');
-                                return;
-                            }
-
                             // render buttons durations
-                            durations.forEach(d => {
-                                // expected d has { id, name, minutes }
+                            durations.forEach(minutes => {
                                 const btn = $('<button>')
                                     .addClass('btn btn-outline-primary m-1 duration-btn')
-                                    .data('minutes', d.minutes)
-                                    .data('duration-id', d.id)
-                                    .data('duration-name', d.name)
-                                    .text(`${d.minutes} phút`)
+                                    .data('minutes', minutes)
+                                    .text(`${minutes} phút`)
                                     .attr('type', 'button');
 
                                 container.append(btn);
@@ -269,13 +375,11 @@
                     const minutes = parseInt($(this).data('minutes'));
                     const start = $('#startTime').val(); // "08:00"
                     if (!start || isNaN(minutes)) {
-                        console.error('Thiếu startTime hoặc minutes');
                         return;
                     }
 
                     // set duration (minutes) và endTime
                     $('#duration').val(minutes);
-                    console.log(minutes);
 
                     // compute endTime HH:mm
                     const [h, m] = start.split(':').map(Number);
@@ -286,8 +390,32 @@
                     const endTime = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
 
                     $('#endTime').val(endTime);
-                    console.log(endTime);
 
+                    //Dynamic time pricing
+                    const fieldId = /*[[${field.id}]]*/ 0;
+
+
+                    $.ajax({
+                        url: `/api/v1/bookings/preview-timingPrice?fieldId=${fieldId}&startTime=${start}&endTime=${endTime}`,
+                        method: 'GET',
+                        success: function (response) {
+                            pricePreviewVal = response.data || 0;
+
+                            // Nếu chưa có vùng hiển thị giá thì tạo mới
+                            //if ($('#pricePreview').length === 0) {
+                            //    $('#durationContainer').after('<div id="pricePreview" class="mt-3 fs-5 fw-bold text-success"></div>');
+                            //}
+
+                            $('#pricePreview').text(`💰 Giá tạm tính: ${pricePreviewVal.toLocaleString()}₫`).show();
+
+                            updateAllTotals();
+                        },
+                        error: function (xhr) {
+                            pricePreviewVal = 0;
+                            $('#pricePreview').text('Không thể tính giá.').show();
+                            updateAllTotals();
+                        }
+                    });
                 });
 
                 // Show/hide số lượng khi chọn checkbox
@@ -297,8 +425,130 @@
                     else qtyInput.hide();
                 });
 
+
+                // Hàm định dạng giá (dùng dấu phẩy ngăn cách nghìn)
+                function formatCurrency(value) {
+                    if (isNaN(value) || value === null) return '0₫';
+                    return value.toLocaleString('vi-VN') + '₫';
+                }
+
+                function getUnitPrice(itemEl) {
+                    const priceAttr = itemEl.find('.service-price').data('price');
+                    // ensure number
+                    return parseFloat(priceAttr) || 0;
+                }
+
+                // Cập nhật tổng cho một item (hiển thị)
+                function updateServiceTotal(itemEl) {
+                    const unitPrice = getUnitPrice(itemEl);
+                    const qty = parseInt(itemEl.find('.service-qty').val()) || 0;
+                    const total = unitPrice * qty;
+                    itemEl.find('.service-total').data('total', total).text(formatCurrency(total));
+                }
+
+                // Tính tổng tất cả service đã chọn
+                function calculateServicesTotal() {
+                    let sum = 0;
+                    $('.list-group-item').each(function () {
+                        const itemEl = $(this);
+                        if (itemEl.find('.service-checkbox').is(':checked')) {
+                            let t = parseFloat(itemEl.find('.service-total').data('total')) || 0;
+                            sum += t;
+                        }
+                    });
+                    return sum;
+                }
+
+                // Update tất cả vùng hiển thị giá: pricePreview, servicesTotal, grandTotal
+                function updateAllTotals() {
+
+                    const servicesTotalVal = calculateServicesTotal();
+                    if (servicesTotalVal > 0)
+                        $('#servicesTotal').show().text('💼 Dịch vụ: ' + formatCurrency(servicesTotalVal));
+                    else
+                        $('#servicesTotal').hide().text('');
+
+                    const totalBeforeVoucher = (pricePreviewVal || 0) + servicesTotalVal;
+
+                    let discountAmount = 0;
+                    if (selectedVoucher && selectedVoucher.discount > 0) {
+                        discountAmount = Math.round(totalBeforeVoucher * selectedVoucher.discount / 100);
+                        $('#voucherFeedback').show().text(`Giảm ${selectedVoucher.discount}%: -${formatCurrency(discountAmount)}`);
+                    } else {
+                        $('#voucherFeedback').hide().text('');
+                    }
+
+                    const grandTotal = Math.max(totalBeforeVoucher - discountAmount, 0);
+                    if (grandTotal > 0)
+                        $('#grandTotal').show().text('💰 Tổng: ' + formatCurrency(grandTotal));
+                    else
+                        $('#grandTotal').hide().text('');
+                }
+
+
+                // Khi check/uncheck checkbox
+                $(document).on('change', '.service-checkbox', function () {
+                    const itemEl = $(this).closest('.list-group-item');
+                    const qtyInput = itemEl.find('.service-qty');
+                    if ($(this).is(':checked')) {
+                        qtyInput.show();
+                    } else {
+                        qtyInput.hide();
+                        qtyInput.val(1); // reset về 1 khi bỏ chọn
+                    }
+                    // cập nhật hiển thị total cho item
+                    updateServiceTotal(itemEl);
+                    updateAllTotals();
+                });
+
+                // Khi thay đổi số lượng
+                $(document).on('input', '.service-qty', function () {
+                    const itemEl = $(this).closest('.list-group-item');
+                    // guard min
+                    const min = parseInt($(this).attr('min')) || 1;
+                    let val = parseInt($(this).val()) || min;
+                    if (val < min) { val = min; $(this).val(val); }
+                    updateServiceTotal(itemEl);
+                    updateAllTotals();
+                });
+
+                // Khi click vào voucher
+                $(document).on('click', '.voucher-btn', function () {
+                    $('.voucher-btn').removeClass('active');
+                    $(this).addClass('active');
+
+                    const discountPercent = parseFloat($(this).data('discount')) || 0;
+                    const voucherId = $(this).data('id');
+
+                    if (voucherId != null && !isNaN(voucherId)) {
+                        selectedVoucher = { id: Number(voucherId), discount: discountPercent };
+                    } else {
+                        selectedVoucher = null;
+                    }
+
+                    // Hiển thị thông báo
+                    $('#voucherFeedback').show().text(`Giảm ${discountPercent}%`);
+
+                    // Cập nhật grand total
+                    updateAllTotals();
+                });
+
+                function setPricePreview(val) {
+                    pricePreviewVal = val || 0;
+                    $('#pricePreview').text(`💰 Giá tạm tính: ${formatCurrency(pricePreviewVal)}`).show();
+                    updateAllTotals();
+                }
+
                 // Khi submit form, tạo hidden input cho Spring bind
                 $('#bookingForm').on('submit', function () {
+                    // 1. Tạo hidden input voucher nếu chưa tồn tại
+                    let voucherInput = $('#voucher-hidden-input');
+                    if (voucherInput.length === 0) {
+                        $(this).append('<input type="hidden" name="voucherId" id="voucher-hidden-input">');
+                        voucherInput = $('#voucher-hidden-input');
+                        // 2. Set giá trị voucherId (nếu chưa chọn -> rỗng)
+                        voucherInput.val(selectedVoucher ? selectedVoucher.id : '');
+                    }
                     $('#service-hidden-inputs').empty();
                     $('.service-checkbox:checked').each(function (i) {
                         const serviceId = $(this).val();
@@ -308,12 +558,10 @@
                             `<input type="hidden" name="bookingServiceItemRequest[${i}].quantity" value="${qty}">`
                         );
                     });
+                    console.log('Voucher ID sent:', voucherInput.val());
 
-                    // $('#subFieldId').val($('.subfield-radio:checked').val());
                 });
-
-                // === NOTE: bạn cần đảm bảo JS xử lý service-checkbox & service-qty (thêm hidden inputs)
-                // nếu bạn muốn mình chèn lại phần js đó, báo mình sẽ thêm đầy đủ.
+                // === NOTE: JS xử lý service-checkbox & service-qty (thêm hidden inputs)
             });
         </script>
     </section>

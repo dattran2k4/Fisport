@@ -1,0 +1,36 @@
+package com.fisport.repository;
+
+import com.fisport.dto.response.FieldServiceItemResponse;
+import com.fisport.model.FieldServiceItem;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface FieldServiceItemRepository extends JpaRepository<FieldServiceItem, Long>, JpaSpecificationExecutor<FieldServiceItem> {
+
+    @Query("SELECT new com.fisport.dto.response.FieldServiceItemResponse(fsi.id, si.id, fsi.quantity, si.name, s.name, fsi.price)" +
+            "FROM FieldServiceItem fsi " +
+            "JOIN fsi.serviceItem si " +
+            "JOIN si.service s " +
+            "WHERE fsi.field.id = :fieldId AND fsi.status = 'ACTIVE'")
+    List<FieldServiceItemResponse> findByActive(Long fieldId);
+
+
+    @Query("SELECT fsi FROM FieldServiceItem fsi " +
+            "JOIN FETCH fsi.field f " +
+            "JOIN FETCH fsi.serviceItem si " +
+            "JOIN FETCH si.service s " +
+            "WHERE f.owner.id = :ownerId " +
+            "ORDER BY f.name, s.name, si.name")
+    List<FieldServiceItem> findAllByOwnerId(Long ownerId);
+
+    List<FieldServiceItem> findByFieldId(Long fieldId);
+
+    void deleteAllByField_Id(Long fieldId);
+
+}

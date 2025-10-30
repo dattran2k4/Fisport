@@ -74,19 +74,88 @@
                   class="btn btn-sm btn-success" title="Review">
                   <i class="bi bi-star-fill"></i>
                 </a>
+                <button th:if="${booking.status == 'PAID'}" class="btn btn-sm btn-primary btn-create-challenge"
+                  type="button" data-bs-toggle="modal" data-bs-target="#createChallengeModal"
+                  th:data-booking-id="${booking.id}">
+                  <i class="bi bi-lightning-fill"></i> Tạo thách đấu ⚔️
+                </button>
               </td>
 
               <!-- Inline Rating -->
               <td>
                 <span th:if="${booking.rating != null}">
                   <i class="bi bi-star-fill text-warning" th:each="i : ${#numbers.sequence(1, booking.rating)}"></i>
-                  <i class="bi bi-star text-muted" th:each="i : ${#numbers.sequence(booking.rating +1,5)}"></i>
+                  <i class="bi bi-star text-muted" th:each="i : ${#numbers.sequence(booking.rating + 1 ,5)}"></i>
                 </span>
                 <span th:if="${booking.rating == null}"> Not yet </span>
               </td>
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+    <!-- Modal tạo thách đấu -->
+    <div class="modal fade" id="createChallengeModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content rounded-4 shadow">
+
+          <!-- Header -->
+          <div class="modal-header">
+            <h5 class="modal-title">⚔️ Tạo trận thách đấu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <!-- Body Form -->
+          <div class="modal-body">
+            <form id="challengeForm">
+              <div class="row g-3">
+
+                <div class="col-md-6">
+                  <label class="form-label">Loại hình 🏅</label>
+                  <select class="form-select" name="matchType" required>
+                    <option value="" disabled selected>Chọn loại hình</option>
+                    <option value="SINGLE">Đơn 🧑 vs 🧑</option>
+                    <option value="DOUBLE">Đôi 🧑👤 vs 🧑👤</option>
+                  </select>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Phí tham gia 💰</label>
+                  <input type="number" name="fee" class="form-control" placeholder="Nhập phí (VND)" min="0" required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Tiêu đề trận đấu 🏆</label>
+                  <input type="text" name="title" class="form-control" placeholder="Nhập tiêu đề" maxlength="50"
+                    required>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Level Suggest 🎯</label>
+                  <select class="form-select" name="levelSuggest" required>
+                    <option value="" disabled selected>Chọn level</option>
+                    <option value="BEGINNER">Beginner 🟢</option>
+                    <option value="INTERMEDIATE">Intermediate 🟡</option>
+                    <option value="ADVANCED">Advanced 🔴</option>
+                  </select>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Ghi chú 📝</label>
+                  <textarea name="note" class="form-control" placeholder="Ghi chú thêm" maxlength="200"
+                    rows="3"></textarea>
+                </div>
+
+              </div>
+            </form>
+          </div>
+
+          <!-- Footer -->
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy ❌</button>
+            <button type="submit" form="challengeForm" class="btn btn-primary">Tạo trận đấu ✅</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -121,7 +190,7 @@
             },
             success: function (response) {
               // ✅ Kiểm tra field "status" trong JSON
-              if (response.status >= 200 && response.status < 300) {
+              if (response.status == 202) {
                 Swal.fire({
                   icon: "success",
                   title: "Thành công",

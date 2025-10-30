@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .error-container {
+            max-width: 600px;
+            margin: 80px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .error-code {
+            font-size: 96px;
+            font-weight: bold;
+        }
+        .error-message {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .error-path {
+            color: #6c757d;
+            margin-bottom: 30px;
+        }
+        .btn-home {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="error-container">
+    <!-- Icon -->
+    <div class="mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" fill="currentColor" class="bi bi-exclamation-triangle-fill text-warning" viewBox="0 0 16 16">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.964 0L.165 13.233c-.457.778.091 1.767.982 1.767h13.706c.891 0 1.439-.99.982-1.767L8.982 1.566zm-.982 11.434a1 1 0 1 1 2 0 1 1 0 0 1-2 0zm.93-5.412a.5.5 0 0 0-.857 0l-.35 2.15a.5.5 0 0 0 .485.64h1.554a.5.5 0 0 0 .485-.64l-.35-2.15z"/>
+        </svg>
+    </div>
+
+    <!-- Error Code -->
+    <div class="error-code text-danger" th:text="${status}">500</div>
+
+    <!-- Error Message -->
+    <div class="error-message" th:text="${message}">Internal server error</div>
+
+    <!-- Request Path -->
+    <div class="error-path" th:text="'Requested URL: ' + ${path}">/example/path</div>
+
+    <!-- Back Home Button -->
+    <a th:href="@{'/'}" class="btn btn-primary btn-lg btn-home">
+        <i class="bi bi-house-door-fill"></i> Go to Home
+    </a>
+</div>
+
+<!-- Bootstrap JS + icons -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+</body>
+</html>

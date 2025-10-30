@@ -1,0 +1,13 @@
+package com.fisport.repository;
+
+import com.fisport.model.Ward;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface WardRepository extends CrudRepository<Ward,Long> {
+    List<Ward> findByCityId(long cityId);
+    Ward findBySlug(String slug);
+}

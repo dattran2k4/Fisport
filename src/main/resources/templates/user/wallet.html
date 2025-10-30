@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/layout/user/user}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Wallet</title>
+    <style>
+        /* ==== General Layout ==== */
+        body {
+            background-color: #f5f7fb;
+            font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+        }
+
+        .card {
+            border: none;
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-body h4 i {
+            color: #0d6efd;
+        }
+
+        /* ==== Wallet Summary ==== */
+        .bg-primary.bg-opacity-10 {
+            background: linear-gradient(135deg, #0d6efd15, #0d6efd05);
+            border: 1px solid #e4ebf5;
+            transition: all 0.2s ease;
+        }
+
+        .bg-primary.bg-opacity-10:hover {
+            border-color: #bcd0f7;
+            box-shadow: 0 0 12px rgba(13, 110, 253, 0.1);
+        }
+
+        .bg-primary.bg-opacity-10 h5 {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+
+        .bg-primary.bg-opacity-10 h2 {
+            font-size: 2rem;
+            color: #212529;
+            font-weight: 700;
+        }
+
+        .bg-primary.bg-opacity-10 p {
+            color: #6c757d;
+        }
+
+        /* ==== Top-up Form ==== */
+        .border.p-3.rounded-3 {
+            border: 1px solid #dee2e6 !important;
+            background: #fcfcfd;
+            transition: all 0.2s ease;
+        }
+
+        .border.p-3.rounded-3:hover {
+            border-color: #bcd0f7;
+            box-shadow: 0 0 8px rgba(13, 110, 253, 0.08);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-control,
+        .form-select {
+            border-radius: 10px;
+            border-color: #ced4da;
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #0d6efd, #007bff);
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #0b5ed7, #0a58ca);
+            transform: translateY(-1px);
+        }
+
+        /* ==== Recent Transactions ==== */
+        .table {
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .table thead {
+            background-color: #f1f3f9;
+        }
+
+        .table th {
+            color: #495057;
+            font-weight: 600;
+        }
+
+        .table td {
+            color: #333;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9ff;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .text-success {
+            font-weight: 600;
+            color: #198754 !important;
+        }
+
+        .text-warning {
+            font-weight: 600;
+            color: #ffc107 !important;
+        }
+
+        /* ==== Animation ==== */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ==== Responsive ==== */
+        @media (max-width: 768px) {
+            .card-body {
+                padding: 1.5rem !important;
+            }
+
+            .bg-primary.bg-opacity-10 h2 {
+                font-size: 1.5rem;
+            }
+
+            .table th,
+            .table td {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div layout:fragment="content">
+    <div class="container mt-5 mb-5">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3">
+                <div class="list-group shadow-sm rounded-3">
+                    <a href="#" class="list-group-item list-group-item-action active">
+                        <i class="bi bi-wallet2 me-2"></i> My Wallet
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="bi bi-clock-history me-2"></i> Transaction History
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="bi bi-gear me-2"></i> Settings
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main content -->
+            <div class="col-md-9">
+                <div class="card shadow-sm rounded-4">
+                    <div class="card-body p-4">
+
+                        <h4 class="mb-4"><i class="bi bi-wallet-fill me-2"></i>My Wallet</h4>
+
+                        <!-- Wallet summary -->
+                        <div class="wallet-card mb-4">
+                            <h5 class="fw-semibold mb-2">Current Balance:</h5>
+                            <div class="wallet-balance mb-2"
+                                 th:text="${#numbers.formatDecimal(wallet.balance, 0, 'COMMA', 0, 'POINT') + 'VND'}">
+                                0 VND
+                            </div>
+                            <p class="mb-0">
+                                <span th:text="'WALLET USER: ' + ${#authentication.name}">Wallet ID: WALLET001</span><br>
+                            </p>
+                        </div>
+
+                        <!-- Top-up form -->
+                        <div class="border p-4 rounded-4 mb-4 bg-white topup-form shadow-sm">
+                            <h5 class="fw-semibold mb-3">Top up your wallet</h5>
+                            <form class="">
+                                <div class="mb-3">
+                                    <label for="amount" class="form-label">Amount (VND)</label>
+                                    <input type="number" id="amount" name="amount" class="form-control" min="10000"
+                                           placeholder="Số tiền cần nạp..." required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Payment Method</label>
+                                    <select class="form-select" name="paymentMethod" required>
+                                        <option th:each="method : ${methods}"
+                                                th:value="${method}"
+                                                th:text="${method.name()}"
+                                                th:method-data="${method.name().toLowerCase()}"
+                                        ></option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary px-4 py-2">
+                                    <i class="bi bi-plus-circle me-2"></i>Top Up Now
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Recent Transactions -->
+                        <div class="bg-white p-4 rounded-4 shadow-sm">
+                            <h5 class="fw-semibold mb-3">Recent Transactions</h5>
+                            <form th:action="@{/user/wallet}" method="get" class="d-flex flex-wrap mb-3 align-items-center">
+                                <select name="transactionType" class="form-select me-2 mb-2" style="width: 150px;">
+                                    <option value="">All Type</option>
+                                    <option th:each="type : ${types}"
+                                            th:value="${type}"
+                                            th:text="${type}"
+                                            th:selected="${type == transactionType}">
+                                    </option>
+                                </select>
+
+                                <select name="transactionStatus" class="form-select me-2 mb-2" style="width: 150px;">
+                                    <option value="">All Status</option>
+                                    <option th:each="status : ${status}"
+                                            th:value="${status}"
+                                            th:text="${status}"
+                                            th:selected="${status == transactionStatus}">
+                                    </option>
+                                </select>
+
+                                <select name="paymentMethod" class="form-select me-2 mb-2" style="width: 150px;">
+                                    <option value="">All Method</option>
+                                    <option th:each="method : ${paymentMethods}"
+                                            th:value="${method}"
+                                            th:text="${method}"
+                                            th:selected="${method == paymentMethod}">
+                                    </option>
+                                </select>
+
+                                <select name="sortField" class="form-select me-2 mb-2" style="width: 150px;">
+                                    <option value="createdAt_desc" th:selected="${sortField == 'createAt' and sortDir == 'desc'}">Newest</option>
+                                    <option value="createdAt_asc" th:selected="${sortField == 'createAt' and sortDir == 'asc'}">Oldest</option>
+                                    <option value="amount_desc" th:selected="${sortField == 'amount' and sortDir == 'desc'}">Amount High → Low</option>
+                                    <option value="amount_asc" th:selected="${sortField == 'amount' and sortDir == 'asc'}">Amount Low → High</option>
+                                </select>
+
+                                <button type="submit" class="btn btn-primary btn-sm mb-2">Apply</button>
+                            </form>
+                            <table class="table table-hover align-middle">
+                                <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Amount</th>
+                                    <th>Type</th>
+                                    <th>Method</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr th:each="transaction, iterStat : ${transactions.content}">
+                                    <td th:text="${iterStat.index + 1 + transactions.number * transactions.size}">1</td>
+                                    <td th:text="${#numbers.formatDecimal(transaction.amount,0,'COMMA',0,'POINT')} + ' VND'">100,000 VND</td>
+                                    <td th:text="${transaction.transactionType}">TOPUP</td>
+                                    <td th:text="${transaction.paymentMethod}">VNPAY</td>
+                                    <td><span th:classappend="${transaction.transactionStatus == 'SUCCESS' ? 'text-success' :
+                                      transaction.transactionStatus == 'PENDING' ? 'text-warning' :
+                                      'text-danger'}"
+                                        th:text="${transaction.transactionStatus}">SUCCESS</span>
+                                    </td>
+                                    <td th:text="${#temporals.format(transaction.createAt,'dd/MM/yyyy HH:mm')}">21/10/2025 14:30</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<section layout:fragment="scripts">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            $('.topup-form form').submit(function (e) {
+                e.preventDefault();
+
+                let $form = $(this);
+                let $btn = $form.find('button[type="submit"]');
+
+                let amount = $('#amount').val();
+                let paymentMethod = $('select[name="paymentMethod"]').val().toLowerCase();
+                let walletId = /*[[${wallet.id}]]*/ 0;
+
+
+                if (!amount || amount < 10000) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Số tiền không hợp lệ',
+                        text: 'Số tiền nạp phải >= 10,000 VND',
+                        toast: true,
+                        position: 'top-end',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                    return;
+                }
+
+                let requestData = {
+                    amount: amount.toString(),
+                    paymentMethod: paymentMethod,
+                    walletId: walletId
+                }
+
+                $btn.prop('disabled', true);
+
+
+                Swal.fire({
+                    title: 'Đang tạo link thanh toán...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: '/api/payment/create-payment-wallet-topup',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(requestData),
+                    success: function (response) {
+                        $btn.prop('disabled', false);
+
+                        Swal.close(); // ẩn loading
+                        if (response.data) {
+                            window.location.href = response.data;
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Thất bại',
+                                text: 'Không tạo được link thanh toán. Vui lòng thử lại.',
+                                toast: true,
+                                position: 'top-end',
+                                timer: 4000,
+                                showConfirmButton: false
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        $btn.prop('disabled', false);
+                        Swal.close(); // ẩn loading
+                        let msg = "Đã xảy ra lỗi";
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Lỗi',
+                            text: msg,
+                            toast: true,
+                            position: 'top-end',
+                            timer: 4000,
+                            showConfirmButton: false
+                        });
+                    }
+                })
+            });
+        });
+    </script>
+</section>
+</body>
+
+</html>

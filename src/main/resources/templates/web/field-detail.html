@@ -89,7 +89,7 @@
                         </div>
 
                         <!-- Nút đặt sân -->
-                        <a th:href="@{/{loai}/{slug}/dat-san(loai=${field.typeSlug}, slug=${field.slug})}"
+                        <a th:href="@{/san/{loai}/{slug}/dat-san(loai=${field.typeSlug}, slug=${field.slug})}"
                             class="btn btn-lg btn-primary d-flex align-items-center justify-content-center gap-2 rounded-3 shadow-sm"
                             id="btn-booking">
                             <i class="bi bi-calendar-check"></i> Đặt sân ngay
@@ -168,10 +168,6 @@
                     })
                 };
 
-                // Ghim sân hiện tại
-                // const mainMarker = L.marker([fieldLat, fieldLng], { icon: mainIcon }).addTo(map);
-                // mainMarker.bindPopup(`<b>${fieldName}</b><br><a href='/${fieldSlug}'>Xem chi tiết</a>`).openPopup();
-
                 // Vẽ vùng bán kính 2km quanh sân
                 L.circle([fieldLat, fieldLng], {
                     color: '#007bff',
@@ -234,7 +230,7 @@
                                             ${field.openTime ?? '07:00'} - ${field.closeTime ?? '21:00'}
                                         </p>
 
-                                        <a href="/${field.typeSlug}/${field.slug}/dat-san"
+                                        <a href="/san/${field.typeSlug}/${field.slug}/dat-san"
                                         class="btn btn-sm btn-primary w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 shadow-sm">
                                             <i class="bi bi-calendar-check"></i> Đặt sân ngay
                                         </a>
@@ -246,9 +242,6 @@
                                 .bindTooltip(tooltipHtml)
                                 .bindPopup(popupHtml);
 
-                            // Hiệu ứng popup hover
-                            // marker.on('mouseover', () => marker.openPopup());
-                            // marker.on('mouseout', () => marker.closePopup());
                         });
                     },
                     error: function (xhr) {

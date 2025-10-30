@@ -20,7 +20,7 @@
                         <a class="nav-link active" th:href="@{/}">Trang chủ</a>
                     </li>
                     <li class="nav-item" th:each="t : ${fieldTypes}">
-                        <a class="nav-link d-flex align-items-center" th:href="@{'/' + ${t.slug}}">
+                        <a class="nav-link d-flex align-items-center" th:href="@{'/san/' + ${t.slug}}">
                             <i th:class="'me-1 bi ' + (
                                     ${t.slug} == 'bong-da'     ? 'bi-balloon' : (
                                     ${t.slug} == 'cau-long'    ? 'bi-feather' : (
