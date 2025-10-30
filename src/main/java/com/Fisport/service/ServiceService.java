@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface ServiceService {
     List<ServiceResponse> getAllServices();
+    List<ServiceResponse> searchServices(String keyword);
     ServiceResponse getServiceById(Long id);
     ServiceResponse createService(ServiceRequest request);
     ServiceResponse updateService(Long id, ServiceRequest request);

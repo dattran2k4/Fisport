@@ -29,4 +29,8 @@ public interface FieldServiceItemRepository extends JpaRepository<FieldServiceIt
             "ORDER BY f.name, s.name, si.name")
     List<FieldServiceItem> findAllByOwnerId(Long ownerId);
 
+    List<FieldServiceItem> findByFieldId(Long fieldId);
+
+    void deleteAllByField_Id(Long fieldId);
+
 }

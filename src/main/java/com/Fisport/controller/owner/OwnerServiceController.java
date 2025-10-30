@@ -20,11 +20,15 @@ public class OwnerServiceController {
     private final OwnerFieldServiceService ownerFieldServiceService;
 
     @GetMapping
-    public String listServices(Model model, HttpServletRequest request) {
-        List<ServiceResponse> services = serviceService.getAllServices();
+    public String listServices(@RequestParam(value = "q", required = false) String q,
+                               Model model, HttpServletRequest request) {
+        List<ServiceResponse> services = (q == null || q.trim().isEmpty())
+                ? serviceService.getAllServices()
+                : serviceService.searchServices(q);
         int totalItems = services.stream().mapToInt(s -> s.getServiceItems() != null ? s.getServiceItems().size() : 0).sum();
         double averageItems = services.size() > 0 ? (double) totalItems / services.size() : 0.0;
         model.addAttribute("services", services);
+        model.addAttribute("q", q);
         model.addAttribute("totalItems", totalItems);
         model.addAttribute("averageItems", averageItems);
         model.addAttribute("content", "owner/services/list");

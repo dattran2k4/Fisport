@@ -31,6 +31,17 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ServiceResponse> searchServices(String keyword) {
+        List<Service> services = (keyword == null || keyword.trim().isEmpty())
+                ? serviceRepository.findAll()
+                : serviceRepository.findByNameContainingIgnoreCase(keyword.trim());
+        return services.stream()
+                .map(this::toServiceResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ServiceResponse getServiceById(Long id) {
         Service service = serviceRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy dịch vụ với ID: " + id));

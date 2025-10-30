@@ -22,7 +22,7 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Inter', 'Poppins', 'Nunito Sans', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: var(--light-bg);
     color: var(--text-dark);
     line-height: 1.6;
@@ -91,7 +91,7 @@ body {
     display: flex;
     align-items: center;
     gap: 15px;
-    padding: 15px 20px;
+    padding: 18px 22px;
     color: var(--text-light);
     text-decoration: none;
     transition: var(--transition);
@@ -107,6 +107,10 @@ body {
     background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
     color: white;
     border-right: 4px solid white;
+}
+
+.nav-link.active i {
+    color: inherit;
 }
 
 .nav-link i {
