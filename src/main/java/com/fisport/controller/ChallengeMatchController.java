@@ -51,11 +51,15 @@ public class ChallengeMatchController {
     public String challengeMatchDetail(@PathVariable Long id, Model model) {
         ChallengeMatch match = challengeMatchService.findChallengeMatch(id);
 
+        int maxPlayersPerTeam = match.getChallengeMatchType().getMaxPlayers() / 2;
+        model.addAttribute("maxPlayersPerTeam", maxPlayersPerTeam);
+
         model.addAttribute("creator", userSportEloService.getUserSportEloResponse(match.getCreator().getId(), match.getFieldTypeId()));
 
         model.addAttribute("match", challengeMatchService.getChallengeMatchDetail(id));
 
         model.addAttribute("participants", challengeParticipantService.getAllAcceptedParticipantsInfo(id));
+
         return "web/challenge-match-detail";
     }
 }

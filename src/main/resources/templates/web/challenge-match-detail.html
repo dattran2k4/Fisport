@@ -1,114 +1,138 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorate="~{layout/web/web}">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chi tiết thách đấu | FiSport</title>
-
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-
-    <style>
-        body {
-      background: linear-gradient(135deg, #f0f4ff, #e9f8ff);
-      font-family: "Poppins", sans-serif;
-    }
-    .challenge-card {
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-      transition: all 0.3s ease-in-out;
-    }
-    .challenge-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
-    }
-    .section-title {
-      border-left: 5px solid #007bff;
-      padding-left: 10px;
-      font-weight: 600;
-      margin-bottom: 15px;
-    }
-    .info-item {
-      display: flex;
-      align-items: center;
-      font-size: 1rem;
-      padding: 6px 0;
-    }
-    .info-item span {
-      font-weight: 500;
-      color: #333;
-      margin-left: 6px;
-    }
-    .btn-custom {
-      border-radius: 12px;
-      font-weight: 600;
-      padding: 10px 24px;
-    }
-    .btn-join {
-      background-color: #00b894;
-      color: white;
-    }
-    .btn-join:hover {
-      background-color: #019875;
-    }
-    .btn-back {
-      background-color: #dfe6e9;
-      color: #2d3436;
-    }
-    .btn-back:hover {
-      background-color: #b2bec3;
-    }
-    .creator-card {
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chi tiết trận đấu</title>
+  <style>
+    body {
       background-color: #f8f9fa;
-      border-radius: 15px;
-      padding: 20px;
     }
-    @media (max-width: 576px) {
-      .challenge-card {
-        padding: 20px;
-      }
+
+    .match-card {
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
-    </style>
+
+    .team-card {
+      border-radius: 8px;
+      background-color: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .participant {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .participant:last-child {
+      border-bottom: none;
+    }
+
+    .level-badge {
+      font-size: 0.8rem;
+    }
+  </style>
 </head>
+
 <body>
-<!-- Challenge Detail Page -->
-<div class="container my-5">
-    <div class="challenge-card mx-auto" style="max-width: 700px;">
-        <h2 class="text-center mb-4 fw-bold text-dark">⚔️ Chi tiết trận thách đấu</h2>
+  <div layout:fragment="content">
+    <div class="container my-5">
 
-        <!-- Creator Info -->
-        <div class="creator-card mb-4">
-            <h5 class="section-title">👑 Thông tin người tạo</h5>
-            <div class="info-item">👤 <span>Username: DatTran</span></div>
-            <div class="info-item">☎️ <span>SĐT: 0909xxxxxx</span></div>
-            <div class="info-item">🏅 <span>ELO: 1750</span></div>
-            <div class="info-item">📈 <span>Level: Trung bình khá</span></div>
+      <!-- Match Detail Card -->
+      <div class="card match-card p-4 mb-5">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+          <h3 class="fw-bold"><i class="bi bi-trophy-fill text-warning"></i>
+            <span th:text="${match.title}">Match Title</span>
+            Friendly Match
+          </h3>
+          <span class="badge fs-6" th:text="'Trạng thái: ' + ${match.challengeStatus.value}">Status</span>
         </div>
-
-        <!-- Match Info -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <p><i class="bi bi-person-fill"></i> Chủ kèo: <strong th:text="${match.creator}">Creator Name</strong></p>
+            <p><i class="bi bi-gender-ambiguous"></i> Giới tính: <strong th:text="${match.gender}">Gender</strong></p>
+            <p><i class="bi bi-people-fill"></i> Số người chơi hiện tại:
+              <strong th:text="${match.currentPlayers} + ' / ' + ${match.maxPlayers}">0 / 0</strong>
+            </p>
+            <p><i class="bi bi-currency-dollar"></i> Phí tham gia: <strong th:text="${match.fee}">0</strong></p>
+          </div>
+          <div class="col-md-6">
+            <p><i class="bi bi-flag-fill"></i> Khu vực:
+              <strong th:text="${match.ward} + ', ' + ${match.city}">Ward, City</strong>
+            </p>
+            <p><i class="bi bi-clock-fill"></i> Thời gian diễn ra:
+              <strong th:text="${match.startTime} + ' - ' + ${match.endTime}">00:00 - 00:00</strong>
+            </p>
+            <p><i class="bi bi-calendar-event-fill"></i> Ngày:
+              <strong th:text="${match.date}">YYYY-MM-DD</strong>
+            </p>
+            <p><i class="bi bi-info-circle-fill"></i> Ghi chú:
+              <strong th:text="${match.note}">Note</strong>
+            </p>
+          </div>
+        </div>
         <div>
-            <h5 class="section-title">📋 Thông tin trận đấu</h5>
-            <div class="info-item">📅 <span>Ngày: 12/11/2025</span></div>
-            <div class="info-item">⏰ <span>Giờ: 17:00 - 18:00</span></div>
-            <div class="info-item">📍 <span>Địa điểm: Sân 7 - Q.7, TP.HCM</span></div>
-            <div class="info-item">💰 <span>Phí tham gia: 100.000 VNĐ</span></div>
-            <div class="info-item">👥 <span>Tối đa: 10 người</span></div>
-            <div class="info-item">🚩 <span>Trạng thái: <strong class="text-success">OPEN</strong></span></div>
-            <div class="info-item">📝 <span>Ghi chú: Giao lưu thân mật, vui là chính!</span></div>
+          <span class="badge bg-primary level-badge">
+            <i class="bi bi-bar-chart-fill"></i>
+            Trình độ: <span th:text="${match.level.value}">Level</span>
+          </span>
+          <span class="badge bg-secondary level-badge">
+            <i class="bi bi-basket-fill"></i>
+            Loại môn: <span th:text="${match.sport}">Sport</span>
+          </span>
+          <span class="badge bg-info level-badge">
+            <i class="bi bi-card-list"></i>
+            Nội dung thách đấu: <span th:text="${match.matchType}">Match Type</span>
+          </span>
         </div>
+      </div>
 
-        <!-- Buttons -->
-        <div class="d-flex justify-content-center gap-3 mt-4">
-            <button class="btn btn-custom btn-join">🤝 Tham gia ngay</button>
-            <button class="btn btn-custom btn-back">↩️ Quay lại</button>
+      <!-- Participants Section -->
+      <div class="row g-4">
+        <!-- Loop qua các team -->
+        <div class="col-md-6" th:each="teamEntry : ${participants.entrySet()}">
+          <div class="card team-card p-3">
+
+            <!-- Team Header -->
+            <h5 class="fw-bold mb-3">
+              <i class="bi bi-people-fill"></i>
+              <span th:text="${teamEntry.key.value}">Team A</span>
+              <span class="badge bg-secondary ms-2"
+                th:text="|Còn: ${maxPlayersPerTeam - #lists.size(teamEntry.value ?: {})}|">
+                Còn: 0
+              </span>
+            </h5>
+
+            <!-- Participants List -->
+            <div class="participant" th:each="player : ${teamEntry.value ?: {}}">
+              <span th:text="${player.username}">Player Name</span>
+              <span>
+                <span class="badge bg-success" th:text="'ELO: ' + ${player.playerElo}">ELO: 0</span>
+                <span class="badge bg-warning text-dark" th:text="'Level: ' + ${player.playerLevel.value}">Level</span>
+              </span>
+            </div>
+
+            <!-- Empty Slots / Join Buttons -->
+            <div class="participant">
+              <span th:each="i : ${#numbers.sequence(1, maxPlayersPerTeam - #lists.size(teamEntry.value ?: {}))}">
+                <button class="btn btn-outline-primary btn-sm me-1">Join</button>
+              </span>
+            </div>
+
+          </div>
         </div>
+      </div>
+
+
     </div>
-</div>
+  </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

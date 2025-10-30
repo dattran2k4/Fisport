@@ -19,6 +19,8 @@ import java.util.Map;
 @Getter
 public class ChallengeMatchDetailResponse {
     private Long id;
+    private String creator;
+    private EGender gender;
     private String title;
     private String note;
     private ELevel level;

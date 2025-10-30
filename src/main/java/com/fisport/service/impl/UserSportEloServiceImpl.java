@@ -2,6 +2,7 @@ package com.fisport.service.impl;
 
 import com.fisport.common.ELevel;
 import com.fisport.dto.response.UserSportEloResponse;
+import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.UserSportElo;
 import com.fisport.repository.UserSportEloRepository;
 import com.fisport.service.EloService;
@@ -52,6 +53,6 @@ public class UserSportEloServiceImpl implements UserSportEloService {
     }
 
     private UserSportElo getUserSportElo(Long userId, Long sportId) {
-        return userSportEloRepository.findByUserIdAndFieldTypeId(userId, sportId).orElse(null);
+        return userSportEloRepository.findByUserIdAndFieldTypeId(userId, sportId).orElseThrow(() -> new ResourceNotFoundException("User Sport Elo Not Found"));
     }
 }

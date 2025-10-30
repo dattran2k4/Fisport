@@ -19,6 +19,7 @@ public interface ChallengeParticipantService {
 
     List<ChallengeParticipantForCreatorResponse> getAllParticipantsByMatchAndCreator(Long matchId, String username);
 
+    //Web-detail
     Map<ETeam, List<ChallengeParticipantsInfoResponse>> getAllAcceptedParticipantsInfo(Long matchId);
 
 //    Map<ETeam, List<ChallengeParticipant>> getAllAcceptedPariticipants

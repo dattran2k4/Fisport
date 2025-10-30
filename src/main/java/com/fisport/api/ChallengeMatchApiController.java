@@ -64,6 +64,16 @@ public class ChallengeMatchApiController {
                 .build();
     }
 
+    //Web detail
+    @GetMapping("/{id}/participants-accepted")
+    public ApiResponse getParticipantsInMatch(@PathVariable Long id) {
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("participants in match")
+                .data(challengeParticipantService.getAllAcceptedParticipantsInfo(id))
+                .build();
+    }
+
     @GetMapping("/{id}/participants-list ")
     public ApiResponse getParticipantsList(@PathVariable Long id, Principal principal) {
         return ApiResponse.builder()
