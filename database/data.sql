@@ -539,7 +539,7 @@ VALUES
 
 (2, 2, 6,  'Giao hữu chiều thứ 4', 'KHA', 80000,  'Ưu tiên các bạn đá cánh nhanh nhẹn.', 'MATCHED', 2, NOW(), NOW()),
 
-(3, 3, 1,  'Trận test sân mới', 'TRUNGBINH_KHA', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
+(3, 4, 6,  'Trận test sân mới', 'TRUNGBINH_KHA', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
 
 --(1, 3, 1,  'Trận test sân mới', 'TRUNGBINH', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
 --
