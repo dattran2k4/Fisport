@@ -32,4 +32,7 @@ public interface ChallengeParticipantRepository extends JpaRepository<ChallengeP
     boolean existsByMatchIdAndUserId(Long matchId, Long id);
 
     List<ChallengeParticipant> findByMatchIdAndTeam(Long matchId, ETeam team);
+
+
+    Long countByMatchIdAndTeam(Long matchId, ETeam eTeam);
 }

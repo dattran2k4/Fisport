@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -115,10 +116,10 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
     }
 
     @Override
-    public Map<ETeam, List<ChallengeParticipantsInfoResponse>> getAllAcceptedParticipantsInfo(Long matchId) {
+    public List<ChallengeParticipantsInfoResponse> getAllAcceptedParticipantsInfo(Long matchId) {
         List<ChallengeParticipantsInfoResponse> participants = challengeParticipantRepository.findAllAcceptedParticipantsInfo(matchId);
 
-        return participants.stream().collect(Collectors.groupingBy(ChallengeParticipantsInfoResponse::getTeam));
+        return participants.stream().sorted(Comparator.comparing(ChallengeParticipantsInfoResponse::getId)).toList();
     }
 
     @Override
@@ -148,6 +149,13 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
         ChallengeMatch match = challengeMatchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException("Match not found"));
 
         return Math.toIntExact(match.getParticipants().stream().filter(p -> p.getStatus().equals(EParticipantStatus.PENDING)).count());
+    }
+
+    @Override
+    public Long teamPlayerCount(Long matchId, ETeam team) {
+        ChallengeMatch match = challengeMatchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException("Match not found"));
+
+        return match.getParticipants().stream().filter(p -> p.getTeam().equals(team)).count();
     }
 
     @Override

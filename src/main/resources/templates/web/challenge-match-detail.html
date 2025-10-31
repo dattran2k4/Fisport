@@ -43,6 +43,13 @@
   <div layout:fragment="content">
     <div class="container my-5">
 
+      <!-- Nút Trở về -->
+      <div class="mb-3">
+        <a th:href="@{/thach-dau}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left-circle"></i> Trở về
+        </a>
+      </div>
+
       <!-- Match Detail Card -->
       <div class="card match-card p-4 mb-5">
         <div class="d-flex justify-content-between align-items-start mb-3">
@@ -92,38 +99,89 @@
         </div>
       </div>
 
-      <!-- Participants Section -->
       <div class="row g-4">
-        <!-- Loop qua các team -->
-        <div class="col-md-6" th:each="teamEntry : ${participants.entrySet()}">
-          <div class="card team-card p-3">
+        <div class="col-md-12">
+          <div class="card p-3">
+            <h5 class="fw-bold mb-3"><i class="bi bi-people-fill"></i> Danh sách người chơi đang tham gia</h5>
 
-            <!-- Team Header -->
-            <h5 class="fw-bold mb-3">
-              <i class="bi bi-people-fill"></i>
-              <span th:text="${teamEntry.key.value}">Team A</span>
-              <span class="badge bg-secondary ms-2"
-                th:text="|Còn: ${maxPlayersPerTeam - #lists.size(teamEntry.value ?: {})}|">
-                Còn: 0
-              </span>
-            </h5>
+            <table class="table table-bordered table-striped mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Người chơi</th>
+                  <th>Giới tính</th>
+                  <th>Đội</th>
+                  <th>ELO</th>
+                  <th>Trình độ</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="player : ${participants}">
+                  <td th:text="${player.username}">Player Name</td>
+                  <td th:text="${player.playerGender.value}">Player Name</td>
+                  <td th:text="${player.team.value}">Team</td>
+                  <td th:text="${player.playerElo}">0</td>
+                  <td th:text="${player.playerLevel.value}">Level</td>
+                </tr>
+              </tbody>
+            </table>
+            <!-- Nút Tham gia -->
+              <div class="mt-3 text-end">
+                  <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#joinMatchModal">
+                      <i class="bi bi-person-plus-fill"></i> Tham gia
+                  </button>
+              </div>
 
-            <!-- Participants List -->
-            <div class="participant" th:each="player : ${teamEntry.value ?: {}}">
-              <span th:text="${player.username}">Player Name</span>
-              <span>
-                <span class="badge bg-success" th:text="'ELO: ' + ${player.playerElo}">ELO: 0</span>
-                <span class="badge bg-warning text-dark" th:text="'Level: ' + ${player.playerLevel.value}">Level</span>
-              </span>
-            </div>
+              <!-- Join Match Modal -->
+              <div class="modal fade" id="joinMatchModal" tabindex="-1" aria-labelledby="joinMatchModalLabel" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                      <div class="modal-content border-0 shadow-lg">
+                          <div class="modal-header bg-primary text-white">
+                              <h5 class="modal-title fw-bold" id="joinMatchModalLabel">
+                                  <i class="bi bi-person-plus-fill"></i> Yêu cầu tham gia trận đấu
+                              </h5>
+                              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                          </div>
 
-            <!-- Empty Slots / Join Buttons -->
-            <div class="participant">
-              <span th:each="i : ${#numbers.sequence(1, maxPlayersPerTeam - #lists.size(teamEntry.value ?: {}))}">
-                <button class="btn btn-outline-primary btn-sm me-1">Join</button>
-              </span>
-            </div>
+                          <div class="modal-body">
+                              <form id="joinMatchForm" class="needs-validation" novalidate>
+                                  <div class="mb-3">
+                                      <label class="form-label fw-semibold">Tin nhắn gửi chủ kèo</label>
+                                      <textarea class="form-control" name="message" rows="3" maxlength="200" required
+                                                placeholder="Ví dụ: Cho mình tham gia nhé!"></textarea>
+                                      <div class="form-text text-muted">Tối đa 200 ký tự.</div>
+                                  </div>
 
+                                  <div class="mb-3">
+                                      <label class="form-label fw-semibold">Chọn đội</label>
+                                      <select class="form-select" name="team" required>
+                                          <option value="">-- Chọn đội --</option>
+                                          <option value="TEAM_A" th:disabled="${teamAPlayer >= maxPlayersPerTeam}">
+                                              🅰️ Đội A
+                                              <span th:text="'(' + (${teamAPlayer} ?: 0) + '/' + ${maxPlayersPerTeam} + ')'"></span>
+                                          </option>
+                                          <option value="TEAM_B" th:disabled="${teamBPlayer >= maxPlayersPerTeam}">
+                                              🅱️ Đội B
+                                              <span th:text="'(' + (${teamBPlayer} ?: 0) + '/' + ${maxPlayersPerTeam} + ')'"></span>
+                                          </option>
+                                      </select>
+                                      <div class="form-text text-muted">
+                                          Mỗi đội tối đa <span th:text="${maxPlayersPerTeam}">X</span> người.
+                                      </div>
+                                  </div>
+                              </form>
+                          </div>
+
+                          <div class="modal-footer d-flex justify-content-between">
+                              <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                  <i class="bi bi-arrow-left-circle"></i> Trở về
+                              </button>
+                              <button class="btn btn-primary" id="btnJoinSubmit">
+                                  <i class="bi bi-send-fill"></i> Gửi yêu cầu
+                              </button>
+                          </div>
+                      </div>
+                  </div>
+              </div>
           </div>
         </div>
       </div>

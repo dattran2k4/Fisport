@@ -20,7 +20,7 @@ public interface ChallengeParticipantService {
     List<ChallengeParticipantForCreatorResponse> getAllParticipantsByMatchAndCreator(Long matchId, String username);
 
     //Web-detail
-    Map<ETeam, List<ChallengeParticipantsInfoResponse>> getAllAcceptedParticipantsInfo(Long matchId);
+    List<ChallengeParticipantsInfoResponse> getAllAcceptedParticipantsInfo(Long matchId);
 
 //    Map<ETeam, List<ChallengeParticipant>> getAllAcceptedPariticipants
 
@@ -30,6 +30,7 @@ public interface ChallengeParticipantService {
 
     Integer getPendingCurrentPlayers(Long matchId);
 
+    Long teamPlayerCount(Long matchId, ETeam team);
 
     List<ChallengeParticipant> getParticipantsByMatchAndTeam(Long matchId, ETeam team);
 

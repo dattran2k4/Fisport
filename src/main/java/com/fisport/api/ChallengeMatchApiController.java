@@ -74,7 +74,7 @@ public class ChallengeMatchApiController {
                 .build();
     }
 
-    @GetMapping("/{id}/participants-list ")
+    @GetMapping("/{id}/participants-list")
     public ApiResponse getParticipantsList(@PathVariable Long id, Principal principal) {
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())
