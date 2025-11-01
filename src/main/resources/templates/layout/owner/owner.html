@@ -28,7 +28,7 @@
         <nav class="nav-menu">
             <a th:href="@{/owner/dashboard}"
                class="nav-link"
-               th:classappend="${currentUri.contains('/dashboard') ? 'active' : ''}">
+               th:classappend="${currentUri.matches('.*/(dashboard|reports).*') ? 'active' : ''}">
                 <i class="fas fa-chart-line"></i>
                 <span>Dashboard</span>
             </a>
