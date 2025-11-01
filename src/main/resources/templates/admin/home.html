@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Fisport</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f7fc;
+            color: #2d3748;
+            margin: 0;
+            padding: 0;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+            border-radius: 0 0 2rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: rotate(45deg);
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1);
+        }
+
+        .icon-users { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .icon-active { background: linear-gradient(135deg, #43e97b, #38f9d7); }
+        .icon-new { background: linear-gradient(135deg, #fa709a, #fee140); }
+        .icon-fields { background: linear-gradient(135deg, #30cfd0, #330867); }
+        .icon-bookings { background: linear-gradient(135deg, #ff9a56, #ff6a88); }
+        .icon-revenue { background: linear-gradient(135deg, #a8edea, #fed6e3); color: #764ba2; }
+        .icon-reviews { background: linear-gradient(135deg, #fbc2eb, #a6c1ee); }
+        .icon-pending { background: linear-gradient(135deg, #f093fb, #f5576c); }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-trend {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .trend-up { color: #28a745; }
+        .trend-down { color: #dc3545; }
+
+        .chart-card, .activity-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-btn {
+            padding: 1rem;
+            border-radius: 0.75rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-decoration: none;
+            color: #2d3748;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-align: center;
+            flex-direction: column;
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .action-btn i {
+            font-size: 1.8rem;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-btn .fw-semibold {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .action-btn small {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-left: 3px solid #667eea;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stat-card, .action-btn, .activity-item, .chart-card, .activity-card {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+
+        @media (max-width: 768px) {
+            .stat-value { font-size: 1.8rem; }
+            .stat-icon { width: 50px; height: 50px; font-size: 1.5rem; }
+            .dashboard-header { padding: 2rem 0; }
+            .action-btn .fw-semibold { font-size: 0.9rem; }
+            .action-btn small { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="display-5 fw-bold mb-2">
+                    <i class="fas fa-tachometer-alt me-2"></i>
+                    Dashboard
+                </h1>
+                <p class="mb-0 opacity-75">Tổng quan hệ thống quản lý Fisport</p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="text-white">
+                    <i class="fas fa-calendar-alt me-2"></i>
+                    <span id="currentDate"></span>
+                </div>
+                <div class="text-white-50 small mt-1">
+                    <i class="fas fa-clock me-2"></i>
+                    <span id="currentTime"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="welcome-banner">
+        <h3 class="mb-2">
+            <i class="fas fa-smile me-2"></i>
+            Chào mừng trở lại, Admin!
+        </h3>
+        <p class="text-muted mb-0">Tổng quan hoạt động hệ thống hôm nay</p>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon icon-users">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-label">Tổng người dùng</div>
+                <div class="stat-value" th:text="${totalUsers}"></div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span th:text="'+' + ${totalUsers * 0.12} + ' so với tháng trước'"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon icon-active">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-label">Người dùng hoạt động</div>
+                <div class="stat-value" th:text="${activeUsers}"></div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span th:text="'+' + ${activeUsers * 0.08} + ' so với tuần trước'"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon icon-new">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="stat-label">Người dùng mới (30 ngày)</div>
+                <div class="stat-value" th:text="${newUsers}"></div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span th:text="'+' + ${newUsers * 0.24} + ' so với kỳ trước'"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon icon-fields">
+                    <i class="fas fa-futbol"></i>
+                </div>
+                <div class="stat-label">Tổng số sân</div>
+                <div class="stat-value" th:text="${totalFields}"></div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span th:text="'+' + ${totalFields * 0.05} + ' sân mới'"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon icon-bookings">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-label">Tổng lượt đặt sân</div>
+                <div class="stat-value" th:text="${totalBookings}"></div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span th:text="'+' + ${totalBookings * 0.18} + ' so với tháng trước'"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon icon-revenue">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-label">Doanh thu tháng này</div>
+                <div class="stat-value" th:text="${revenue} + 'đ'"></div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span th:text="'+' + ${revenue * 0.15} + ' so với tháng trước'"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon icon-reviews">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="stat-label">Đánh giá trung bình</div>
+                <div class="stat-value" th:text="${averageRating}"></div>
+                <div class="stat-trend trend-up">
+                    <i class="fas fa-arrow-up"></i>
+                    <span>+0.2 điểm</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="stat-card">
+                <div class="stat-icon icon-pending">
+                    <i class="fas fa-hourglass-half"></i>
+                </div>
+                <div class="stat-label">Đặt sân chờ xác nhận</div>
+                <div class="stat-value" th:text="${pendingBookings}"></div>
+                <div class="stat-trend trend-down">
+                    <i class="fas fa-arrow-down"></i>
+                    <span th:text="'-' + ${pendingBookings * 0.1} + ' so với hôm qua'"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-title">
+        <i class="fas fa-bolt me-2"></i> Thao tác nhanh
+    </div>
+    <div class="quick-actions">
+    <a href="/admin/users" class="action-btn">
+            <i class="fas fa-users"></i>
+            <div class="fw-semibold">Quản lý người dùng</div>
+            <small>Xem và chỉnh sửa</small>
+        </a>
+        <a href="/admin/fields" class="action-btn">
+            <i class="fas fa-futbol"></i>
+            <div class="fw-semibold">Quản lý sân</div>
+            <small>Thêm, sửa, xóa sân</small>
+        </a>
+        <a href="/admin/bookings" class="action-btn">
+            <i class="fas fa-calendar-check"></i>
+            <div class="fw-semibold">Quản lý đặt sân</div>
+            <small>Xác nhận và theo dõi</small>
+        </a>
+        <a href="/admin/reports" class="action-btn">
+            <i class="fas fa-chart-line"></i>
+            <div class="fw-semibold">Báo cáo thống kê</div>
+            <small>Xem chi tiết</small>
+        </a>
+    </div>
+
+    <div class="row g-4 mt-4">
+        <div class="col-lg-8">
+            <div class="chart-card">
+                <h5>
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Biểu đồ đặt sân 7 ngày gần nhất
+                </h5>
+                <canvas id="bookingChart" height="100"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="activity-card">
+                <h5>
+                    <i class="fas fa-list-ul me-2"></i>
+                    Hoạt động gần đây
+                </h5>
+                <div class="activity-list" style="max-height: 320px; overflow-y: auto;">
+                    <div class="activity-item" th:each="activity : ${recentActivities}">
+                        <div class="fw-semibold" th:text="${activity[0]} == 'USER_REGISTRATION' ? 'Người dùng mới đăng ký' : ${activity[0]} == 'BOOKING' ? 'Đặt sân mới' : ${activity[0]} == 'REVIEW' ? 'Đánh giá mới' : 'Thanh toán thành công'"></div>
+                        <div class="text-muted small" th:text="${activity[1]}"></div>
+                        <div class="activity-time" th:text="${#dates.format(activity[2], 'dd/MM/yyyy HH:mm')}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Update date and time
+    function updateDateTime() {
+        const now = new Date();
+        const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('vi-VN', dateOptions);
+        document.getElementById('currentTime').textContent = now.toLocaleTimeString('vi-VN', timeOptions);
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    // Chart.js configuration
+    const ctx = document.getElementById('bookingChart');
+    if (ctx) {
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: /*[[${bookingLabels}]]*/,
+                datasets: [{
+                    label: 'Lượt đặt sân',
+                    data: /*[[${bookingData}]]*/,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>

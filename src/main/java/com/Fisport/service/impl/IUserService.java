@@ -15,29 +15,23 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 @RequiredArgsConstructor
 @Service
 public class IUserService implements UserService {
     private final UserRepository userRepository;
+    private final com.Fisport.repository.RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponse getUserByUserName(String name) {
-        Optional<User> user = userRepository.findByUsername(name);
-        return UserResponse.builder()
-                .id(user.get().getId())
-                .username(user.get().getUsername())
-                .email(user.get().getEmail())
-                .phone(user.get().getPhone())
-                .birthday(user.get().getBirthday())
-                .gender(user.get().getGender())
-                .roleName(String.valueOf(user.get().getRole().getName()))
-                .status(user.get().getStatus())
-                .createdAt(user.get().getCreatedAt())
-                .updatedAt(user.get().getUpdatedAt())
-                .build();
+        User user = userRepository.findByUsername(name)
+                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
+        return toUserResponse(user);
     }
 
     @Override
@@ -79,9 +73,66 @@ public class IUserService implements UserService {
     }
 
     @Override
+    public org.springframework.data.domain.Page<UserResponse> getAllUsersPaged(String keyword, com.Fisport.common.ERole role, com.Fisport.common.EUserStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(Math.max(0, page), Math.max(1, size));
+        Page<User> userPage = userRepository.findByFilters(keyword, role, status, pageable);
+
+        List<UserResponse> content = userPage.stream().map(this::toUserResponse).toList();
+        return new PageImpl<>(content, pageable, userPage.getTotalElements());
+    }
+
+    @Override
     public void changeStatus(Long id, EUserStatus status) {
         User user = getUser(id);
         user.setStatus(status);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void deleteUser(Long id) {
+        User user = getUser(id);
+        userRepository.delete(user);
+    }
+
+    @Override
+    public void adminUpdateUser(Long id, com.Fisport.dto.request.UpdateProfileRequest request, ERole role, EUserStatus status) {
+        User user = getUser(id);
+        user.setEmail(request.getEmail());
+        user.setPhone(request.getPhone());
+        user.setGender(request.getGender());
+        user.setBirthday(request.getBirthday());
+        user.setStatus(status);
+        // set role by finding Role entity
+        var roleEntity = roleRepository.findByName(role).orElseThrow(() -> new RuntimeException("Role not found"));
+        user.setRole(roleEntity);
+        userRepository.save(user);
+    }
+
+    @Override
+    public void createUser(String username, String rawPassword, com.Fisport.dto.request.UpdateProfileRequest request, ERole role, EUserStatus status) {
+        if (userRepository.existsByUsername(username)) {
+            throw new RuntimeException("Username already exists");
+        }
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists");
+        }
+        if (userRepository.existsByPhone(request.getPhone())) {
+            throw new RuntimeException("Phone already exists");
+        }
+
+        var roleEntity = roleRepository.findByName(role).orElseThrow(() -> new RuntimeException("Role not found"));
+
+        User user = User.builder()
+                .username(username)
+                .password(passwordEncoder.encode(rawPassword))
+                .email(request.getEmail())
+                .phone(request.getPhone())
+                .birthday(request.getBirthday())
+                .gender(request.getGender())
+                .status(status)
+                .role(roleEntity)
+                .build();
+
         userRepository.save(user);
     }
 

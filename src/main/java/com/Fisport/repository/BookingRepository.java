@@ -57,4 +57,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                              @Param("now") LocalDateTime now);
 
     List<Booking> findBySubfieldAndBookingDate(SubField subField, LocalDate date);
+
+        @Query("SELECT COUNT(b) FROM Booking b WHERE b.bookingStatus = com.Fisport.common.EBookingStatus.PENDING")
+        long countByPendingStatus();
+
+        @Query("SELECT FUNCTION('DATE', b.bookingDate) as d, COUNT(b) FROM Booking b WHERE b.bookingDate >= :from AND b.bookingDate <= :to GROUP BY b.bookingDate ORDER BY b.bookingDate")
+        java.util.List<java.lang.Object[]> countByDateRange(@Param("from") LocalDate from, @Param("to") LocalDate to);
 }

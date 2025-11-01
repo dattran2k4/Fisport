@@ -14,6 +14,12 @@ public interface ReviewRepository extends CrudRepository<Review, Long> {
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.field.id = :fieldId")
     Double findAverageByFieldId(@Param("fieldId") Long fieldId);
+
+    @Query("SELECT AVG(r.rating) FROM Review r")
+    Double findGlobalAverageRating();
+
+    java.util.List<Review> findTop5ByOrderByCreatedAtDesc();
+
     void deleteByFieldId(Long fieldId);
     List<Review> findByUser(User user);
 }

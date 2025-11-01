@@ -1,20 +1,80 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
-    <meta charset="UTF-8">
-    <title layout:title-pattern="$CONTENT_TITLE - FiSport">FiSport</title>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title layout:title-pattern="$CONTENT_TITLE - FiSport">FiSport</title>
 
-    <!-- Bootstrap + Icons -->
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+      <!-- Bootstrap + Icons -->
+      <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+      <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+      <style>
+            /* small layout helpers */
+            body { padding-top: 56px; }
+            .sidebar { width: 240px; }
+            .content-area { margin-left: 0; }
+            @media(min-width: 992px) { .content-area { margin-left: 240px; } }
+      </style>
 </head>
 
 <body>
-<div layout:fragment="content"></div>
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+      <div class="container-fluid">
+            <a class="navbar-brand" th:href="@{/}">FiSport</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsMain"
+                        aria-controls="navbarsMain" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarsMain">
+                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" th:href="@{/}">Trang chủ</a></li>
+                        <li class="nav-item"><a class="nav-link" th:href="@{/admin}">Admin</a></li>
+                  </ul>
+                  <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                              <a class="nav-link dropdown-toggle" href="#" id="userMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i> <span th:text="${#authentication?.name ?: 'Guest'}">User</span>
+                              </a>
+                              <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                    <li><a class="dropdown-item" th:href="@{/logout}">Đăng xuất</a></li>
+                              </ul>
+                        </li>
+                  </ul>
+            </div>
+      </div>
+</nav>
 
+<!-- Optional sidebar for admin -->
+<div class="d-none d-lg-block position-fixed bg-light h-100 sidebar border-end">
+      <div class="p-3">
+            <h5 class="mb-3">Admin</h5>
+            <ul class="nav nav-pills flex-column">
+                  <li class="nav-item"><a class="nav-link" th:href="@{/admin/users}"><i class="bi bi-people"></i> Người dùng</a></li>
+                  <li class="nav-item"><a class="nav-link" th:href="@{/admin}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+            </ul>
+      </div>
+</div>
+
+<!-- Main content area -->
+<main class="content-area">
+      <div class="container-fluid pt-4">
+                  <!-- Flash messages -->
+                  <div th:if="${FLASH != null}" class="mb-3">
+                        <div th:each="msg : ${FLASH}">
+                              <div class="alert alert-info" th:text="${msg}"></div>
+                        </div>
+                  </div>
+
+            <div layout:fragment="content"></div>
+      </div>
+</main>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
