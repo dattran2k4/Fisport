@@ -138,7 +138,7 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
 
         participant.setStatus(EParticipantStatus.NOSHOW);
         challengeParticipantRepository.save(participant);
-        log.info("PlayerId {} marked not shown",  participant.getUser().getId());
+        log.info("PlayerId {} marked not shown", participant.getUser().getId());
     }
 
     @Override
@@ -181,8 +181,7 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
     @Override
     public List<ChallengeParticipantsInfoResponse> getAllAcceptedParticipantsInfo(Long matchId) {
         List<ChallengeParticipantsInfoResponse> participants = challengeParticipantRepository.findAllAcceptedParticipantsInfo(matchId);
-
-        return participants.stream().sorted(Comparator.comparing(ChallengeParticipantsInfoResponse::getId)).toList();
+        return participants;
     }
 
     @Override

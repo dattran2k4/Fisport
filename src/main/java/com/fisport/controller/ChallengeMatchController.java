@@ -57,6 +57,8 @@ public class ChallengeMatchController {
 
         model.addAttribute("creator", userSportEloService.getUserSportEloResponse(match.getCreator().getId(), match.getFieldTypeId()));
 
+        model.addAttribute("teams", ETeam.values());
+
         model.addAttribute("match", challengeMatchService.getChallengeMatchDetail(id));
 
         model.addAttribute("participants", challengeParticipantService.getAllAcceptedParticipantsInfo(id));
