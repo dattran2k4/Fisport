@@ -1,18 +1,25 @@
 package com.Fisport.controller.admin;
 
+import com.Fisport.common.EFieldStatus;
+import com.Fisport.dto.response.FieldResponse;
 import com.Fisport.repository.BookingRepository;
 import com.Fisport.repository.FieldRepository;
 import com.Fisport.repository.PaymentRepository;
 import com.Fisport.repository.ReviewRepository;
 import com.Fisport.repository.UserRepository;
+import com.Fisport.service.FieldService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
@@ -25,6 +32,8 @@ public class AdminHomeController {
     private final PaymentRepository paymentRepository;
     private final ReviewRepository reviewRepository;
 
+    @Autowired
+    private FieldService fieldService;
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping({"", "/", "/dashboard"})
     public String dashboard(Model model) {
@@ -106,5 +115,23 @@ public class AdminHomeController {
         model.addAttribute("bookingData", data);
 
         return "admin/home";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/fields")
+    public String listFields(@RequestParam(required = false) String keyword,
+                             @RequestParam(required = false) String statusFilter,
+                             Model model) {
+        List<FieldResponse> fields = fieldService.searchFields(keyword, statusFilter);
+        model.addAttribute("fields", fields);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("statusFilter", statusFilter);
+        return "admin/fields/manage";
+    }
+
+    @PostMapping("/fields/change-status")
+    public String changeStatus(@RequestParam Long id, @RequestParam EFieldStatus status) {
+        fieldService.updateStatus(id, status);
+        return "redirect:/admin/fields";
     }
 }

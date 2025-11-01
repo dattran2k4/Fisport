@@ -147,7 +147,7 @@ public class FieldServiceImpl implements FieldService {
                 .slug(slug)
                 .openTime(fieldCreateRequest.getOpeningTime())
                 .closeTime(fieldCreateRequest.getClosingTime())
-                .fieldStatus(EFieldStatus.INACTIVE)
+                .fieldStatus(EFieldStatus.PENDING)
                 .ward(ward).longitude(Double.parseDouble(fieldCreateRequest.getLongitude()))
                 .latitude(Double.parseDouble(fieldCreateRequest.getLatitude()))
                 .owner(user).fieldType(fieldType)
@@ -252,11 +252,42 @@ public class FieldServiceImpl implements FieldService {
     }
 
     @Override
+    public List<FieldResponse> getAllFields() {
+        return (fieldRepository.findAll()).stream().map(this::toDto).toList();
+    }
+
+    @Override
     public List<FieldResponse> getAllPendingFieldsByOwner(String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy chủ sân"));
 
         List<Field> fields = fieldRepository.findByFieldStatusAndOwner_Username(EFieldStatus.PENDING, user.getUsername());
         return fields.stream().map(this::toDto).toList();
+    }
+
+    @Override
+    public List<FieldResponse> searchFields(String keyword, String statusFilter) {
+        Specification<Field> spec = (root, query, cb) -> cb.conjunction();
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            spec = spec.and((root, query, cb) ->
+                    cb.or(
+                            cb.like(cb.lower(root.get("name")), "%" + keyword.toLowerCase() + "%"),
+                            cb.like(cb.lower(root.get("address")), "%" + keyword.toLowerCase() + "%")
+                    ));
+        }
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            try {
+                EFieldStatus status = EFieldStatus.valueOf(statusFilter.toUpperCase());
+                spec = spec.and((root, query, cb) -> cb.equal(root.get("fieldStatus"), status));
+            } catch (IllegalArgumentException e) {
+            }
+        }
+
+        List<Field> fields = fieldRepository.findAll(spec);
+
+        return fields.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -283,6 +314,14 @@ public class FieldServiceImpl implements FieldService {
                 .features(features.stream().map(Feature::getName).collect(Collectors.toSet()))
                 .rating(rating)
                 .build();
+    }
+
+    @Override
+    public void updateStatus(Long fieldId, EFieldStatus status) {
+        Field field = fieldRepository.findById(fieldId)
+                .orElseThrow(() -> new RuntimeException("Field not found with id: " + fieldId));
+        field.setFieldStatus(status);
+        fieldRepository.save(field);
     }
 
     @Override

@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -63,4 +64,67 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
         @Query("SELECT FUNCTION('DATE', b.bookingDate) as d, COUNT(b) FROM Booking b WHERE b.bookingDate >= :from AND b.bookingDate <= :to GROUP BY b.bookingDate ORDER BY b.bookingDate")
         java.util.List<java.lang.Object[]> countByDateRange(@Param("from") LocalDate from, @Param("to") LocalDate to);
+    // Count bookings with date filter
+    @Query("SELECT COUNT(b) FROM Booking b " +
+            "WHERE (:ownerId IS NULL OR b.subfield.field.owner.id = :ownerId) " +
+            "AND b.bookingDate BETWEEN :from AND :to")
+    Long countBookings(@Param("ownerId") Long ownerId,
+                       @Param("from") LocalDate from,
+                       @Param("to") LocalDate to);
+
+    // Sum revenue
+    @Query("SELECT COALESCE(SUM(b.totalPrice), 0) FROM Booking b " +
+            "WHERE (:ownerId IS NULL OR b.subfield.field.owner.id = :ownerId) " +
+            "AND b.bookingDate BETWEEN :from AND :to " +
+            "AND (:status IS NULL OR b.bookingStatus = :status)")
+    BigDecimal sumRevenue(@Param("ownerId") Long ownerId,
+                          @Param("from") LocalDate from,
+                          @Param("to") LocalDate to,
+                          @Param("status") EBookingStatus status);
+
+    // Revenue grouped by date
+    @Query("SELECT b.bookingDate, SUM(b.totalPrice) FROM Booking b " +
+            "WHERE (:ownerId IS NULL OR b.subfield.field.owner.id = :ownerId) " +
+            "AND b.bookingDate BETWEEN :from AND :to " +
+            "GROUP BY b.bookingDate ORDER BY b.bookingDate")
+    List<Object[]> revenueGroupByDate(@Param("ownerId") Long ownerId,
+                                      @Param("from") LocalDate from,
+                                      @Param("to") LocalDate to);
+
+    // Top fields by revenue
+    @Query("SELECT f.id, f.name, COUNT(b), SUM(b.totalPrice) FROM Booking b " +
+            "JOIN b.subfield sf JOIN sf.field f " +
+            "WHERE (:ownerId IS NULL OR f.owner.id = :ownerId) " +
+            "GROUP BY f.id, f.name " +
+            "ORDER BY SUM(b.totalPrice) DESC")
+    List<Object[]> topFieldsByRevenue(@Param("ownerId") Long ownerId,
+                                      @Param("limit") int limit);
+
+    // Count bookings by status (using Enum)
+    @Query("SELECT COUNT(b) FROM Booking b " +
+            "WHERE (:ownerId IS NULL OR b.subfield.field.owner.id = :ownerId) " +
+            "AND b.bookingDate BETWEEN :from AND :to " +
+            "AND b.bookingStatus = :status")
+    Long countByStatus(@Param("ownerId") Long ownerId,
+                       @Param("from") LocalDate from,
+                       @Param("to") LocalDate to,
+                       @Param("status") EBookingStatus status);
+
+    // Bookings grouped by status
+    @Query("SELECT CAST(b.bookingStatus AS string), COUNT(b) FROM Booking b " +
+            "WHERE (:ownerId IS NULL OR b.subfield.field.owner.id = :ownerId) " +
+            "AND b.bookingDate BETWEEN :from AND :to " +
+            "GROUP BY b.bookingStatus")
+    List<Object[]> countByStatusGroup(@Param("ownerId") Long ownerId,
+                                      @Param("from") LocalDate from,
+                                      @Param("to") LocalDate to);
+
+    // Bookings by hour
+    @Query("SELECT HOUR(b.startTime), COUNT(b) FROM Booking b " +
+            "WHERE (:ownerId IS NULL OR b.subfield.field.owner.id = :ownerId) " +
+            "AND b.bookingDate BETWEEN :from AND :to " +
+            "GROUP BY HOUR(b.startTime) ORDER BY HOUR(b.startTime)")
+    List<Object[]> bookingsByHour(@Param("ownerId") Long ownerId,
+                                  @Param("from") LocalDate from,
+                                  @Param("to") LocalDate to);
 }

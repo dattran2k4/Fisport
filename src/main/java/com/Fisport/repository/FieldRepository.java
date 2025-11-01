@@ -23,7 +23,6 @@ public interface FieldRepository extends JpaRepository<Field,Long>, JpaSpecifica
     List<Field> findByOwner(User owner);
     Field findByOwnerIdAndId(long user_id, long id);
     Field findBySlug(String fieldNameSlug);
-
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM field WHERE id = :fieldId LIMIT 1", nativeQuery = true)
@@ -47,4 +46,6 @@ public interface FieldRepository extends JpaRepository<Field,Long>, JpaSpecifica
                                                     @Param("minLng") Double minLng,
                                                     @Param("maxLng") Double maxLng,
                                                     @Param("radius") Double radius);
+
+    Long countByOwnerId(Long ownerId);
 }

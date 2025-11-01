@@ -24,11 +24,11 @@ public interface FieldService {
     Set<FeatureResponse> getFeautresByField(Long id);
     void deleteFieldByOwner(Long fieldId, String username);
     List<FieldResponse> getAllPendingFields();
-
+    List<FieldResponse> getAllFields();
     List<FieldResponse> getAllPendingFieldsByOwner(String name);
-
+    List<FieldResponse> searchFields(String keyword, String statusFilter);
     FieldDetailResponse findBySlug(String fieldNameSlug);
-
+    void updateStatus(Long fieldId, EFieldStatus status);
     List<FieldDetailResponse> getFieldsNearBy(Double lat, Double lng, Double radius);
 
     FieldResponse getFieldByIdAndOwnerName(Long id, String name);

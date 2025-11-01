@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -46,4 +47,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @org.springframework.data.jpa.repository.Query("SELECT COUNT(u) FROM User u WHERE u.createdAt >= :from")
     long countCreatedAfter(java.time.LocalDateTime from);
+
+    @Query("SELECT COUNT(DISTINCT b.user.id) FROM Booking b " +
+            "WHERE (:ownerId IS NULL OR b.subfield.field.owner.id = :ownerId) " +
+            "AND b.bookingDate BETWEEN :from AND :to")
+    Long countDistinctUsersByBookings(@Param("ownerId") Long ownerId,
+                                      @Param("from") LocalDate from,
+                                      @Param("to") LocalDate to);
 }
