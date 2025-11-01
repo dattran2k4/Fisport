@@ -9,7 +9,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 
 @Getter
-public class ChallengeMatchRequest {
+public class ChallengeMatchCreateRequest {
 
     private BigDecimal fee;
 

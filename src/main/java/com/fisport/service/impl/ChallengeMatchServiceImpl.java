@@ -1,11 +1,9 @@
 package com.fisport.service.impl;
 
 import com.fisport.common.*;
-import com.fisport.dto.request.ChallengeMatchRequest;
-import com.fisport.dto.response.ChallengeMatchDetailResponse;
-import com.fisport.dto.response.ChallengeMatchManagementResponse;
-import com.fisport.dto.response.ChallengeMatchSummaryResponse;
-import com.fisport.dto.response.PageResponse;
+import com.fisport.dto.request.ChallengeMatchCreateRequest;
+import com.fisport.dto.request.ChallengeMatchUpdateRequest;
+import com.fisport.dto.response.*;
 import com.fisport.exception.InvalidDataException;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.*;
@@ -25,28 +23,25 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
-
 public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
     private final ChallengeMatchRepository challengeMatchRepository;
-    private final ChallengeMatchTypeService challengeMatchTypeService;
     private final ChallengeMatchTypeRepository challengeMatchTypeRepository;
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
-    private final UserService userService;
     private final ChallengeParticipantRepository challengeParticipantRepository;
     private final ChallengeParticipantService challengeParticipantService;
     private final WalletPaymentService walletPaymentService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createChallengeMatch(ChallengeMatchRequest request, String username) {
+    public void createChallengeMatch(ChallengeMatchCreateRequest request, String username) {
         log.info("create challenge match");
         User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -86,6 +81,33 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
         challengeParticipantRepository.save(participant);
 
         log.info("Created challengeId {}", challengeMatch.getId());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateChallengeMatch(Long id, ChallengeMatchUpdateRequest request) {
+        ChallengeMatch match = findChallengeMatch(id);
+
+        ChallengeMatchType type = challengeMatchTypeRepository.findById(request.getChallengeMatchTypeId()).orElseThrow(() -> new ResourceNotFoundException("Challenge Match Type not found"));
+
+        List<ChallengeParticipant> participants = challengeParticipantRepository.findAllByMatchId(id);
+
+        boolean hasPaid = participants.stream()
+                    .anyMatch(p -> !p.getUser().getId().equals(match.getCreator().getId())   // không tính creator
+                            && Boolean.TRUE.equals(p.isPaid()));                         // đã trả phí
+        if (hasPaid && request.getFee() != null && !request.getFee().equals(match.getParticipationFee())) {
+                throw new InvalidDataException("Không thể thay đổi phí vì đã có người chơi thanh toán.");
+        }
+
+        match.setChallengeMatchType(type);
+        match.setTitle(request.getTitle());
+        match.setNote(request.getNote());
+        if (request.getFee() != null && !request.getFee().equals(match.getParticipationFee())) {
+            match.setParticipationFee(request.getFee());
+        }
+
+        challengeMatchRepository.save(match);
+        log.info("Updated challengeMatchId {}", match.getId());
     }
 
     @Override
@@ -178,7 +200,7 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
     @Override
     public void checkMatchFinished(Long matchId) {
         ChallengeMatch match = findChallengeMatch(matchId);
-        if (match.getBooking().getEndTime().isBefore(LocalTime.now()) && match.getStatus().equals(EChallengeStatus.MATCHED)) {
+        if (match.getBooking().getEndTime().isBefore(LocalTime.now()) && !match.getStatus().equals(EChallengeStatus.MATCHED)) {
             match.setStatus(EChallengeStatus.MATCHED);
             challengeMatchRepository.save(match);
         }
@@ -187,11 +209,14 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
     @Override
     @Transactional
-    public void cancelMatch(Long matchId) {
+    public void cancelMatch(Long matchId, String username) {
         ChallengeMatch match = findChallengeMatch(matchId);
 
-        if (canCancel(matchId)) {
+        if (!username.equals(match.getCreator().getUsername())) {
+            throw new InvalidDataException("Bạn không được phép thực hiện");
+        }
 
+        if (canCancel(matchId)) {
             //Refund
             if (match.getParticipants() != null) {
                 for (ChallengeParticipant c : match.getParticipants()) {
@@ -216,6 +241,7 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
         EChallengeStatus status = challengeMatch.getStatus();
 
+        //Disable 12 hours
         if ((status.equals(EChallengeStatus.OPEN) || status.equals(EChallengeStatus.FULL) || status.equals(EChallengeStatus.PENDING))
                 && LocalDateTime.now().plusHours(12).isBefore(start)) {
             return true;
@@ -226,17 +252,76 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
     @Override
     public List<ChallengeMatchManagementResponse> getListMatchForManagement(String username) {
-        Optional<User> user = userService.findByUsername(username);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        List<ChallengeMatch> matches = challengeMatchRepository.findByCreatorId(user.get().getId());
+        List<ChallengeMatch> matches = challengeMatchRepository.findByCreatorId(user.getId());
 
         return matches.stream().map(m -> ChallengeMatchManagementResponse.builder()
                 .id(m.getId())
                 .title(m.getTitle())
                 .status(m.getStatus())
-                .maxPlayers(m.getChallengeMatchType().getMaxPlayers())
-                .playersInMatch(challengeParticipantService.getAcceptedCurrentPlayers(m.getId()))
-                .playersPending(challengeParticipantService.getPendingCurrentPlayers(m.getId()))
+                .playerTeamA(challengeParticipantService.countAcceptedPlayersByTeam(m.getId(), ETeam.TEAM_A))
+                .playerTeamB(challengeParticipantService.countAcceptedPlayersByTeam(m.getId(), ETeam.TEAM_B))
+                .maxPlayersPerTeam(m.getChallengeMatchType().getMaxPlayers() / 2)
+                .matchType(m.getChallengeMatchType().getName())
+                .date(m.getBooking().getBookingDate())
+                .sport(m.getChallengeMatchType().getFieldType().getName())
+                .actions(checkAction(m))
                 .build()).toList();
+    }
+
+    @Override
+    public ChallengeMatchDetailManagementResponse getMatchDetailForManagement(Long matchId, String username) {
+        ChallengeMatch match = findChallengeMatch(matchId);
+
+        if (!match.getCreator().getUsername().equals(username)) {
+            throw new InvalidDataException("Bạn không được phép thực hiện");
+        }
+
+        return ChallengeMatchDetailManagementResponse.builder()
+                .id(match.getId())
+                .title(match.getTitle())
+                .note(match.getNote())
+                .challengeStatus(match.getStatus())
+                .matchType(match.getChallengeMatchType().getName())
+                .level(match.getSuggestedLevel())
+                .date(match.getBooking().getBookingDate())
+                .city(match.getBooking().getSubfield().getField().getWard().getCity().getName())
+                .ward(match.getBooking().getSubfield().getField().getWard().getName())
+                .field(match.getBooking().getSubfield().getField().getName())
+                .subField(match.getBooking().getSubfield().getName())
+                .startTime(match.getBooking().getStartTime())
+                .endTime(match.getBooking().getEndTime())
+                .fee(match.getParticipationFee())
+                .playerTeamA(challengeParticipantService.countAcceptedPlayersByTeam(match.getId(), ETeam.TEAM_A))
+                .playerTeamB(challengeParticipantService.countAcceptedPlayersByTeam(match.getId(), ETeam.TEAM_B))
+                .maxPlayersPerTeam(match.getChallengeMatchType().getMaxPlayers() / 2)
+                .matchType(match.getChallengeMatchType().getName())
+                .sport(match.getChallengeMatchType().getFieldType().getName())
+                .createdAt(match.getCreatedAt())
+                .updatedAt(match.getUpdatedAt())
+                .build();
+
+    }
+
+    private List<String> checkAction(ChallengeMatch m) {
+        List<String> actions = new ArrayList<>();
+        switch (m.getStatus()) {
+            case OPEN:
+            case PENDING:
+            case FULL:
+                actions.add("View");
+                actions.add("Edit");
+                actions.add("Cancel");
+                break;
+            case CANCELLED:
+                break;
+            case MATCHED:
+                actions.add("View Result");
+                break;
+            default:
+                break;
+        }
+        return actions;
     }
 }

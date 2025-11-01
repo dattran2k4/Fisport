@@ -9,20 +9,21 @@ import com.fisport.dto.response.ChallengeParticipantsInfoResponse;
 import com.fisport.model.ChallengeParticipant;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ChallengeParticipantService {
 
     void joinMatch(Long matchId, JoinMatchRequest joinMatchRequest, String username);
 
-    void responeMatch(Long participantId, UpdateParticipantStatusRequest request, String username);
+    String acceptPlayer(Long participantId, UpdateParticipantStatusRequest request, String username);
+
+    String rejectPlayer(Long participantId, UpdateParticipantStatusRequest request, String username);
+
+    void markNotJoinPlayer(Long participantId, String username);
 
     List<ChallengeParticipantForCreatorResponse> getAllParticipantsByMatchAndCreator(Long matchId, String username);
 
     //Web-detail
     List<ChallengeParticipantsInfoResponse> getAllAcceptedParticipantsInfo(Long matchId);
-
-//    Map<ETeam, List<ChallengeParticipant>> getAllAcceptedPariticipants
 
     List<ChallengeParticipantsForUserResponse> getAllPariticipantsByUser(String username);
 
@@ -30,7 +31,7 @@ public interface ChallengeParticipantService {
 
     Integer getPendingCurrentPlayers(Long matchId);
 
-    Long teamPlayerCount(Long matchId, ETeam team);
+    Integer countAcceptedPlayersByTeam(Long matchId, ETeam team);
 
     List<ChallengeParticipant> getParticipantsByMatchAndTeam(Long matchId, ETeam team);
 

@@ -3,7 +3,6 @@ package com.fisport.controller;
 import com.fisport.common.EChallengeStatus;
 import com.fisport.common.ELevel;
 import com.fisport.common.ETeam;
-import com.fisport.dto.response.ChallengeParticipantsInfoResponse;
 import com.fisport.model.ChallengeMatch;
 import com.fisport.service.*;
 import lombok.RequiredArgsConstructor;
@@ -16,10 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RequiredArgsConstructor
 @Controller
@@ -65,11 +61,13 @@ public class ChallengeMatchController {
 
         model.addAttribute("participants", challengeParticipantService.getAllAcceptedParticipantsInfo(id));
 
-        model.addAttribute("teams", ETeam.values());
+        model.addAttribute("teamA", ETeam.TEAM_A);
 
-        model.addAttribute("teamAPlayer", challengeParticipantService.teamPlayerCount(id, ETeam.TEAM_A));
+        model.addAttribute("teamB", ETeam.TEAM_B);
 
-        model.addAttribute("teamAPlayer", challengeParticipantService.teamPlayerCount(id, ETeam.TEAM_B));
+        model.addAttribute("teamAPlayer", challengeParticipantService.countAcceptedPlayersByTeam(id, ETeam.TEAM_A));
+
+        model.addAttribute("teamBPlayer", challengeParticipantService.countAcceptedPlayersByTeam(id, ETeam.TEAM_B));
 
         return "web/challenge-match-detail";
     }

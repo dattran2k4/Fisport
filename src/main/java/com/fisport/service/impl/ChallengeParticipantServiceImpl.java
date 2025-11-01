@@ -16,7 +16,6 @@ import com.fisport.model.User;
 import com.fisport.repository.ChallengeMatchRepository;
 import com.fisport.repository.ChallengeParticipantRepository;
 import com.fisport.repository.UserRepository;
-import com.fisport.service.ChallengeMatchService;
 import com.fisport.service.ChallengeMatchTypeService;
 import com.fisport.service.ChallengeParticipantService;
 import com.fisport.service.UserSportEloService;
@@ -25,10 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -49,12 +48,22 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
 
         ChallengeMatch challengeMatch = challengeMatchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy trận đấu"));
 
+        int maxPlayerPerTeam = challengeMatch.getChallengeMatchType().getMaxPlayers() / 2;
+
+        if (challengeParticipantRepository.existsByMatchIdAndUserId(matchId, user.getId())) {
+            throw new InvalidDataException("Bạn đã tham gia rồi");
+        }
+
         if (getAcceptedCurrentPlayers(matchId) == challengeMatchTypeService.maxPlayer(challengeMatch.getChallengeMatchType().getId())) {
             throw new InvalidDataException("Số lượng người tham gia hiện tại đã đủ");
         }
 
-        if (challengeParticipantRepository.existsByMatchIdAndUserId(matchId, user.getId())) {
-            throw new InvalidDataException("Bạn đã tham gia rồi");
+        if (joinMatchRequest.getTeam().equals(ETeam.TEAM_A) && (countAcceptedPlayersByTeam(matchId, ETeam.TEAM_A).compareTo(maxPlayerPerTeam) >= 0)) {
+            throw new InvalidDataException("Đội A đã đủ người");
+        }
+
+        if (joinMatchRequest.getTeam().equals(ETeam.TEAM_B) && (countAcceptedPlayersByTeam(matchId, ETeam.TEAM_B).compareTo(maxPlayerPerTeam) >= 0)) {
+            throw new InvalidDataException("Đội B đã đủ người");
         }
 
         ChallengeParticipant challengeParticipant = ChallengeParticipant.builder()
@@ -72,8 +81,7 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void responeMatch(Long participantId, UpdateParticipantStatusRequest request, String username) {
-
+    public String acceptPlayer(Long participantId, UpdateParticipantStatusRequest request, String username) {
 
         ChallengeParticipant participant = findParticipant(participantId);
 
@@ -81,21 +89,56 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
             throw new InvalidDataException("Chỉ có người tạo trận đấu mới được thực hiện");
         }
 
-        //Check số người chơi hiện tại < max
-        if (request.getStatus().equals(EParticipantStatus.ACCEPTED)) {
-            if (getAcceptedCurrentPlayers(participant.getMatch().getId()) == challengeMatchTypeService.maxPlayer(participant.getMatch().getChallengeMatchType().getId())) {
-                throw new InvalidDataException("Số lượng người tham gia hiện tại đã đủ");
-            }
+        if (getAcceptedCurrentPlayers(participant.getMatch().getId()).compareTo(participant.getMatch().getChallengeMatchType().getMaxPlayers()) >= 0) {
+            throw new InvalidDataException("Số lượng người chơi đã đủ!");
         }
 
-        participant.setStatus(request.getStatus());
+        participant.setStatus(EParticipantStatus.ACCEPTED);
         participant.setResponseMessage(request.getResponseMessage());
 
         challengeParticipantRepository.save(participant);
+        log.info("creator {} accepted for playerId {}", username, participant.getUser().getId());
 
-        log.info("MatchId {} status is: {}", participant.getMatch().getId(), participant.getMatch().getStatus());
+        return participant.getUser().getUsername();
+    }
 
-        log.info("creator {} response for playerId {}", username, participant.getUser().getId());
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String rejectPlayer(Long participantId, UpdateParticipantStatusRequest request, String username) {
+        ChallengeParticipant participant = findParticipant(participantId);
+
+        if (!participant.getMatch().getCreator().getUsername().equals(username)) {
+            throw new InvalidDataException("Chỉ có người tạo trận đấu mới được thực hiện");
+        }
+
+        participant.setStatus(EParticipantStatus.REJECTED);
+        participant.setResponseMessage(request.getResponseMessage());
+
+        challengeParticipantRepository.save(participant);
+        log.info("creator {} rejected for playerId {}", username, participant.getUser().getId());
+
+        return participant.getUser().getUsername();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void markNotJoinPlayer(Long participantId, String username) {
+        ChallengeParticipant participant = findParticipant(participantId);
+
+        ChallengeMatch match = participant.getMatch();
+
+        if (!match.getCreator().getUsername().equals(username)) {
+            throw new InvalidDataException("Chỉ có người tạo trận đấu mới được thực hiện");
+        }
+
+        //check finish
+        if (match.getBooking().getEndTime().isBefore(LocalTime.now()) || match.getStatus().equals(EChallengeStatus.MATCHED)) {
+            throw new InvalidDataException("Chưa hoàn thành trận đấu");
+        }
+
+        participant.setStatus(EParticipantStatus.NOSHOW);
+        challengeParticipantRepository.save(participant);
+        log.info("PlayerId {} marked not shown",  participant.getUser().getId());
     }
 
     @Override
@@ -112,7 +155,27 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
                 .team(p.getTeam())
                 .message(p.getRequestMessage())
                 .paid(p.isPaid())
+                .actions(checkAction(p))
                 .build()).toList();
+    }
+
+    private List<String> checkAction(ChallengeParticipant p) {
+        List<String> actions = new ArrayList<>();
+
+        switch (p.getStatus()) {
+            case PENDING:
+                actions.add("Chấp nhận");
+                actions.add("Từ chối");
+                break;
+            case ACCEPTED:
+                actions.add("Không tham gia");
+                break;
+            case NOSHOW:
+            case REJECTED:
+            case CANCELLED:
+        }
+
+        return actions;
     }
 
     @Override
@@ -152,10 +215,8 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
     }
 
     @Override
-    public Long teamPlayerCount(Long matchId, ETeam team) {
-        ChallengeMatch match = challengeMatchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException("Match not found"));
-
-        return match.getParticipants().stream().filter(p -> p.getTeam().equals(team)).count();
+    public Integer countAcceptedPlayersByTeam(Long matchId, ETeam team) {
+        return challengeParticipantRepository.countAcceptedPlayersByTeam(matchId, team);
     }
 
     @Override

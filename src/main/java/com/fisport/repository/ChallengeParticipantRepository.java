@@ -35,4 +35,9 @@ public interface ChallengeParticipantRepository extends JpaRepository<ChallengeP
 
 
     Long countByMatchIdAndTeam(Long matchId, ETeam eTeam);
+
+    @Query("SELECT COUNT(p) FROM ChallengeParticipant p WHERE p.match.id = :matchId AND p.team = :team AND p.status = 'ACCEPTED'")
+    Integer countAcceptedPlayersByTeam(@Param("matchId") Long matchId, @Param("team") ETeam team);
+
+    List<ChallengeParticipant> findAllByMatchId(Long id);
 }

@@ -2,13 +2,10 @@ package com.fisport.service;
 
 import com.fisport.common.EChallengeStatus;
 import com.fisport.common.ELevel;
-import com.fisport.dto.request.ChallengeMatchRequest;
-import com.fisport.dto.response.ChallengeMatchDetailResponse;
-import com.fisport.dto.response.ChallengeMatchManagementResponse;
-import com.fisport.dto.response.ChallengeMatchSummaryResponse;
-import com.fisport.dto.response.PageResponse;
+import com.fisport.dto.request.ChallengeMatchCreateRequest;
+import com.fisport.dto.request.ChallengeMatchUpdateRequest;
+import com.fisport.dto.response.*;
 import com.fisport.model.ChallengeMatch;
-import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -16,7 +13,9 @@ import java.util.List;
 
 public interface ChallengeMatchService {
 
-    void createChallengeMatch(ChallengeMatchRequest request, String username);
+    void createChallengeMatch(ChallengeMatchCreateRequest request, String username);
+
+    void updateChallengeMatch(Long id, ChallengeMatchUpdateRequest request);
 
     ChallengeMatchDetailResponse getChallengeMatchDetail(Long id);
 
@@ -29,9 +28,10 @@ public interface ChallengeMatchService {
 
     void checkMatchFinished(Long matchId);
 
-    void cancelMatch(Long matchId);
+    void cancelMatch(Long matchId, String username);
 
     boolean canCancel(Long matchId);
 
     List<ChallengeMatchManagementResponse> getListMatchForManagement(String username);
+    ChallengeMatchDetailManagementResponse getMatchDetailForManagement(Long matchId, String username);
 }

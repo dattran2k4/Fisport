@@ -1,21 +1,34 @@
 package com.fisport.controller.user;
 
 import com.fisport.service.ChallengeMatchService;
+import com.fisport.service.ChallengeParticipantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import java.security.Principal;
 
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/user/challenge-matches")
 public class UserChallengeMatchController {
 
     private final ChallengeMatchService challengeMatchService;
+    private final ChallengeParticipantService challengeParticipantService;
 
-    public String showChallengeMatchManagement(Model model) {
+    @GetMapping
+    public String showChallengeMatchManagement(Model model, Principal principal) {
+        model.addAttribute("matches", challengeMatchService.getListMatchForManagement(principal.getName()));
+        return "user/challenge-matches";
+    }
 
-        model.addAttribute("matchs");
-        return null;
+    @GetMapping("/{id}")
+    public String viewChallengeMatch( @PathVariable Long id, Model model, Principal principal) {
+        model.addAttribute("match", challengeMatchService.getMatchDetailForManagement(id, principal.getName()));
+        model.addAttribute("participants", challengeParticipantService.getAllParticipantsByMatchAndCreator(id, principal.getName()));
+        return "user/challenge-match-detail";
     }
 }
