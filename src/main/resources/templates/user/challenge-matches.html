@@ -287,19 +287,24 @@
 
                                     <td>
                                         <div class="d-flex gap-2 justify-content-center">
-                                            <a th:each="act : ${m.actions}" th:switch="${act}" th:href="${act == 'View' ? '/user/challenge-matches/' + m.id
-                                            : (act == 'Edit' ? '/user/challenge-matches/m.id/view/'
-                                            : (act == 'Cancel' ? '/user/matches/cancel/' + m.id 
-                                            : (act == 'View Result' ? '/user/matches/' + m.id + '/result' 
-                                            : '#')))}" class="action-btn" th:title="${act}" th:classappend="${act == 'View' ? ' view-btn' 
-                                            : (act == 'Edit' ? ' edit-btn' 
-                                            : (act == 'Cancel' ? ' cancel-btn' 
-                                            : (act == 'View Result' ? ' result-btn' : '')))}">
-                                                <i th:case="'View'" class="bi bi-eye-fill"></i>
-                                                <i th:case="'Edit'" class="bi bi-pencil-square"></i>
-                                                <i th:case="'Cancel'" class="bi bi-x-circle-fill"></i>
-                                                <i th:case="'View Result'" class="bi bi-trophy-fill"></i>
-                                                <i th:case="*" class="bi bi-question-circle"></i>
+                                            <!-- Các nút bình thường: View / Edit / Cancel -->
+                                            <a th:each="act : ${m.actions}" th:if="${act != 'View Result'}" th:href="${act == 'View' ? '/user/challenge-matches/' + m.id
+                     : (act == 'Edit' ? '/user/challenge-matches/' + m.id + '/view/'
+                     : (act == 'Cancel' ? '/user/matches/cancel/' + m.id : '#'))}" class="action-btn" th:classappend="${act == 'View' ? ' view-btn' 
+                            : (act == 'Edit' ? ' edit-btn' 
+                            : (act == 'Cancel' ? ' cancel-btn' : ''))}" th:title="${act}">
+                                                <i th:text="${act == 'View' ? '' : (act == 'Edit' ? '' : '')}"></i>
+                                                <!-- Nếu muốn icon khác nhau thì dùng th:if / th:unless trong <i> -->
+                                                <i th:if="${act == 'View'}" class="bi bi-eye-fill"></i>
+                                                <i th:if="${act == 'Edit'}" class="bi bi-pencil-square"></i>
+                                                <i th:if="${act == 'Cancel'}" class="bi bi-x-circle-fill"></i>
+                                            </a>
+
+                                            <!-- Nút View Result: chỉ popup -->
+                                            <a th:if="${m.actions.contains('View Result')}" href="javascript:void(0)"
+                                                class="action-btn result-btn" th:attr="data-match-id=${m.id}"
+                                                title="View Result">
+                                                <i class="bi bi-trophy-fill"></i>
                                             </a>
                                         </div>
                                     </td>
@@ -310,6 +315,7 @@
                 </div>
             </div>
         </div>
+        <!-- Modal UPdate -->
         <div class="modal fade" id="editMatchModal" tabindex="-1" aria-labelledby="editMatchLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg rounded-4">
@@ -358,12 +364,111 @@
                 </div>
             </div>
         </div>
+        <!-- Modal Result -->
+        <div class="modal fade" id="resultModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Kết quả trận đấu</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="resultForm">
+                            <input type="hidden" id="matchId">
+
+                            <div class="mb-3">
+                                <label for="scoreTeamA" class="form-label">Điểm Team A</label>
+                                <input type="number" id="scoreTeamA" class="form-control" min="0" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="scoreTeamB" class="form-label">Điểm Team B</label>
+                                <input type="number" id="scoreTeamB" class="form-control" min="0" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-primary" id="saveResultBtn">Lưu kết quả</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
     <section layout:fragment="scripts">
         <script th:inline="javascript">
+            $(document).ready(function () {
+                // ===== Utils Swal =====
+                const SwalUtil = {
+                    loading: (text = "Đang tải...") => Swal.fire({ title: text, allowOutsideClick: false, didOpen: () => Swal.showLoading() }),
+                    success: (msg) => Swal.fire('Thành công', msg, 'success'),
+                    error: (msg) => Swal.fire('Lỗi', msg, 'error')
+                };
 
+                // ===== Click nút View Result =====
+                $('.result-btn').click(function () {
+                    let matchId = $(this).data('match-id');
+                    $('#matchId').val(matchId);
+
+                    SwalUtil.loading(); // hiện loading
+
+                    $.ajax({
+                        url: `/api/v1/challenge-matchs/${matchId}/result`,
+                        type: 'GET',
+                        success: function (res) {
+                            Swal.close(); // đóng loading
+                            // Nếu có dữ liệu thì điền vào form, không thì để trống
+                            $('#scoreTeamA').val(res.data?.scoreTeamA || '');
+                            $('#scoreTeamB').val(res.data?.scoreTeamB || '');
+                            new bootstrap.Modal(document.getElementById('resultModal')).show();
+                        },
+                        error: function (err) {
+                            Swal.close();
+                            console.error(err);
+                            SwalUtil.error('Có lỗi khi lấy kết quả!');
+                        }
+                    });
+                });
+
+                // ===== Lưu kết quả =====
+                $('#saveResultBtn').click(function () {
+                    let matchId = $('#matchId').val();
+                    let scoreTeamA = $('#scoreTeamA').val();
+                    let scoreTeamB = $('#scoreTeamB').val();
+
+                    if (scoreTeamA === '' || scoreTeamB === '') {
+                        SwalUtil.error('Vui lòng nhập đầy đủ kết quả!');
+                        return;
+                    }
+
+                    SwalUtil.loading('Đang cập nhật kết quả...');
+
+                    $.ajax({
+                        url: `/api/v1/challenge-matchs/${matchId}/update-result`,
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            scortTeamA: parseInt(scoreTeamA),
+                            scortTeamB: parseInt(scoreTeamB)
+                        }),
+                        success: function (res) {
+                            Swal.close();
+                            SwalUtil.success(res.message || 'Cập nhật kết quả thành công!');
+                            $('#resultModal').modal('hide');
+                            // TODO: update UI nếu cần, ví dụ reload bảng hoặc cập nhật row match
+                        },
+                        error: function (err) {
+                            Swal.close();
+                            console.error(err);
+                            SwalUtil.error(err.responseJSON?.message || 'Cập nhật thất bại!');
+                        }
+                    });
+                });
+            });
         </script>
     </section>
+
 </body>
 
 </html>

@@ -205,7 +205,7 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
     @Transactional
     public void checkMatchFinished(Long matchId) {
         ChallengeMatch match = findChallengeMatch(matchId);
-        if (match.getBooking().getEndTime().isBefore(LocalTime.now()) && !match.getStatus().equals(EChallengeStatus.MATCHED)) {
+        if (LocalDateTime.now().isAfter(LocalDateTime.of(match.getBooking().getBookingDate(), match.getBooking().getEndTime())) && !match.getStatus().equals(EChallengeStatus.MATCHED)) {
             match.setStatus(EChallengeStatus.MATCHED);
             challengeMatchRepository.save(match);
 

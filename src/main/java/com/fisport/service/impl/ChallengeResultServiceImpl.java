@@ -1,8 +1,10 @@
 package com.fisport.service.impl;
 
+import com.fisport.common.EChallengeStatus;
 import com.fisport.common.EParticipantStatus;
 import com.fisport.common.ETeam;
 import com.fisport.dto.request.MatchResultRequest;
+import com.fisport.dto.response.ChallengeResultResponse;
 import com.fisport.exception.InvalidDataException;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.ChallengeMatch;
@@ -18,6 +20,7 @@ import com.fisport.service.UserSportEloService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -46,7 +49,12 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
             throw new InvalidDataException("Chỉ có chủ trận mới được thực hiện");
         }
 
-        challengeMatchService.checkMatchFinished(matchID);
+
+        //TO-DO UPDATE MATCHED REAL TIME
+
+        if (!match.getStatus().equals(EChallengeStatus.MATCHED)) {
+            throw new InvalidDataException("Trận đấu chưa hoàn thành");
+        }
 
         ChallengeResult result = ChallengeResult.builder()
                 .match(match)
@@ -77,5 +85,32 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
 
         //Save
         userSportEloService.updateSportElo(eloTeamA, eloTeamB, request.getScortTeamA(), request.getScortTeamB());
+    }
+
+    @Override
+    public List<ChallengeResultResponse> getAll(Long matchId) {
+        return List.of();
+    }
+
+    @Override
+    public ChallengeResultResponse getByMatchId(Long matchId) {
+        log.info("get result by matchId {}", matchId);
+        ChallengeMatch match =  challengeMatchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException("Match not found"));
+
+        ChallengeResult result = match.getResult();
+
+        if (result == null) {
+            return ChallengeResultResponse.builder()
+                    .matchId(matchId)
+                    .hasResult(false)
+                    .build();
+        }
+
+        return ChallengeResultResponse.builder()
+                .matchId(matchId)
+                .scoreTeamA(result.getTeamAScort())
+                .scoreTeamB(result.getTeamBScort())
+                .hasResult(true)
+                .build();
     }
 }
