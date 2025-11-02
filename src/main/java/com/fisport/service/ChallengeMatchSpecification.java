@@ -14,8 +14,8 @@ public class ChallengeMatchSpecification {
     private ChallengeMatchSpecification() {
     }
 
-    public static Specification<ChallengeMatch> filterChallengeMatch(EChallengeStatus status, ELevel level, String matchType,
-                                                                     LocalDate date, BigDecimal fee, Long cityId, Long fieldTypeId) {
+    public static Specification<ChallengeMatch> filterChallengeMatch(EChallengeStatus status, ELevel level, Long typeId,
+                                                                     Long cityId, Long fieldTypeId) {
 
         return (Root<ChallengeMatch> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             Join<?, ?> bookingJoin = root.join("booking");
@@ -35,16 +35,8 @@ public class ChallengeMatchSpecification {
                 predicate = cb.and(predicate, cb.equal(root.get("suggestedLevel"), level));
             }
 
-            if (matchType != null) {
-                predicate = cb.and(predicate, cb.equal(matchTypeJoin.get("name"), matchType));
-            }
-
-            if (date != null) {
-                predicate = cb.and(predicate, cb.equal(bookingJoin.get("bookingDate"), date));
-            }
-
-            if (fee != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("participationFee"), fee));
+            if (typeId != null) {
+                predicate = cb.and(predicate, cb.equal(matchTypeJoin.get("id"), typeId));
             }
 
             if (cityId != null) {

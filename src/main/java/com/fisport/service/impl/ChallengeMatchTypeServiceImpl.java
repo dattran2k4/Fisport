@@ -39,4 +39,10 @@ public class ChallengeMatchTypeServiceImpl implements ChallengeMatchTypeService 
                 .maxPlayers(t.getMaxPlayers())
                 .build()).toList();
     }
+
+    @Override
+    public List<ChallengeMatchTypeResponse> getAll() {
+        List<ChallengeMatchType> matchTypes = challengeMatchTypeRepository.findAll();
+        return matchTypes.stream().map(t -> ChallengeMatchTypeResponse.builder().id(t.getId()).name(t.getName()).maxPlayers(t.getMaxPlayers()).build()).toList();
+    }
 }

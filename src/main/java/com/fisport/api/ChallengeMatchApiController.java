@@ -43,9 +43,7 @@ public class ChallengeMatchApiController {
     @GetMapping
     public ApiResponse getAllChallengeMatches(@RequestParam(required = false) EChallengeStatus status,
                                               @RequestParam(required = false) ELevel level,
-                                              @RequestParam(required = false) String matchType,
-                                              @RequestParam(required = false) LocalDate date,
-                                              @RequestParam(required = false) BigDecimal fee,
+                                              @RequestParam(required = false) Long typeId,
                                               @RequestParam(required = false) Long cityId,
                                               @RequestParam(required = false) Long fieldTypeId,
                                               @RequestParam(defaultValue = "0") int page,
@@ -54,7 +52,7 @@ public class ChallengeMatchApiController {
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())
                 .message("challenge matches")
-                .data(challengeMatchService.getAllChallengeMatch(status, level, matchType, date, fee, cityId, fieldTypeId, page, size))
+                .data(challengeMatchService.getAllChallengeMatch(status, level, typeId, cityId, fieldTypeId, page, size))
                 .build();
     }
 

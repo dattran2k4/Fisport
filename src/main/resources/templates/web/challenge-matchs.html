@@ -217,34 +217,39 @@
 
             <!-- Filter Bar -->
             <div class="filter-bar">
-                <select>
-                    <option value="">All Status</option>
-                    <option value="NEW">NEW</option>
-                    <option value="PENDING">PENDING</option>
-                    <option value="CONFIRMED">CONFIRMED</option>
+                <select id="status" name="status">
+                    <option value="">Tất cả trạng thái sân</option>
+                    <th:block th:each="st : ${status}">
+                        <option th:value="${st.name()}" th:text="${st.value}"></option>
+                    </th:block>
                 </select>
-                <input type="date" placeholder="Select Date">
-                <select>
-                    <option value="">All Fees</option>
-                    <option value="0-50000">0 - 50k</option>
-                    <option value="50000-100000">50k - 100k</option>
-                    <option value="100000-200000">100k - 200k</option>
+
+                <select id="matchTypeId" name="matchTypeId">
+                    <option value="">Tất cả loại</option>
+                    <th:block th:each="mt : ${matchTypes}">
+                        <option th:value="${mt.id}" th:text="${mt.name}"></option>
+                    </th:block>
                 </select>
-                <select>
-                    <option value="">All Cities</option>
-                    <option value="City A">City A</option>
-                    <option value="City B">City B</option>
+
+                <select id="level" name="level">
+                    <option value="">Tất cả trình độ</option>
+                    <th:block th:each="lv : ${level}">
+                        <option th:value="${lv.name()}" th:text="${lv.value}"></option>
+                    </th:block>
                 </select>
-                <select>
-                    <option value="">Max Players</option>
-                    <option value="2">2</option>
-                    <option value="4">4</option>
-                    <option value="6">6</option>
+
+                <select id="sportId" name="sportId">
+                    <option value="">Tất cả môn thể thao</option>
+                    <th:block th:each="s : ${sports}">
+                        <option th:value="${s.id}" th:text="${s.name}"></option>
+                    </th:block>
                 </select>
-                <select>
-                    <option value="">All Sports</option>
-                    <option value="Football">Football</option>
-                    <option value="Basketball">Basketball</option>
+
+                <select id="cityId" name="cityId">
+                    <option value="">Tất cả thành phố</option>
+                    <th:block th:each="city : ${cities}">
+                        <option th:value="${city.id}" th:text="${city.name}"></option>
+                    </th:block>
                 </select>
             </div>
 
@@ -287,12 +292,88 @@
                     </div>
 
                     <div class="card-footer">
-                        <a th:href="@{'/thach-dau/' + ${match.id} + '/chi-tiet'}" class="btn btn-detail">Xem chi tiết</a>
+                        <a th:href="@{'/thach-dau/' + ${match.id} + '/chi-tiet'}" class="btn btn-detail">Xem chi
+                            tiết</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <section layout:fragment="scripts">
+        <script th:inline="javascript">
+            $(document).ready(function () {
+                const filters = ["status", "matchTypeId", "level", "sportId", "cityId"];
+                const container = $(".grid");
+
+                filters.forEach(id => {
+                    $("#" + id).on("change", renderMatches);
+                });
+
+                function renderMatches() {
+                    const params = new URLSearchParams();
+
+                    filters.forEach(id => {
+                        const value = $("#" + id).val();
+                        if (value) params.append(id === "sportId" ? "fieldTypeId" : id, value);
+                    });
+                    $.ajax({
+                        url: "/api/v1/challenge-matchs?" + params.toString(),
+                        type: "GET",
+                        dataType: "json",
+                        success: function (json) {
+                            const matches = json.data?.data;
+
+                            container.empty(); 
+
+                            if (!matches || matches.length === 0) {
+                                container.html("<p>Không tìm thấy trận đấu nào.</p>");
+                                return;
+                            }
+
+                            matches.forEach(m => {
+                                const percent = ((m.currentPlayers * 100) / m.maxPlayers).toFixed(0);
+
+                                const card = `
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>${m.title}</h2>
+                                <span class="badge ${m.status === "OPEN"
+                                        ? "badge-pending"
+                                        : m.status === "PENDING"
+                                            ? "badge-confirmed"
+                                            : "badge-new"
+                                    }">${m.status}</span>
+                            </div>
+                            <div class="card-body">
+                                <p><i class="fas fa-map-marker-alt icon"></i> ${m.ward}, ${m.city}</p>
+                                <p><i class="fas fa-calendar-alt icon"></i> ${m.date}</p>
+                                <p class="fee"><i class="fas fa-money-bill-wave icon"></i> ${m.fee} VND</p>
+                                <p><i class="fas fa-users icon"></i> ${m.currentPlayers} / ${m.maxPlayers} người</p>
+                                <p><i class="fas fa-futbol icon"></i> ${m.sport}</p>
+                                <div class="progress-container">
+                                    <div class="progress-bar" style="width:${percent}%"></div>
+                                </div>
+                                <div class="progress-text">${m.currentPlayers} / ${m.maxPlayers} người</div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="/thach-dau/${m.id}/chi-tiet" class="btn btn-detail">Xem chi tiết</a>
+                            </div>
+                        </div>
+                    `;
+
+                                container.append(card);
+                            });
+                        },
+                        error: function (xhr) {
+                            console.error("Lỗi khi lọc dữ liệu:", xhr);
+                            container.html("<p>Lỗi khi tải dữ liệu.</p>");
+                        },
+                    });
+                }
+            });
+
+        </script>
+    </section>
 </body>
 
 </html>

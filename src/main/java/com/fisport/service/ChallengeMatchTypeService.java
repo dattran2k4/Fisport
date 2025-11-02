@@ -9,4 +9,5 @@ public interface ChallengeMatchTypeService {
 
     List<ChallengeMatchTypeResponse> getAllChallengeMatchTypesByFieldType(Long fieldTypeId);
 
+    List<ChallengeMatchTypeResponse> getAll();
 }

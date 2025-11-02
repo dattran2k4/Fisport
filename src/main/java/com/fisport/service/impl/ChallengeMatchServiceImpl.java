@@ -145,11 +145,11 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
     @Override
     public PageResponse<ChallengeMatchSummaryResponse> getAllChallengeMatch(EChallengeStatus status, ELevel level,
-                                                                            String matchType, LocalDate date, BigDecimal fee, Long cityId, Long fieldTypeId,
+                                                                            Long typeId, Long cityId, Long fieldTypeId,
                                                                             int page, int size) {
         int pageNumber = (page > 0) ? page - 1 : 0;
 
-        Specification<ChallengeMatch> spec = ChallengeMatchSpecification.filterChallengeMatch(status, level, matchType, date, fee, cityId, fieldTypeId);
+        Specification<ChallengeMatch> spec = ChallengeMatchSpecification.filterChallengeMatch(status, level, typeId, cityId, fieldTypeId);
 
         Pageable pageable = PageRequest.of(pageNumber, size, Sort.by(Sort.Direction.DESC, "booking.bookingDate"));
 

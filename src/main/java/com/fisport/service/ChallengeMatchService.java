@@ -20,7 +20,7 @@ public interface ChallengeMatchService {
     ChallengeMatchDetailResponse getChallengeMatchDetail(Long id);
 
     PageResponse<ChallengeMatchSummaryResponse> getAllChallengeMatch(EChallengeStatus status, ELevel level,
-                                                                     String matchType, LocalDate date, BigDecimal fee, Long cityId, Long fieldTypeId, int page, int size);
+                                                                     Long typeId, Long cityId, Long fieldTypeId, int page, int size);
 
     ChallengeMatch findChallengeMatch(Long id);
 
