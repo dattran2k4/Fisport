@@ -49,6 +49,8 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
             throw new InvalidDataException("Chỉ có chủ trận mới được thực hiện");
         }
 
+        //TO-DO CHECK != NULL AND ROLL-BACK
+
 
         //TO-DO UPDATE MATCHED REAL TIME
 
@@ -56,16 +58,19 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
             throw new InvalidDataException("Trận đấu chưa hoàn thành");
         }
 
-        ChallengeResult result = ChallengeResult.builder()
-                .match(match)
-                .teamAScort(request.getScortTeamA())
-                .teamBScort(request.getScortTeamB())
-                .build();
+        ChallengeResult result = match.getResult();
 
-        challengeResultRepository.save(result);
 
-        log.info("challengeId updated result {} - {}", match, request.getScortTeamA(), request.getScortTeamB());
-
+        if (result == null) {
+            result = new ChallengeResult();
+            result.setMatch(match);
+            result.setTeamAScort(request.getScortTeamA());
+            result.setTeamBScort(request.getScortTeamB());
+            challengeResultRepository.save(result);
+            log.info("challengeId updated result {} - {}", match, request.getScortTeamA(), request.getScortTeamB());
+        } else {
+            throw new InvalidDataException("Kết quả trận đấu đã được cập nhật. Không thể chỉnh sửa!");
+        }
 
         //Get list participants in team
         List<ChallengeParticipant> participantsA = challengeParticipantService.getParticipantsByMatchAndTeamAndStatus(matchID, ETeam.TEAM_A, EParticipantStatus.ACCEPTED);
@@ -88,8 +93,8 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
     }
 
     @Override
-    public List<ChallengeResultResponse> getAll(Long matchId) {
-        return List.of();
+    public List<ChallengeResultResponse> getAll(Long matchId, String username) {
+        return null;
     }
 
     @Override

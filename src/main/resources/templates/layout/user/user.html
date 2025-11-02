@@ -94,22 +94,17 @@
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
                     <a th:href="@{/user/profile}" class="nav-link" th:classappend="${activePage=='profile'}? ' active'">
-                        <i class="bi bi-person-circle me-2"></i>Profile
+                        <i class="bi bi-person-circle me-2"></i>Hồ sơ cá nhân
                     </a>
                 </li>
                 <li>
                     <a th:href="@{/user/bookings}" class="nav-link" th:classappend="${activePage=='bookings'}? ' active'">
-                        <i class="bi bi-calendar-check-fill me-2"></i>My Bookings
-                    </a>
-                </li>
-                <li>
-                    <a th:href="@{/user/favorites}" class="nav-link" th:classappend="${activePage=='favorites'}? ' active'">
-                        <i class="bi bi-heart-fill me-2"></i>Favorites
+                        <i class="bi bi-calendar-check-fill me-2"></i>Lịch sử đặt lịch
                     </a>
                 </li>
                 <li>
                     <a th:href="@{/user/reviews}" class="nav-link" th:classappend="${activePage=='reviews'}? ' active'">
-                        <i class="bi bi-star-fill me-2"></i>Reviews
+                        <i class="bi bi-star-fill me-2"></i>Đánh giá
                     </a>
                 </li>
                 <li>
@@ -120,42 +115,42 @@
 
                 <li>
                     <a th:href="@{/user/wallet}" class="nav-link" th:classappend="${activePage=='wallet'}? ' active'">
-                        <i class="bi bi-wallet-fill me-2"></i>Wallet
+                        <i class="bi bi-wallet-fill me-2"></i>Ví tiền
                     </a>
                 </li>
 
-                <li>
-                    <a th:href="@{/user/transactions}" class="nav-link" th:classappend="${activePage=='transactions'}? ' active'">
-                        <i class="bi bi-cash-stack me-2"></i>Transactions
-                    </a>
-                </li>
+<!--                <li>-->
+<!--                    <a th:href="@{/user/transactions}" class="nav-link" th:classappend="${activePage=='transactions'}? ' active'">-->
+<!--                        <i class="bi bi-cash-stack me-2"></i>Transactions-->
+<!--                    </a>-->
+<!--                </li>-->
 
                 <li>
                     <a th:href="@{/user/change-password}" class="nav-link"
                        th:classappend="${activePage=='change-password'}? ' active'">
-                        <i class="bi bi-lock-fill me-2"></i>Change Password
+                        <i class="bi bi-lock-fill me-2"></i>Đổi mật khẩu
                     </a>
                 </li>
                 <li>
                     <a th:href="@{/user/2fa}" class="nav-link" th:classappend="${activePage=='2fa'}? ' active'">
-                        <i class="bi bi-shield-lock-fill me-2"></i>Two-Factor Auth
+                        <i class="bi bi-shield-lock-fill me-2"></i>Xác thực 2 bước
                     </a>
                 </li>
                 <li>
                     <a th:href="@{/user/challenge-matches}" class="nav-link"
                        th:classappend="${activePage=='challenge-matches'}? ' active'">
-                        <i class="bi bi-lightning-fill"></i>Challenge Matches
+                        <i class="bi bi-lightning-fill"></i>Lịch sử tạo trận
                     </a>
                 </li>
                 <li>
                     <a th:href="@{/user/participants}" class="nav-link"
                        th:classappend="${activePage=='participants'}? ' active'">
-                        <i class="bi bi-lightning-fill"></i>Challenge Matches
+                        <i class="bi bi-clock-history"></i>Lịch sử tham gia
                     </a>
                 </li>
                 <li>
                     <a th:href="@{/logout}" class="nav-link text-danger fw-semibold">
-                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
                     </a>
                 </li>
 

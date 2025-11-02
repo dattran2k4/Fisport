@@ -365,35 +365,42 @@
             </div>
         </div>
         <!-- Modal Result -->
-        <div class="modal fade" id="resultModal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Kết quả trận đấu</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal fade" id="resultModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="bi bi-trophy-fill me-2"></i>Kết quả trận đấu</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body text-center">
                         <form id="resultForm">
                             <input type="hidden" id="matchId">
 
                             <div class="mb-3">
-                                <label for="scoreTeamA" class="form-label">Điểm Team A</label>
-                                <input type="number" id="scoreTeamA" class="form-control" min="0" required>
+                                <label class="form-label fw-bold">Điểm Team A</label>
+                                <input type="number" id="scoreTeamA" class="form-control text-center fs-5 fw-bold"
+                                    min="0" required>
                             </div>
 
                             <div class="mb-3">
-                                <label for="scoreTeamB" class="form-label">Điểm Team B</label>
-                                <input type="number" id="scoreTeamB" class="form-control" min="0" required>
+                                <label class="form-label fw-bold">Điểm Team B</label>
+                                <input type="number" id="scoreTeamB" class="form-control text-center fs-5 fw-bold"
+                                    min="0" required>
+                            </div>
+
+                            <div id="alreadyResult" class="alert alert-info d-none">
+                                Kết quả đã được cập nhật, không thể chỉnh sửa.
                             </div>
                         </form>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer justify-content-center">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                         <button type="button" class="btn btn-primary" id="saveResultBtn">Lưu kết quả</button>
                     </div>
                 </div>
             </div>
         </div>
+
 
     </div>
     <section layout:fragment="scripts">

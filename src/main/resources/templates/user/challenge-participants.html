@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{/layout/user/user}">
+    layout:decorate="~{/layout/user/user}">
+
 <head>
     <title>Trận đấu của tôi</title>
 
@@ -45,75 +46,90 @@
 </head>
 
 <body>
-<div layout:fragment="content">
-    <div class="container py-4">
-        <h2 class="mb-4 text-center text-primary fw-bold">
-            <i class="bi bi-trophy-fill me-2"></i>Danh sách trận đấu của bạn
-        </h2>
+    <div layout:fragment="content">
+        <div class="container py-4">
+            <h2 class="mb-4 text-center text-primary fw-bold">
+                <i class="bi bi-trophy-fill me-2"></i>Danh sách trận đấu của bạn
+            </h2>
 
-        <div class="row g-4" th:if="${matches != null}">
-            <div class="col-md-6 col-lg-4" th:each="m : ${matches}">
-                <a th:href="@{'/thach-dau/' + ${m.matchId}} + '/chi-tiet'" class="text-decoration-none text-dark">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body">
-                            <h5 class="card-title text-primary fw-bold" th:text="${m.title}">Sunday Challenge</h5>
-                            <p class="text-muted mb-2">
-                                <i class="bi bi-geo-alt-fill me-1"></i>
-                                <span th:text="${m.fieldName}">Sân A, Quận 7</span>
-                            </p>
-                            <p class="mb-1"><i class="bi bi-calendar-event me-1"></i>
-                                <span th:text="${m.date}">2025-11-10</span>
-                            </p>
-                            <p class="mb-1"><i class="bi bi-flag me-1"></i>
-                                <span th:text="${m.matchType}">Friendly</span> -
-                                <span th:text="${m.sport}">Football</span>
-                            </p>
-                            <p class="mb-2"><i class="bi bi-coin me-1"></i>
-                                Phí: <span class="fw-semibold text-success" th:text="${#numbers.formatDecimal(m.fee, 0, 'COMMA', 0, 'POINT')} + 'đ'">50,000đ</span>
-                            </p>
+            <div class="row g-4" th:if="${matches != null}">
+                <div class="col-md-6 col-lg-4" th:each="m : ${matches}">
+                    <a th:href="@{'/thach-dau/' + ${m.matchId}} + '/chi-tiet'" class="text-decoration-none text-dark">
+                        <div class="card shadow-sm border-0 h-100">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary fw-bold" th:text="${m.title}">Sunday Challenge</h5>
+                                <p class="text-muted mb-2">
+                                    <i class="bi bi-geo-alt-fill me-1"></i>
+                                    <span th:text="${m.fieldName}">Sân A, Quận 7</span>
+                                </p>
+                                <p class="mb-1"><i class="bi bi-calendar-event me-1"></i>
+                                    <span th:text="${m.date}">2025-11-10</span>
+                                </p>
+                                <p class="mb-1"><i class="bi bi-flag me-1"></i>
+                                    <span th:text="${m.matchType}">Friendly</span> -
+                                    <span th:text="${m.sport}">Football</span>
+                                </p>
+                                <p class="mb-2"><i class="bi bi-coin me-1"></i>
+                                    Phí: <span class="fw-semibold text-success"
+                                        th:text="${#numbers.formatDecimal(m.fee, 0, 'COMMA', 0, 'POINT')} + 'đ'">50,000đ</span>
+                                </p>
 
-                            <!-- Trạng thái -->
-                            <span class="badge bg-warning text-dark" th:if="${m.status.name() == 'PENDING'}" th:text="${m.status.value}">Đang chờ</span>
-                            <span class="badge bg-success" th:if="${m.status.name() == 'ACCEPTED'} " th:text="${m.status.value}">Đã chấp nhận</span>
-                            <span class="badge bg-danger" th:if="${m.status.name() == 'REJECTED'}" th:text="${m.status.value}">Từ chối</span>
+                                <p class="mb-1">
+                                    <i class="bi bi-trophy me-1"></i>
+                                    <span th:if="${m.result != null and m.result.hasResult}"
+                                        th:text="${'Kết quả A-B: ' + m.result.scoreTeamA + ' - ' + m.result.scoreTeamB}">
+                                        Kết quả: 2 - 1
+                                    </span>
+                                    <span th:if="${m.result == null or !m.result.hasResult}">
+                                        Chưa có kết quả trận đấu
+                                    </span>
+                                </p>
 
-                            <span class="badge bg-secondary"
-                                  th:if="${m.status.name() == 'CANCELLED'}"
-                                  th:text="${m.status.value}">
-                                Đã huỷ
-                        </span>
-                            <span class="badge bg-dark"
-                                  th:if="${m.status.name() == 'NOSHOW'}"
-                                  th:text="${m.status.value}">
-                                Vắng mặt
-                            </span>
+                                <!-- Trạng thái -->
+                                <span class="badge bg-warning text-dark" th:if="${m.status.name() == 'PENDING'}"
+                                    th:text="${m.status.value}">Đang chờ</span>
+                                <span class="badge bg-success" th:if="${m.status.name() == 'ACCEPTED'} "
+                                    th:text="${m.status.value}">Đã chấp nhận</span>
+                                <span class="badge bg-danger" th:if="${m.status.name() == 'REJECTED'}"
+                                    th:text="${m.status.value}">Từ chối</span>
 
-                            <div class="mt-3 d-flex gap-2">
-                                <!-- Nút thanh toán -->
-                                <a th:if="${m.canPay and !m.isPaid}" href="#" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-credit-card"></i> Thanh toán
-                                </a>
+                                <span class="badge bg-secondary" th:if="${m.status.name() == 'CANCELLED'}"
+                                    th:text="${m.status.value}">
+                                    Đã huỷ
+                                </span>
+                                <span class="badge bg-dark" th:if="${m.status.name() == 'NOSHOW'}"
+                                    th:text="${m.status.value}">
+                                    Vắng mặt
+                                </span>
 
-                                <!-- Đã thanh toán -->
-                                <span th:if="${m.isPaid}" class="btn btn-sm btn-success disabled">
-                            <i class="bi bi-check-circle-fill"></i> Đã thanh toán
-                        </span>
+                                <div class="mt-3 d-flex gap-2">
+                                    <!-- Nút thanh toán -->
+                                    <a th:if="${m.canPay and !m.isPaid}" href="#"
+                                        class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-credit-card"></i> Thanh toán
+                                    </a>
+
+                                    <!-- Đã thanh toán -->
+                                    <span th:if="${m.isPaid}" class="btn btn-sm btn-success disabled">
+                                        <i class="bi bi-check-circle-fill"></i> Đã thanh toán
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </a>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Không có dữ liệu -->
+            <div th:if="${#lists.isEmpty(matches)}" class="text-center py-5">
+                <i class="bi bi-emoji-frown fs-1 text-muted"></i>
+                <p class="text-muted mt-2">Bạn chưa tham gia trận đấu nào.</p>
             </div>
         </div>
-
-        <!-- Không có dữ liệu -->
-        <div th:if="${#lists.isEmpty(matches)}" class="text-center py-5">
-            <i class="bi bi-emoji-frown fs-1 text-muted"></i>
-            <p class="text-muted mt-2">Bạn chưa tham gia trận đấu nào.</p>
-        </div>
     </div>
-</div>
-<section layout:fragment="scripts">
-    <script th:inline="javascript"></script>
-</section>
+    <section layout:fragment="scripts">
+        <script th:inline="javascript"></script>
+    </section>
 </body>
+
 </html>

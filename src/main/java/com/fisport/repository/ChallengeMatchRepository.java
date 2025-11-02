@@ -14,4 +14,5 @@ public interface ChallengeMatchRepository extends JpaRepository<ChallengeMatch, 
     Optional<ChallengeMatch> findByBooking(Booking booking);
 
     List<ChallengeMatch> findByCreatorId(Long id);
+
 }

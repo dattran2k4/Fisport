@@ -8,7 +8,8 @@ import java.util.List;
 public interface ChallengeResultService {
     void updateMatchResult(Long matchID, MatchResultRequest request, String username);
 
-    List<ChallengeResultResponse> getAll(Long matchId);
+    List<ChallengeResultResponse> getAll(Long matchId, String username);
 
     ChallengeResultResponse getByMatchId(Long matchId);
 }
+
