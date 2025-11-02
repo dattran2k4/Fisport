@@ -3,10 +3,13 @@ package com.fisport.api;
 import com.fisport.common.EChallengeStatus;
 import com.fisport.common.ELevel;
 import com.fisport.dto.request.ChallengeMatchCreateRequest;
+import com.fisport.dto.request.ChallengeMatchUpdateRequest;
 import com.fisport.dto.request.JoinMatchRequest;
+import com.fisport.dto.request.MatchResultRequest;
 import com.fisport.dto.response.ApiResponse;
 import com.fisport.service.ChallengeMatchService;
 import com.fisport.service.ChallengeParticipantService;
+import com.fisport.service.ChallengeResultService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +28,7 @@ public class ChallengeMatchApiController {
 
     private final ChallengeMatchService challengeMatchService;
     private final ChallengeParticipantService challengeParticipantService;
+    private final ChallengeResultService challengeResultService;
 
     @PostMapping("/create")
     public ApiResponse createChallengeMatch(@RequestBody ChallengeMatchCreateRequest request, Principal principal) {
@@ -82,7 +86,6 @@ public class ChallengeMatchApiController {
     }
 
 
-
     @PostMapping("/{id}/join")
     public ApiResponse joinMatch(@PathVariable Long id, @Valid @RequestBody JoinMatchRequest request, Principal principal) {
         challengeParticipantService.joinMatch(id, request, principal.getName());
@@ -93,10 +96,11 @@ public class ChallengeMatchApiController {
     }
 
     @PutMapping("/{id}/update-result")
-    public ApiResponse updateResultMatch(@PathVariable Long id, Principal principal) {
+    public ApiResponse updateResultMatch(@PathVariable Long id, MatchResultRequest request, Principal principal) {
+        challengeResultService.updateMatchResult(id, request, principal.getName());
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
-                .message("OK")
+                .message("Cập nhật kết quả thành công!")
                 .build();
     }
 
@@ -106,6 +110,15 @@ public class ChallengeMatchApiController {
         return ApiResponse.builder()
                 .status(200)
                 .message("Đã hủy trận đấu và hoàn trả giao dịch cho các người chơi!")
+                .build();
+    }
+
+    @PutMapping("{id}/update")
+    public ApiResponse updateMatch(@PathVariable Long id, ChallengeMatchUpdateRequest request, Principal principal) {
+        challengeMatchService.updateChallengeMatch(id, request, principal.getName());
+        return ApiResponse.builder()
+                .status(HttpStatus.ACCEPTED.value())
+                .message("Đã cập nhật trận đấu thành công!")
                 .build();
     }
 

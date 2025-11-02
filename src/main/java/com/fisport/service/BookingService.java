@@ -18,11 +18,13 @@ public interface BookingService {
 
     void cancelBooking(Long id, String name);
 
+    void markAsExpired(Long id);
+
     List<BookingForUserResponse> getBookingsForUser(String name);
 
     BookingForUserResponse getBookingForUser(Long id, String name);
 
-    void checkExpiredBooking(Booking booking);
+    boolean isExpiredBooking(Booking booking);
 
     List<Integer> getAvailableDurationsBooking(Long id, LocalDate date, LocalTime startTime);
 

@@ -1,6 +1,8 @@
 package com.fisport.service.impl;
 
+import com.fisport.common.EParticipantStatus;
 import com.fisport.common.ETeam;
+import com.fisport.dto.request.MatchResultRequest;
 import com.fisport.exception.InvalidDataException;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.ChallengeMatch;
@@ -36,28 +38,34 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
 
     @Override
     @Transactional
-    public void updateMatchResult(Long matchID, Integer scortTeamA, Integer scortTeamB) {
+    public void updateMatchResult(Long matchID, MatchResultRequest request, String username) {
 
-        ChallengeMatch match = challengeMatchRepository.findById(matchID).orElseThrow(()-> new ResourceNotFoundException("Match not found"));
+        ChallengeMatch match = challengeMatchRepository.findById(matchID).orElseThrow(() -> new ResourceNotFoundException("Match not found"));
+
+        if (!match.getCreator().getUsername().equals(username)) {
+            throw new InvalidDataException("Chỉ có chủ trận mới được thực hiện");
+        }
 
         challengeMatchService.checkMatchFinished(matchID);
 
         ChallengeResult result = ChallengeResult.builder()
                 .match(match)
-                .teamAScort(scortTeamA)
-                .teamBScort(scortTeamB)
+                .teamAScort(request.getScortTeamA())
+                .teamBScort(request.getScortTeamB())
                 .build();
 
         challengeResultRepository.save(result);
 
-        log.info("challengeId updated result {} - {}", match, scortTeamA, scortTeamB);
+        log.info("challengeId updated result {} - {}", match, request.getScortTeamA(), request.getScortTeamB());
 
 
         //Get list participants in team
-        List<ChallengeParticipant> participantsA = challengeParticipantService.getParticipantsByMatchAndTeam(matchID, ETeam.TEAM_A);
-        List<ChallengeParticipant> participantsB = challengeParticipantService.getParticipantsByMatchAndTeam(matchID, ETeam.TEAM_B);
+        List<ChallengeParticipant> participantsA = challengeParticipantService.getParticipantsByMatchAndTeamAndStatus(matchID, ETeam.TEAM_A, EParticipantStatus.ACCEPTED);
+        List<ChallengeParticipant> participantsB = challengeParticipantService.getParticipantsByMatchAndTeamAndStatus(matchID, ETeam.TEAM_B, EParticipantStatus.ACCEPTED);
 
-        if (participantsA.isEmpty() && participantsB.isEmpty()) return;
+        if (participantsA.isEmpty() && participantsB.isEmpty()) {
+            throw new InvalidDataException("Không thể cập nhật kết quả");
+        }
 
         //Get Ids
         List<Long> userIdsTeamA = participantsA.stream().map(c -> c.getUser().getId()).toList();
@@ -68,8 +76,6 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
         List<UserSportElo> eloTeamB = userSportEloService.getUserSportEloByUserIds(userIdsTeamB);
 
         //Save
-        userSportEloService.updateSportElo(eloTeamA, eloTeamB, scortTeamA, scortTeamB);
-        log.info("challengeId updated result {} - {}", match, scortTeamA, scortTeamB);
-
+        userSportEloService.updateSportElo(eloTeamA, eloTeamB, request.getScortTeamA(), request.getScortTeamB());
     }
 }

@@ -42,7 +42,8 @@ public class PaymentServiceImpl implements PaymentService {
         Booking booking = findByPaymentToken(request.getPaymentToken());
         booking.setPaymentMethod(request.getPaymentMethod());
 
-        bookingService.checkExpiredBooking(booking);
+        bookingService.isExpiredBooking(booking);
+        
         bookingRepository.save(booking);
         Payment payment = Payment.builder()
                 .amount(booking.getTotalPrice())

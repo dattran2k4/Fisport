@@ -1,5 +1,7 @@
 package com.fisport.service;
 
+import com.fisport.dto.request.MatchResultRequest;
+
 public interface ChallengeResultService {
-    void updateMatchResult(Long matchID, Integer scortTeamA, Integer scortTeamB);
+    void updateMatchResult(Long matchID, MatchResultRequest request, String username);
 }

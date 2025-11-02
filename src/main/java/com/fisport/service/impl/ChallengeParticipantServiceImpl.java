@@ -24,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -49,6 +51,19 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
         ChallengeMatch challengeMatch = challengeMatchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy trận đấu"));
 
         int maxPlayerPerTeam = challengeMatch.getChallengeMatchType().getMaxPlayers() / 2;
+
+        if (challengeMatch.getStatus().equals(EChallengeStatus.CANCELLED)) {
+            throw new InvalidDataException("Trận đấu đã bị huỷ");
+        }
+
+        LocalDate date = challengeMatch.getBooking().getBookingDate();
+        LocalTime startTime = challengeMatch.getBooking().getStartTime();
+
+        LocalDateTime start = LocalDateTime.of(date, startTime);
+
+        if (start.isBefore(LocalDateTime.now())) {
+            throw new InvalidDataException("Trận đấu đã bắt đầu");
+        }
 
         if (challengeParticipantRepository.existsByMatchIdAndUserId(matchId, user.getId())) {
             throw new InvalidDataException("Bạn đã tham gia rồi");
@@ -97,6 +112,14 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
         participant.setResponseMessage(request.getResponseMessage());
 
         challengeParticipantRepository.save(participant);
+
+        int currentAcceptedPlayer = getAcceptedCurrentPlayers(participant.getMatch().getId());
+        if (currentAcceptedPlayer == participant.getMatch().getChallengeMatchType().getMaxPlayers()) {
+            participant.getMatch().setStatus(EChallengeStatus.FULL);
+            challengeMatchRepository.save(participant.getMatch());
+            log.info("MatchId {} is FULL", participant.getMatch().getId());
+        }
+
         log.info("creator {} accepted for playerId {}", username, participant.getUser().getId());
 
         return participant.getUser().getUsername();
@@ -113,6 +136,15 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
 
         participant.setStatus(EParticipantStatus.REJECTED);
         participant.setResponseMessage(request.getResponseMessage());
+
+        ChallengeMatch match = participant.getMatch();
+
+        int currentAcceptedPlayer = getAcceptedCurrentPlayers(match.getId());
+        if (match.getStatus().equals(EChallengeStatus.FULL) && currentAcceptedPlayer < match.getChallengeMatchType().getMaxPlayers()) {
+            match.setStatus(EChallengeStatus.PENDING);
+            challengeMatchRepository.save(match);
+            log.info("MatchId {} is change from FULL to PENDING", match.getId());
+        }
 
         challengeParticipantRepository.save(participant);
         log.info("creator {} rejected for playerId {}", username, participant.getUser().getId());
@@ -180,8 +212,7 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
 
     @Override
     public List<ChallengeParticipantsInfoResponse> getAllAcceptedParticipantsInfo(Long matchId) {
-        List<ChallengeParticipantsInfoResponse> participants = challengeParticipantRepository.findAllAcceptedParticipantsInfo(matchId);
-        return participants;
+        return challengeParticipantRepository.findAllAcceptedParticipantsInfo(matchId);
     }
 
     @Override
@@ -219,8 +250,8 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
     }
 
     @Override
-    public List<ChallengeParticipant> getParticipantsByMatchAndTeam(Long matchId, ETeam team) {
-        return challengeParticipantRepository.findByMatchIdAndTeam(matchId, team);
+    public List<ChallengeParticipant> getParticipantsByMatchAndTeamAndStatus(Long matchId, ETeam team, EParticipantStatus status) {
+        return challengeParticipantRepository.findByMatchIdAndTeam(matchId, team, status);
     }
 
     private ChallengeParticipant findParticipant(Long id) {

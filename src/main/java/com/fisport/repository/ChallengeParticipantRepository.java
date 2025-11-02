@@ -1,5 +1,7 @@
 package com.fisport.repository;
 
+import com.fisport.common.EChallengeStatus;
+import com.fisport.common.EParticipantStatus;
 import com.fisport.common.ETeam;
 import com.fisport.dto.response.ChallengeParticipantsInfoResponse;
 import com.fisport.model.ChallengeParticipant;
@@ -31,7 +33,7 @@ public interface ChallengeParticipantRepository extends JpaRepository<ChallengeP
 
     boolean existsByMatchIdAndUserId(Long matchId, Long id);
 
-    List<ChallengeParticipant> findByMatchIdAndTeam(Long matchId, ETeam team);
+    List<ChallengeParticipant> findByMatchIdAndTeam(Long matchId, ETeam team, EParticipantStatus status);
 
 
     Long countByMatchIdAndTeam(Long matchId, ETeam eTeam);

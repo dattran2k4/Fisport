@@ -119,6 +119,9 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
     public void payBooking(String paymentToken, String username) {
         Booking booking = paymentService.findByPaymentToken(paymentToken);
 
+        User owner = booking.getSubfield().getField().getOwner();
+        Wallet ownerWallet = owner.getWallet();
+
         if (!booking.getBookingStatus().equals(EBookingStatus.PENDING)) {
             throw new InvalidDataException("Payment paid already");
         }
@@ -154,9 +157,23 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         transactionRepository.save(transaction);
         log.info("Transaction update status: " + transaction.getStatus());
 
+
         booking.setBookingStatus(EBookingStatus.PAID);
         bookingRepository.save(booking);
         log.info("Booking {} paid", booking.getId());
+
+        Transaction ownerTracsaction = Transaction.builder()
+                .wallet(ownerWallet)
+                .type(ETransactionType.RECEIVED)
+                .amount(booking.getTotalPrice())
+                .status(ETransactionStatus.SUCCESS)
+                .method(EPaymentMethod.WALLET)
+                .booking(booking)
+                .build();
+
+        transactionRepository.save(ownerTracsaction);
+
+        walletService.creditWallet(ownerTracsaction);
 
         ChallengeMatch match = challengeMatchRepository.findByBooking(booking).orElse(null);
 
@@ -175,8 +192,10 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new RuntimeException("Booking not found"));
 
         User user = booking.getUser();
+        User owner = booking.getSubfield().getField().getOwner();
 
         Wallet wallet = walletRepository.findByUser(user);
+        Wallet ownerWallet = owner.getWallet();
 
         if (!booking.getBookingStatus().equals(EBookingStatus.PAID)) {
             throw new InvalidDataException("Invalid booking status");

@@ -15,7 +15,7 @@ public interface ChallengeMatchService {
 
     void createChallengeMatch(ChallengeMatchCreateRequest request, String username);
 
-    void updateChallengeMatch(Long id, ChallengeMatchUpdateRequest request);
+    void updateChallengeMatch(Long id, ChallengeMatchUpdateRequest request, String username);
 
     ChallengeMatchDetailResponse getChallengeMatchDetail(Long id);
 
@@ -33,5 +33,6 @@ public interface ChallengeMatchService {
     boolean canCancel(Long matchId);
 
     List<ChallengeMatchManagementResponse> getListMatchForManagement(String username);
+
     ChallengeMatchDetailManagementResponse getMatchDetailForManagement(Long matchId, String username);
 }

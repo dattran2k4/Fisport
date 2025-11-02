@@ -7,6 +7,7 @@ import com.fisport.dto.request.BookingRequest;
 import com.fisport.dto.request.BookingServiceItemRequest;
 import com.fisport.dto.response.*;
 import com.fisport.exception.BookingException;
+import com.fisport.exception.InvalidDataException;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.*;
 import com.fisport.repository.*;
@@ -17,6 +18,7 @@ import com.fisport.service.VoucherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -191,9 +193,17 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy booking"));
 
-        checkExpiredBooking(booking);
+        try {
+            if (isExpiredBooking(booking)) {
+                throw new InvalidDataException("Booking is expired");
+            }
+        } catch (InvalidDataException e) {
+            markAsExpired(id);
+            throw e;
+        }
 
-        if (LocalDateTime.now().isAfter(LocalDateTime.of(booking.getBookingDate(), booking.getStartTime()))) {
+        if (LocalDateTime.now().isAfter(LocalDateTime.of(booking.getBookingDate(), booking.getStartTime())) ||
+                EBookingStatus.COMPLETED.equals(booking.getBookingStatus())) {
             throw new BookingException("Cannot cancel a booking that has already started or passed.");
         }
 
@@ -204,6 +214,14 @@ public class BookingServiceImpl implements BookingService {
         } else {
             throw new BookingException("Cannot cancel booking with status: " + booking.getBookingStatus());
         }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void markAsExpired(Long id) {
+        Booking booking = findBooking(id);
+        booking.setBookingStatus(EBookingStatus.FAILED);
+        bookingRepository.save(booking);
     }
 
     @Override
@@ -259,12 +277,11 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public void checkExpiredBooking(Booking booking) {
+    public boolean isExpiredBooking(Booking booking) {
         if (booking.getBookingStatus().equals(EBookingStatus.PENDING) && booking.getExpiredAt().isBefore(LocalDateTime.now())) {
-            booking.setBookingStatus(EBookingStatus.FAILED);
-            bookingRepository.save(booking);
-            throw new BookingException("Booking has expired");
+            return true;
         }
+        return false;
     }
 
     @Override

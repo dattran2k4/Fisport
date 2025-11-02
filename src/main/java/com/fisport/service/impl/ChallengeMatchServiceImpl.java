@@ -85,18 +85,22 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateChallengeMatch(Long id, ChallengeMatchUpdateRequest request) {
+    public void updateChallengeMatch(Long id, ChallengeMatchUpdateRequest request, String username) {
         ChallengeMatch match = findChallengeMatch(id);
 
         ChallengeMatchType type = challengeMatchTypeRepository.findById(request.getChallengeMatchTypeId()).orElseThrow(() -> new ResourceNotFoundException("Challenge Match Type not found"));
 
         List<ChallengeParticipant> participants = challengeParticipantRepository.findAllByMatchId(id);
 
+        if (!username.equals(match.getCreator().getUsername())) {
+            throw new InvalidDataException("Bạn không được phép thực hiện");
+        }
+
         boolean hasPaid = participants.stream()
-                    .anyMatch(p -> !p.getUser().getId().equals(match.getCreator().getId())   // không tính creator
-                            && Boolean.TRUE.equals(p.isPaid()));                         // đã trả phí
+                .anyMatch(p -> !p.getUser().getId().equals(match.getCreator().getId())   // không tính creator
+                        && Boolean.TRUE.equals(p.isPaid()));                         // đã trả phí
         if (hasPaid && request.getFee() != null && !request.getFee().equals(match.getParticipationFee())) {
-                throw new InvalidDataException("Không thể thay đổi phí vì đã có người chơi thanh toán.");
+            throw new InvalidDataException("Không thể thay đổi phí vì đã có người chơi thanh toán.");
         }
 
         match.setChallengeMatchType(type);
@@ -198,11 +202,14 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
     }
 
     @Override
+    @Transactional
     public void checkMatchFinished(Long matchId) {
         ChallengeMatch match = findChallengeMatch(matchId);
         if (match.getBooking().getEndTime().isBefore(LocalTime.now()) && !match.getStatus().equals(EChallengeStatus.MATCHED)) {
             match.setStatus(EChallengeStatus.MATCHED);
             challengeMatchRepository.save(match);
+
+            log.info("MatchId {} is MATCHED", matchId);
         }
         throw new InvalidDataException("Trận đấu chưa hoàn thành");
     }

@@ -1,5 +1,6 @@
 package com.fisport.service;
 
+import com.fisport.common.EParticipantStatus;
 import com.fisport.common.ETeam;
 import com.fisport.dto.request.JoinMatchRequest;
 import com.fisport.dto.request.UpdateParticipantStatusRequest;
@@ -33,6 +34,5 @@ public interface ChallengeParticipantService {
 
     Integer countAcceptedPlayersByTeam(Long matchId, ETeam team);
 
-    List<ChallengeParticipant> getParticipantsByMatchAndTeam(Long matchId, ETeam team);
-
+    List<ChallengeParticipant> getParticipantsByMatchAndTeamAndStatus(Long matchId, ETeam team, EParticipantStatus status);
 }
