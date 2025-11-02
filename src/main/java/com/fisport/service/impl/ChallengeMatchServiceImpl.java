@@ -234,6 +234,8 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
             match.setStatus(EChallengeStatus.CANCELLED);
             challengeMatchRepository.save(match);
             log.info("MatchId {} changed status {}", matchId, EChallengeStatus.CANCELLED);
+        } else {
+            throw new InvalidDataException("Không thể hủy trận đấu");
         }
     }
 
@@ -245,6 +247,8 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
         LocalTime startTime = challengeMatch.getBooking().getStartTime();
 
         LocalDateTime start = LocalDateTime.of(date, startTime);
+
+        log.info("date={}, time={}, start={}", date, startTime, start);
 
         EChallengeStatus status = challengeMatch.getStatus();
 

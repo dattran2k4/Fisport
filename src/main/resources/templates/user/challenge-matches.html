@@ -287,20 +287,23 @@
 
                                     <td>
                                         <div class="d-flex gap-2 justify-content-center">
-                                            <!-- Các nút bình thường: View / Edit / Cancel -->
-                                            <a th:each="act : ${m.actions}" th:if="${act != 'View Result'}" th:href="${act == 'View' ? '/user/challenge-matches/' + m.id
-                     : (act == 'Edit' ? '/user/challenge-matches/' + m.id + '/view/'
-                     : (act == 'Cancel' ? '/user/matches/cancel/' + m.id : '#'))}" class="action-btn" th:classappend="${act == 'View' ? ' view-btn' 
-                            : (act == 'Edit' ? ' edit-btn' 
-                            : (act == 'Cancel' ? ' cancel-btn' : ''))}" th:title="${act}">
-                                                <i th:text="${act == 'View' ? '' : (act == 'Edit' ? '' : '')}"></i>
-                                                <!-- Nếu muốn icon khác nhau thì dùng th:if / th:unless trong <i> -->
+                                            <!-- Lặp qua các hành động View, Edit -->
+                                            <a th:each="act : ${m.actions}" th:if="${act == 'View' or act == 'Edit'}"
+                                                th:href="${act == 'View' ? '/user/challenge-matches/' + m.id 
+                    : '/user/challenge-matches/' + m.id + '/view/'}" class="action-btn"
+                                                th:classappend="${act == 'View' ? ' view-btn' : ' edit-btn'}"
+                                                th:title="${act}">
                                                 <i th:if="${act == 'View'}" class="bi bi-eye-fill"></i>
                                                 <i th:if="${act == 'Edit'}" class="bi bi-pencil-square"></i>
-                                                <i th:if="${act == 'Cancel'}" class="bi bi-x-circle-fill"></i>
                                             </a>
 
-                                            <!-- Nút View Result: chỉ popup -->
+                                            <!-- Nút Cancel -->
+                                            <a th:if="${m.actions.contains('Cancel')}" href="javascript:void(0)"
+                                                class="action-btn cancel-btn" th:attr="data-id=${m.id}" title="Cancel">
+                                                <i class="bi bi-x-circle-fill"></i>
+                                            </a>
+
+                                            <!-- Nút View Result -->
                                             <a th:if="${m.actions.contains('View Result')}" href="javascript:void(0)"
                                                 class="action-btn result-btn" th:attr="data-match-id=${m.id}"
                                                 title="View Result">
@@ -308,6 +311,7 @@
                                             </a>
                                         </div>
                                     </td>
+
                                 </tr>
                             </tbody>
                         </table>
@@ -406,6 +410,41 @@
     <section layout:fragment="scripts">
         <script th:inline="javascript">
             $(document).ready(function () {
+                // ===== Hủy trận đấu =====
+                $('.cancel-btn').click(function (e) {
+                    e.preventDefault();
+                    const matchId = $(this).data('id'); 
+
+                    Swal.fire({
+                        title: 'Xác nhận hủy trận đấu?',
+                        text: "Sau khi hủy, mọi người chơi sẽ được hoàn tiền!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Đồng ý, hủy ngay',
+                        cancelButtonText: 'Không, giữ lại',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            SwalUtil.loading('Đang xử lý hủy trận đấu...');
+                            $.ajax({
+                                url: `/api/v1/challenge-matchs/${matchId}/cancel`,
+                                type: 'POST',
+                                success: function (res) {
+                                    Swal.close();
+                                    SwalUtil.success(res.message || 'Đã hủy trận đấu thành công!');
+                                    // reload lại trang hoặc xóa dòng khỏi bảng
+                                    setTimeout(() => location.reload(), 1500);
+                                },
+                                error: function (err) {
+                                    Swal.close();
+                                    console.error(err);
+                                    SwalUtil.error(err.responseJSON?.message || 'Không thể hủy trận đấu!');
+                                }
+                            });
+                        }
+                    });
+                });
+
                 // ===== Utils Swal =====
                 const SwalUtil = {
                     loading: (text = "Đang tải...") => Swal.fire({ title: text, allowOutsideClick: false, didOpen: () => Swal.showLoading() }),
