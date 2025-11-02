@@ -223,9 +223,12 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
                 .matchId(p.getMatch().getId())
                 .fee(p.getMatch().getParticipationFee())
                 .date(p.getMatch().getBooking().getBookingDate())
+                .fieldName(p.getMatch().getBooking().getSubfield().getField().getName())
                 .sport(p.getMatch().getBooking().getSubfield().getField().getFieldType().getName())
                 .title(p.getMatch().getTitle())
                 .isPaid(p.isPaid())
+                .status(p.getStatus())
+                .matchType(p.getMatch().getChallengeMatchType().getName())
                 .canPay(p.getStatus().equals(EParticipantStatus.ACCEPTED) && !p.isPaid())
                 .build()).toList();
     }
@@ -251,7 +254,7 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
 
     @Override
     public List<ChallengeParticipant> getParticipantsByMatchAndTeamAndStatus(Long matchId, ETeam team, EParticipantStatus status) {
-        return challengeParticipantRepository.findByMatchIdAndTeam(matchId, team, status);
+        return challengeParticipantRepository.findByMatchIdAndTeamAndStatus(matchId, team, status);
     }
 
     private ChallengeParticipant findParticipant(Long id) {

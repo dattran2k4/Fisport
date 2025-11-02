@@ -15,7 +15,6 @@ public class ChallengeParticipantsForUserResponse {
     private String fieldName;
     private String sport;
     private String matchType;
-    private String address;
     private LocalDate date;
     private BigDecimal fee;
     private EParticipantStatus status;
