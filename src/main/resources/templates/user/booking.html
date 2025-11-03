@@ -225,68 +225,67 @@
               });
             }
           });
+        });
+        $(document).on("click", ".btn-cancel-booking", function () {
+          const bookingId = $(this).data("booking-id");
+          const $button = $(this);
 
-          $(document).on("click", ".btn-cancel-booking", function () {
-            const bookingId = $(this).data("booking-id");
-            const $button = $(this);
+          if (!bookingId) return;
 
-            if (!bookingId) return;
+          if (!confirm(`Bạn có chắc chắn muốn hủy booking #${bookingId}?`)) return;
 
-            if (!confirm(`Bạn có chắc chắn muốn hủy booking #${bookingId}?`)) return;
+          //Cancel booking
+          $.ajax({
+            url: `/api/v1/bookings/${bookingId}/cancel`,
+            type: "POST",
+            beforeSend: function () {
+              $button
+                .prop("disabled", true)
+                .html('<i class="bi bi-hourglass-split"></i> Đang hủy...');
+            },
+            success: function (response) {
+              if (response.status == 202) {
+                Swal.fire({
+                  icon: "success",
+                  title: "Thành công",
+                  text: response.message || "Hủy booking thành công!",
+                  timer: 2000,
+                  showConfirmButton: false,
+                });
 
-            //Cancel booking
-            $.ajax({
-              url: `/api/v1/bookings/${bookingId}/cancel`,
-              type: "POST",
-              beforeSend: function () {
                 $button
                   .prop("disabled", true)
-                  .html('<i class="bi bi-hourglass-split"></i> Đang hủy...');
-              },
-              success: function (response) {
-                if (response.status == 202) {
-                  Swal.fire({
-                    icon: "success",
-                    title: "Thành công",
-                    text: response.message || "Hủy booking thành công!",
-                    timer: 2000,
-                    showConfirmButton: false,
-                  });
-
-                  $button
-                    .prop("disabled", true)
-                    .removeClass("btn-danger")
-                    .addClass("btn-secondary")
-                    .html('<i class="bi bi-check-circle"></i> Đã hủy');
-                } else {
-                  // Nếu có status nhưng không nằm trong khoảng 2xx
-                  Swal.fire({
-                    icon: "error",
-                    title: "Lỗi",
-                    text: response.message || "Không thể hủy booking.",
-                  });
-
-                  $button
-                    .prop("disabled", false)
-                    .html('<i class="bi bi-x-circle"></i> Hủy');
-                }
-              },
-              error: function (xhr) {
-                const msg =
-                  xhr.responseJSON?.message ||
-                  "Có lỗi xảy ra khi hủy booking, vui lòng thử lại.";
-
+                  .removeClass("btn-danger")
+                  .addClass("btn-secondary")
+                  .html('<i class="bi bi-check-circle"></i> Đã hủy');
+              } else {
+                // Nếu có status nhưng không nằm trong khoảng 2xx
                 Swal.fire({
                   icon: "error",
-                  title: "Thất bại",
-                  text: msg,
+                  title: "Lỗi",
+                  text: response.message || "Không thể hủy booking.",
                 });
 
                 $button
                   .prop("disabled", false)
                   .html('<i class="bi bi-x-circle"></i> Hủy');
-              },
-            });
+              }
+            },
+            error: function (xhr) {
+              const msg =
+                xhr.responseJSON?.message ||
+                "Có lỗi xảy ra khi hủy booking, vui lòng thử lại.";
+
+              Swal.fire({
+                icon: "error",
+                title: "Thất bại",
+                text: msg,
+              });
+
+              $button
+                .prop("disabled", false)
+                .html('<i class="bi bi-x-circle"></i> Hủy');
+            },
           });
         });
       });

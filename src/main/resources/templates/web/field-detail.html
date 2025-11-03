@@ -168,6 +168,16 @@
                     })
                 };
 
+                const currentFieldMarker = L.marker([fieldLat, fieldLng], {
+                    icon: L.icon({
+                        iconUrl: '/web/img/field/icons/pickleball.png',
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 40],
+                        popupAnchor: [0, -30]
+                    })
+                }).addTo(map)
+                    .bindPopup(`<strong>${fieldName}</strong>`);
+
                 // Vẽ vùng bán kính 2km quanh sân
                 L.circle([fieldLat, fieldLng], {
                     color: '#007bff',
@@ -189,7 +199,7 @@
                         }
 
                         fields.forEach(function (field) {
-                        const icon = fieldIcons[field.typeSlug?.toUpperCase()] || fieldIcons.DEFAULT;
+                            const icon = fieldIcons[field.typeSlug?.toUpperCase()] || fieldIcons.DEFAULT;
                             const tooltipHtml = `<div style="text-align:center;">
                                 <img src="${field.banner}" style="width:100px;height:60px;object-fit:cover;border-radius:8px;"><br>
                                 <strong>${field.name}</strong><br>
@@ -231,7 +241,7 @@
                                         </p>
 
                                         <a href="/san/${field.typeSlug}/${field.slug}/dat-san"
-                                        class="btn btn-sm btn-primary w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 shadow-sm">
+                                            class="btn btn-sm btn-primary text-white w-100 rounded-3 d-flex align-items-center justify-content-center gap-2 shadow-sm">
                                             <i class="bi bi-calendar-check"></i> Đặt sân ngay
                                         </a>
                                     </div>

@@ -69,18 +69,11 @@ public class BookingApiController {
     }
 
     @PostMapping("/{id}/cancel")
-    public ResponseData<?> cancelBooking(@PathVariable Long id, Principal principal) {
-        try {
-            bookingService.cancelBooking(id, principal.getName());
-            return new ResponseData<>(HttpStatus.ACCEPTED.value(), "Đã hủy booking T-T");
-        } catch (Exception e) {
-            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        }
+    public ApiResponse cancelBooking(@PathVariable Long id, Principal principal) {
+        bookingService.cancelBooking(id, principal.getName());
+        return ApiResponse.builder()
+                .status(HttpStatus.ACCEPTED.value())
+                .message("Đã hủy booking T-T")
+                .build();
     }
-
-    @GetMapping("/{id}/match-type")
-    public ApiResponse getMatchType(@PathVariable Long id) {
-        return ApiResponse.builder().build();
-    }
-
 }

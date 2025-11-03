@@ -173,7 +173,9 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingListResponse> getAllBookings(String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
-        List<Booking> bookings = user.getBookings().stream().toList();
+        List<Booking> bookings = user.getBookings().stream()
+                .sorted(Comparator.comparing(Booking::getId).reversed())
+                .toList();
         return bookings.stream().map(b -> BookingListResponse.builder()
                 .id(b.getId())
                 .start(b.getStartTime())
@@ -182,7 +184,8 @@ public class BookingServiceImpl implements BookingService {
                 .total(b.getTotalPrice())
                 .status(b.getBookingStatus())
                 .fieldName(b.getSubfield().getField().getName())
-                .build()).toList();
+                .build())
+                .toList();
     }
 
     @Transactional
@@ -227,7 +230,9 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingForUserResponse> getBookingsForUser(String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        List<Booking> bookings = user.getBookings().stream().toList();
+        List<Booking> bookings = user.getBookings().stream()
+                .sorted(Comparator.comparing(Booking::getId).reversed())
+                .toList();
         return bookings.stream().map(b -> BookingForUserResponse.builder()
                 .id(b.getId())
                 .date(b.getBookingDate())
