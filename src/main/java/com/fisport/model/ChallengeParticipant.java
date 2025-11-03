@@ -1,6 +1,7 @@
 package com.fisport.model;
 
 import com.fisport.common.EParticipantStatus;
+import com.fisport.common.ETeam;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -33,6 +34,9 @@ public class ChallengeParticipant extends AbstractEntity {
 
     @Column(name = "response_message", length = 200)
     private String responseMessage;
+
+    @Enumerated(EnumType.STRING)
+    private ETeam team;
 
     @Column(name = "paid")
     private boolean paid;

@@ -2,14 +2,16 @@ package com.fisport.api;
 
 import com.fisport.common.EChallengeStatus;
 import com.fisport.common.ELevel;
-import com.fisport.dto.request.ChallengeMatchRequest;
+import com.fisport.dto.request.ChallengeMatchCreateRequest;
+import com.fisport.dto.request.ChallengeMatchUpdateRequest;
 import com.fisport.dto.request.JoinMatchRequest;
-import com.fisport.dto.request.UpdateParticipantStatusRequest;
+import com.fisport.dto.request.MatchResultRequest;
 import com.fisport.dto.response.ApiResponse;
+import com.fisport.dto.response.ChallengeResultResponse;
 import com.fisport.service.ChallengeMatchService;
 import com.fisport.service.ChallengeParticipantService;
+import com.fisport.service.ChallengeResultService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -27,9 +29,10 @@ public class ChallengeMatchApiController {
 
     private final ChallengeMatchService challengeMatchService;
     private final ChallengeParticipantService challengeParticipantService;
+    private final ChallengeResultService challengeResultService;
 
     @PostMapping("/create")
-    public ApiResponse createChallengeMatch(@RequestBody ChallengeMatchRequest request, Principal principal) {
+    public ApiResponse createChallengeMatch(@Valid @RequestBody ChallengeMatchCreateRequest request, Principal principal) {
         challengeMatchService.createChallengeMatch(request, principal.getName());
         return ApiResponse.builder()
                 .status(HttpStatus.CREATED.value())
@@ -40,9 +43,7 @@ public class ChallengeMatchApiController {
     @GetMapping
     public ApiResponse getAllChallengeMatches(@RequestParam(required = false) EChallengeStatus status,
                                               @RequestParam(required = false) ELevel level,
-                                              @Min(1)@RequestParam(required = false) Integer maxPlayers,
-                                              @RequestParam(required = false) LocalDate date,
-                                              @RequestParam(required = false) BigDecimal fee,
+                                              @RequestParam(required = false) Long typeId,
                                               @RequestParam(required = false) Long cityId,
                                               @RequestParam(required = false) Long fieldTypeId,
                                               @RequestParam(defaultValue = "0") int page,
@@ -51,29 +52,40 @@ public class ChallengeMatchApiController {
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())
                 .message("challenge matches")
-                .data(challengeMatchService.getAllChallengeMatch(status, level, maxPlayers, date, fee, cityId, fieldTypeId, page, size))
+                .data(challengeMatchService.getAllChallengeMatch(status, level, typeId, cityId, fieldTypeId, page, size))
                 .build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/list-by")
+    public ApiResponse getChallengeMatches(Principal principal) {
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("challenge matches")
+                .data(challengeMatchService.getListMatchForManagement(principal.getName()))
+                .build();
+    }
+
+    @GetMapping("/{id}/detail")
     public ApiResponse getChallengeMatch(@PathVariable Long id) {
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())
-                .data(challengeMatchService.getChallengeMatch(id))
+                .data(challengeMatchService.getChallengeMatchDetail(id))
                 .message("challenge match")
                 .build();
     }
 
-    @GetMapping("/{id}/participants-list")
-    public ApiResponse getParticipantsList(@PathVariable Long id, Principal principal) {
+    //Web detail
+    @GetMapping("/{id}/participants-accepted")
+    public ApiResponse getParticipantsInMatch(@PathVariable Long id) {
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())
-                .message("participants list")
-                .data(challengeParticipantService.getAllParticipantsByMatchAndCreator(id, principal.getName()))
+                .message("participants in match")
+                .data(challengeParticipantService.getAllAcceptedParticipantsInfo(id))
                 .build();
     }
 
-    @PostMapping("/{id}/participants-request")
+
+    @PostMapping("/{id}/join")
     public ApiResponse joinMatch(@PathVariable Long id, @Valid @RequestBody JoinMatchRequest request, Principal principal) {
         challengeParticipantService.joinMatch(id, request, principal.getName());
         return ApiResponse.builder()
@@ -82,11 +94,40 @@ public class ChallengeMatchApiController {
                 .build();
     }
 
-    @PutMapping("/{id}/update-result")
-    public ApiResponse updateResultMatch(@PathVariable Long id, Principal principal) {
+    @PostMapping("/{id}/update-result")
+    public ApiResponse updateResultMatch(@PathVariable Long id, @Valid @RequestBody MatchResultRequest request, Principal principal) {
+        challengeResultService.updateMatchResult(id, request, principal.getName());
         return ApiResponse.builder()
                 .status(HttpStatus.OK.value())
-                .message("OK")
+                .message("Cập nhật kết quả thành công!")
+                .build();
+    }
+
+    @PostMapping("/{id}/cancel")
+    public ApiResponse cancelMatch(@PathVariable Long id, Principal principal) {
+        challengeMatchService.cancelMatch(id, principal.getName());
+        return ApiResponse.builder()
+                .status(200)
+                .message("Đã hủy trận đấu và hoàn trả giao dịch cho các người chơi!")
+                .build();
+    }
+
+    @PutMapping("{id}/update")
+    public ApiResponse updateMatch(@PathVariable Long id, @Valid @RequestBody ChallengeMatchUpdateRequest request, Principal principal) {
+        challengeMatchService.updateChallengeMatch(id, request, principal.getName());
+        return ApiResponse.builder()
+                .status(HttpStatus.ACCEPTED.value())
+                .message("Đã cập nhật trận đấu thành công!")
+                .build();
+    }
+
+    @GetMapping("{id}/result")
+    public ApiResponse getMatchResult(@PathVariable Long id) {
+        ChallengeResultResponse response = challengeResultService.getByMatchId(id);
+        return ApiResponse.builder()
+                .status(HttpStatus.OK.value())
+                .message("match result")
+                .data(response)
                 .build();
     }
 

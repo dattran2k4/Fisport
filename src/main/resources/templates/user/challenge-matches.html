@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    layout:decorate="~{/layout/user/user}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Challenge Matches</title>
+    <style>
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.07);
+        }
+
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #eee;
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        thead {
+            background-color: #e9f2ff;
+        }
+
+        tbody tr {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.15s ease-in-out;
+        }
+
+        tbody tr:hover {
+            transform: translateY(-2px);
+            background-color: #f9fcff;
+        }
+
+        .table th {
+            color: #333;
+            font-weight: 600;
+        }
+
+        .progress {
+            background-color: #e8edf5;
+            border-radius: 10px;
+        }
+
+        .progress-bar {
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .btn-group .btn {
+            border-radius: 8px !important;
+            font-size: 0.85rem;
+        }
+
+        .btn-group .btn i {
+            font-size: 1rem;
+            vertical-align: middle;
+        }
+
+        .bg-primary-subtle {
+            background-color: rgba(13, 110, 253, 0.1);
+        }
+
+        .bg-danger-subtle {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .badge {
+            font-size: 0.8rem;
+            padding: 6px 10px;
+            border-radius: 10px;
+        }
+
+        .action-btn {
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #0d6efd;
+            transition: 0.2s;
+        }
+
+        .action-btn:hover {
+            color: #0a58ca;
+        }
+
+        .header-title {
+            font-weight: 600;
+            font-size: 1.4rem;
+        }
+
+        .status-badge {
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 10px;
+            padding: 0.45em 0.8em;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .status-badge.open {
+            background-color: rgba(25, 135, 84, 0.15);
+            color: #157347;
+            border: 1px solid rgba(25, 135, 84, 0.25);
+        }
+
+        .status-badge.pending {
+            background-color: rgba(255, 193, 7, 0.15);
+            color: #b58100;
+            border: 1px solid rgba(255, 193, 7, 0.25);
+        }
+
+        .status-badge.full {
+            background-color: rgba(13, 110, 253, 0.15);
+            color: #0a58ca;
+            border: 1px solid rgba(13, 110, 253, 0.25);
+        }
+
+        .status-badge.matched {
+            background-color: rgba(111, 66, 193, 0.15);
+            color: #6f42c1;
+            border: 1px solid rgba(111, 66, 193, 0.25);
+        }
+
+        .status-badge.cancelled {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: #b02a37;
+            border: 1px solid rgba(220, 53, 69, 0.25);
+        }
+
+        .status-badge.other {
+            background-color: rgba(108, 117, 125, 0.15);
+            color: #495057;
+            border: 1px solid rgba(108, 117, 125, 0.25);
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            color: #495057;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.08);
+        }
+
+        /* Màu riêng cho từng loại */
+        .action-btn.view-btn {
+            color: #0d6efd;
+            background-color: rgba(13, 110, 253, 0.1);
+            border-color: rgba(13, 110, 253, 0.2);
+        }
+
+        .action-btn.edit-btn {
+            color: #198754;
+            background-color: rgba(25, 135, 84, 0.1);
+            border-color: rgba(25, 135, 84, 0.2);
+        }
+
+        .action-btn.cancel-btn {
+            color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.1);
+            border-color: rgba(220, 53, 69, 0.2);
+        }
+
+        .action-btn.result-btn {
+            color: #ffc107;
+            background-color: rgba(255, 193, 7, 0.15);
+            border-color: rgba(255, 193, 7, 0.3);
+        }
+
+        .action-btn.result-btn:hover {
+            color: #b68900;
+        }
+
+        .action-btn.cancel-btn:hover {
+            color: #a71d2a;
+        }
+
+        .action-btn.edit-btn:hover {
+            color: #0f5132;
+        }
+
+        .action-btn.view-btn:hover {
+            color: #0a58ca;
+        }
+    </style>
+</head>
+
+<body>
+    <div layout:fragment="content">
+        <div class="container py-5">
+            <!-- Match Table -->
+            <div class="card">
+                <div class="card-body">
+                    <div th:if="${#lists.isEmpty(matches)}" class="text-center text-muted py-4">
+                        <i class="bi bi-emoji-frown fs-3"></i><br>
+                        No matches found.
+                    </div>
+
+                    <div th:if="${!#lists.isEmpty(matches)}" class="table-responsive">
+                        <table class="table align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>#</th>
+                                    <th>Title</th>
+                                    <th>Date</th>
+                                    <th>Sport</th>
+                                    <th>Match Type</th>
+                                    <th>Status</th>
+                                    <th>Team A vs B</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="m, stat : ${matches}">
+                                    <td th:text="${stat.index + 1}"></td>
+                                    <td th:text="${m.title}"></td>
+                                    <td th:text="${m.date}"></td>
+                                    <td th:text="${m.sport}"></td>
+                                    <td th:text="${m.matchType}"></td>
+
+                                    <td>
+                                        <span th:switch="${m.status}">
+                                            <span th:case="${T(com.fisport.common.EChallengeStatus).OPEN}"
+                                                class="badge status-badge open">
+                                                <i class="bi bi-unlock me-1"></i>
+                                                <span th:text="${m.status != null} ? ${m.status.value} : 'N/A'"></span>
+                                            </span>
+                                            <span th:case="${T(com.fisport.common.EChallengeStatus).PENDING}"
+                                                class="badge status-badge pending">
+                                                <i class="bi bi-hourglass-split me-1"></i>
+                                                <span th:text="${m.status != null} ? ${m.status.value} : 'N/A'"></span>
+                                            </span>
+                                            <span th:case="${T(com.fisport.common.EChallengeStatus).FULL}"
+                                                class="badge status-badge full">
+                                                <i class="bi bi-people-fill me-1"></i>
+                                                <span th:text="${m.status != null} ? ${m.status.value} : 'N/A'"></span>
+                                            </span>
+                                            <span th:case="${T(com.fisport.common.EChallengeStatus).MATCHED}"
+                                                class="badge status-badge matched">
+                                                <i class="bi bi-check-circle-fill me-1"></i>
+                                                <span th:text="${m.status != null} ? ${m.status.value} : 'N/A'"></span>
+                                            </span>
+                                            <span th:case="${T(com.fisport.common.EChallengeStatus).CANCELLED}"
+                                                class="badge status-badge cancelled">
+                                                <i class="bi bi-x-circle-fill me-1"></i>
+                                                <span th:text="${m.status != null} ? ${m.status.value} : 'N/A'"></span>
+                                            </span>
+                                            <span th:case="*" class="badge status-badge other">
+                                                <i class="bi bi-question-circle-fill me-1"></i>
+                                                <span th:text="${m.status != null} ? ${m.status.value} : 'N/A'"></span>
+                                            </span>
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex align-items-center justify-content-center gap-2">
+                                            <span class="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill">
+                                                <i class="bi bi-people-fill"></i>
+                                                <span th:text="${m.playerTeamA + '/' + m.maxPlayersPerTeam}"></span>
+                                            </span>
+
+                                            <i class="bi bi-lightning-charge-fill text-warning"></i>
+
+                                            <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill">
+                                                <i class="bi bi-people-fill"></i>
+                                                <span th:text="${m.playerTeamB + '/' + m.maxPlayersPerTeam}"></span>
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <!-- Lặp qua các hành động View, Edit -->
+                                            <a th:each="act : ${m.actions}" th:if="${act == 'View' or act == 'Edit'}"
+                                                th:href="${act == 'View' ? '/user/challenge-matches/' + m.id 
+                    : '/user/challenge-matches/' + m.id + '/view/'}" class="action-btn"
+                                                th:classappend="${act == 'View' ? ' view-btn' : ' edit-btn'}"
+                                                th:title="${act}">
+                                                <i th:if="${act == 'View'}" class="bi bi-eye-fill"></i>
+                                                <i th:if="${act == 'Edit'}" class="bi bi-pencil-square"></i>
+                                            </a>
+
+                                            <!-- Nút Cancel -->
+                                            <a th:if="${m.actions.contains('Cancel')}" href="javascript:void(0)"
+                                                class="action-btn cancel-btn" th:attr="data-id=${m.id}" title="Cancel">
+                                                <i class="bi bi-x-circle-fill"></i>
+                                            </a>
+
+                                            <!-- Nút View Result -->
+                                            <a th:if="${m.actions.contains('View Result')}" href="javascript:void(0)"
+                                                class="action-btn result-btn" th:attr="data-match-id=${m.id}"
+                                                title="View Result">
+                                                <i class="bi bi-trophy-fill"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal UPdate -->
+        <div class="modal fade" id="editMatchModal" tabindex="-1" aria-labelledby="editMatchLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content border-0 shadow-lg rounded-4">
+                    <div class="modal-header bg-primary text-white rounded-top-4">
+                        <h5 class="modal-title" id="editMatchLabel"><i class="bi bi-pencil-square"></i> Edit Match</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <form id="editMatchForm">
+                            <input type="hidden" id="matchId">
+
+                            <div class="mb-3">
+                                <label for="title" class="form-label fw-semibold">Title</label>
+                                <input type="text" id="title" class="form-control" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="fee" class="form-label fw-semibold">Fee (VND)</label>
+                                <input type="number" id="fee" class="form-control" min="0">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="note" class="form-label fw-semibold">Note</label>
+                                <textarea id="note" class="form-control" rows="3"></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="matchTypeId" class="form-label fw-semibold">Match Type</label>
+                                <select id="matchTypeId" class="form-select">
+                                    <option value="1">Friendly</option>
+                                    <option value="2">Tournament</option>
+                                    <option value="3">Training</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" id="saveMatchBtn" class="btn btn-primary">
+                            <i class="bi bi-check2-circle"></i> Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal Result -->
+        <div class="modal fade" id="resultModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content border-0 shadow-lg">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title"><i class="bi bi-trophy-fill me-2"></i>Kết quả trận đấu</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <form id="resultForm">
+                            <input type="hidden" id="matchId">
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Điểm Team A</label>
+                                <input type="number" id="scoreTeamA" class="form-control text-center fs-5 fw-bold"
+                                    min="0" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Điểm Team B</label>
+                                <input type="number" id="scoreTeamB" class="form-control text-center fs-5 fw-bold"
+                                    min="0" required>
+                            </div>
+
+                            <div id="alreadyResult" class="alert alert-info d-none">
+                                Kết quả đã được cập nhật, không thể chỉnh sửa.
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-primary" id="saveResultBtn">Lưu kết quả</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <section layout:fragment="scripts">
+        <script th:inline="javascript">
+            $(document).ready(function () {
+                // ===== Hủy trận đấu =====
+                $('.cancel-btn').click(function (e) {
+                    e.preventDefault();
+                    const matchId = $(this).data('id'); 
+
+                    Swal.fire({
+                        title: 'Xác nhận hủy trận đấu?',
+                        text: "Sau khi hủy, mọi người chơi sẽ được hoàn tiền!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Đồng ý, hủy ngay',
+                        cancelButtonText: 'Không, giữ lại',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            SwalUtil.loading('Đang xử lý hủy trận đấu...');
+                            $.ajax({
+                                url: `/api/v1/challenge-matchs/${matchId}/cancel`,
+                                type: 'POST',
+                                success: function (res) {
+                                    Swal.close();
+                                    SwalUtil.success(res.message || 'Đã hủy trận đấu thành công!');
+                                    // reload lại trang hoặc xóa dòng khỏi bảng
+                                    setTimeout(() => location.reload(), 1500);
+                                },
+                                error: function (err) {
+                                    Swal.close();
+                                    console.error(err);
+                                    SwalUtil.error(err.responseJSON?.message || 'Không thể hủy trận đấu!');
+                                }
+                            });
+                        }
+                    });
+                });
+
+                // ===== Utils Swal =====
+                const SwalUtil = {
+                    loading: (text = "Đang tải...") => Swal.fire({ title: text, allowOutsideClick: false, didOpen: () => Swal.showLoading() }),
+                    success: (msg) => Swal.fire('Thành công', msg, 'success'),
+                    error: (msg) => Swal.fire('Lỗi', msg, 'error')
+                };
+
+                // ===== Click nút View Result =====
+                $('.result-btn').click(function () {
+                    let matchId = $(this).data('match-id');
+                    $('#matchId').val(matchId);
+
+                    SwalUtil.loading(); // hiện loading
+
+                    $.ajax({
+                        url: `/api/v1/challenge-matchs/${matchId}/result`,
+                        type: 'GET',
+                        success: function (res) {
+                            Swal.close(); // đóng loading
+                            // Nếu có dữ liệu thì điền vào form, không thì để trống
+                            $('#scoreTeamA').val(res.data?.scoreTeamA || '');
+                            $('#scoreTeamB').val(res.data?.scoreTeamB || '');
+                            new bootstrap.Modal(document.getElementById('resultModal')).show();
+                        },
+                        error: function (err) {
+                            Swal.close();
+                            console.error(err);
+                            SwalUtil.error('Có lỗi khi lấy kết quả!');
+                        }
+                    });
+                });
+
+                // ===== Lưu kết quả =====
+                $('#saveResultBtn').click(function () {
+                    let matchId = $('#matchId').val();
+                    let scoreTeamA = $('#scoreTeamA').val();
+                    let scoreTeamB = $('#scoreTeamB').val();
+
+                    if (scoreTeamA === '' || scoreTeamB === '') {
+                        SwalUtil.error('Vui lòng nhập đầy đủ kết quả!');
+                        return;
+                    }
+
+                    SwalUtil.loading('Đang cập nhật kết quả...');
+
+                    $.ajax({
+                        url: `/api/v1/challenge-matchs/${matchId}/update-result`,
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            scortTeamA: parseInt(scoreTeamA),
+                            scortTeamB: parseInt(scoreTeamB)
+                        }),
+                        success: function (res) {
+                            Swal.close();
+                            SwalUtil.success(res.message || 'Cập nhật kết quả thành công!');
+                            $('#resultModal').modal('hide');
+                            // TODO: update UI nếu cần, ví dụ reload bảng hoặc cập nhật row match
+                        },
+                        error: function (err) {
+                            Swal.close();
+                            console.error(err);
+                            SwalUtil.error(err.responseJSON?.message || 'Cập nhật thất bại!');
+                        }
+                    });
+                });
+            });
+        </script>
+    </section>
+
+</body>
+
+</html>

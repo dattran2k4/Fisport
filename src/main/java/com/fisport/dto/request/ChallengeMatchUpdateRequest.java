@@ -1,0 +1,27 @@
+package com.fisport.dto.request;
+
+import com.fisport.common.ELevel;
+import com.fisport.dto.validator.EnumValue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+
+import java.math.BigDecimal;
+
+@Getter
+public class ChallengeMatchUpdateRequest {
+
+    private BigDecimal fee;
+
+    @NotBlank(message = "Nhập tiêu đề cho trận đấu")
+    private String title;
+
+    @EnumValue(name = "level", enumClass = ELevel.class)
+    private ELevel level;
+
+    @NotNull(message = "Vui lòng chọn thể thức thi đấu")
+    private Long challengeMatchTypeId;
+
+    @NotBlank(message = "Nhập ghi chú cho trận đấu")
+    private String note;
+}

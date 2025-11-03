@@ -9,7 +9,7 @@ import lombok.Getter;
 import java.math.BigDecimal;
 
 @Getter
-public class ChallengeMatchRequest {
+public class ChallengeMatchCreateRequest {
 
     private BigDecimal fee;
 
@@ -19,8 +19,8 @@ public class ChallengeMatchRequest {
     @EnumValue(name = "level", enumClass = ELevel.class)
     private ELevel level;
 
-    @NotNull(message = "Nhập số người chơi tối đa trong 1 trận đấu")
-    private int maxPlayers;
+    @NotNull(message = "Vui lòng chọn thể thức thi đấu")
+    private Long challengeMatchTypeId;
 
     @NotNull(message = "Chưa có booking")
     private Long bookingId;

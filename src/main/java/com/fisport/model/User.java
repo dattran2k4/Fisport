@@ -57,7 +57,7 @@ public class User extends AbstractEntity {
 
     @OneToMany(mappedBy = "user")
     @Builder.Default
-    private Set<Booking>  bookings = new HashSet<>();
+    private Set<Booking> bookings = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
     @Builder.Default
@@ -72,7 +72,10 @@ public class User extends AbstractEntity {
     private Set<Voucher> vouchers = new HashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<UserSportElo>  sportElos = new HashSet<>();
+    private Set<UserSportElo> sportElos = new HashSet<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<ChallengeParticipant> challengeParticipant = new ArrayList<>();
 
     @OneToOne(mappedBy = "user")
     private Wallet wallet;

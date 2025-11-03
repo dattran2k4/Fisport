@@ -108,15 +108,17 @@
           <!-- Body Form -->
           <div class="modal-body">
             <form id="challengeForm">
+              <input type="hidden" name="bookingId" id="challengeBookingId" value="">
+
               <div class="row g-3">
 
                 <div class="col-md-6">
                   <label class="form-label">Loại hình 🏅</label>
-                  <select class="form-select" name="matchType" required>
-                    <option value="" disabled selected>Chọn loại hình</option>
-                    <option value="SINGLE">Đơn 🧑 vs 🧑</option>
-                    <option value="DOUBLE">Đôi 🧑👤 vs 🧑👤</option>
+                  <!-- sẽ populate bằng JS -->
+                  <select class="form-select" name="challengeMatchTypeId" id="matchTypeSelect" required>
+                    <option value="" disabled selected>Đang tải các loại hình...</option>
                   </select>
+                  <div class="form-text" id="matchTypeHelp">Chọn loại thách đấu phù hợp với booking.</div>
                 </div>
 
                 <div class="col-md-6">
@@ -132,11 +134,11 @@
 
                 <div class="col-md-6">
                   <label class="form-label">Level Suggest 🎯</label>
-                  <select class="form-select" name="levelSuggest" required>
+                  <select class="form-select" name="level" required>
                     <option value="" disabled selected>Chọn level</option>
-                    <option value="BEGINNER">Beginner 🟢</option>
-                    <option value="INTERMEDIATE">Intermediate 🟡</option>
-                    <option value="ADVANCED">Advanced 🔴</option>
+                    <th:block th:each="lv : ${levels}">
+                      <option th:value="${lv}" th:text="${lv.value}"></option>
+                    </th:block>
                   </select>
                 </div>
 
@@ -162,6 +164,7 @@
 
   <section layout:fragment="scripts">
     <script th:inline="javascript">
+
       /*[# th:if="${review}"]*/
       Swal.fire({
         icon: 'success',
@@ -172,6 +175,50 @@
       });
       /*[/]*/
       $(document).ready(function () {
+        //Show types
+        $('#createChallengeModal').on('show.bs.modal', e => {
+          const id = $(e.relatedTarget).data('booking-id');
+          const $sel = $(e.currentTarget).find('select[name="challengeMatchTypeId"]');
+          $('#challengeBookingId').val(id); // gán bookingId vào input hidden
+          $sel.html('<option disabled selected>Đang tải...</option>');
+          $.get(`/api/v1/challenge-types`, { bookingId: id })
+            .done(res => {
+              $sel.empty().append('<option disabled selected>Chọn loại hình</option>');
+              res.data.forEach(t => $sel.append(`<option value="${t.id}">${t.name}</option>`));
+            })
+        });
+
+        //Create-match
+        $('#challengeForm').on('submit', function (e) {
+          e.preventDefault();
+          const formData = {};
+          $(this).serializeArray().forEach(f => formData[f.name] = f.value);
+
+          $.ajax({
+            url: '/api/v1/challenge-matchs/create',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: res => {
+              Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: res.message || 'Tạo trận đấu thành công!',
+                timer: 1500,
+                showConfirmButton: false
+              }).then(() => location.reload());
+            },
+            error: xhr => {
+              const msg = xhr.responseJSON?.message || 'Có lỗi xảy ra, vui lòng thử lại.';
+              Swal.fire({
+                icon: 'error',
+                title: 'Thất bại!',
+                text: msg
+              });
+            }
+          });
+        });
+
         $(document).on("click", ".btn-cancel-booking", function () {
           const bookingId = $(this).data("booking-id");
           const $button = $(this);
@@ -180,6 +227,7 @@
 
           if (!confirm(`Bạn có chắc chắn muốn hủy booking #${bookingId}?`)) return;
 
+          //Cancel booking
           $.ajax({
             url: `/api/v1/bookings/${bookingId}/cancel`,
             type: "POST",

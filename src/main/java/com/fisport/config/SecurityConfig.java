@@ -31,7 +31,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     public static final List<String> WHITE_LIST = List.of( "/common/**", "/web/**", "/web/css/**", "/web/img/**", "/favicon.ico",
-            "/san/**", "/login/**", "/2fa/**", "/", "/web/js/**", "/forgot-password", "/register**", "/error/**", "/confirm/**", "2fa-register"); //test
+            "/san/**", "/login/**", "/2fa/**", "/", "/web/js/**", "/forgot-password", "/register**", "/error/**", "/confirm/**", "2fa-register", "/thach-dau/**"); //test
 
     @Bean
     public PasswordEncoder passwordEncoder() {

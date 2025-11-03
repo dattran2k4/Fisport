@@ -1,26 +1,29 @@
 package com.fisport.common;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
 public enum ELevel {
-    @JsonProperty("Yếu")
-    YEU("Yếu"),
-    @JsonProperty("Trung bình yếu")
-    TRUNGBINH_YEU("Trung bình yếu"),
-    @JsonProperty("Trung bình")
-    TRUNGBINH("Trung bình"),
-    @JsonProperty("Trung bình khá")
-    TRUNGBINH_KHA("Trung bình khá"),
-    @JsonProperty("Khá")
-    KHA("Khá");
+    YEU("Yếu" ,800, 999),
+    TRUNGBINH_YEU("Trung bình yếu", 1000, 1199),
+    TRUNGBINH("Trung bình", 1200, 1399),
+    TRUNGBINH_KHA("Trung bình khá", 1400, 1599),
+    KHA("Khá", 1600, 1799),
+    CHUYEN_NGHIEP("Chuyên nghiệp", 1800, Integer.MAX_VALUE);
 
-    private final String displayName;
+    private final String value;
+    private final int minElo;
+    private final int maxElo;
 
-    ELevel(String displayName) {
-        this.displayName = displayName;
-    }
-
-    public String getDisplayName() {
-        return displayName;
+    public static ELevel fromElo(int elo) {
+        for (ELevel level : values()) {
+            if (elo >= level.minElo && elo <= level.maxElo) {
+                return level;
+            }
+        }
+        return YEU; // default
     }
 }

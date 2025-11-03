@@ -16,16 +16,17 @@ import java.time.LocalDateTime;
 @Table(name = "challenge_result")
 public class ChallengeResult extends AbstractEntity {
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "match_id", nullable = false)
     private ChallengeMatch match;
 
-    @ManyToOne
-    @JoinColumn(name = "player_id", nullable = false)
-    private User player;
-
+    @Column(name = "team_a_scort")
     @Min(0)
-    private Integer score;
+    private Integer teamAScort;
+
+    @Column(name = "team_b_scort")
+    @Min(0)
+    private Integer teamBScort;
 
     @Column(name = "created_at")
     @CreationTimestamp

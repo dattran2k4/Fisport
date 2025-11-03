@@ -1,5 +1,6 @@
 package com.fisport.controller.user;
 
+import com.fisport.common.ELevel;
 import com.fisport.dto.request.ReviewRequest;
 import com.fisport.service.BookingService;
 import com.fisport.service.ReviewService;
@@ -26,6 +27,7 @@ public class UserBookingController {
     @GetMapping()
     public String bookings(Model model, Principal principal) {
         model.addAttribute("bookings", bookingService.getBookingsForUser(principal.getName()));
+        model.addAttribute("levels", ELevel.values());
         return "user/booking";
     }
 

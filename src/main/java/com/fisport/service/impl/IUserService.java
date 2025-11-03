@@ -92,6 +92,11 @@ public class IUserService implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return Optional.ofNullable(userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found")));
+    }
+
 
     @Override
     public UserResponse getUserById(Long id) {

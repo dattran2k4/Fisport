@@ -3,9 +3,7 @@ package com.fisport.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -21,12 +19,15 @@ public class FieldType extends AbstractEntity {
     @Column(nullable = false, unique = true)
     private String slug;
 
-    @OneToMany(mappedBy = "fieldType",  fetch = FetchType.EAGER,  cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "fieldType", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Field> fields = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "fieldType")
-    private Set<FieldTypeBookDuration>  fieldTypeBookDuration = new LinkedHashSet<>();
+    private Set<FieldTypeBookDuration> fieldTypeBookDuration = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "sport")
-    private Set<UserSportElo>  sportElos = new HashSet<>();
+    @OneToMany(mappedBy = "fieldType")
+    private Set<UserSportElo> sportElos = new HashSet<>();
+
+    @OneToMany(mappedBy = "fieldType")
+    private List<ChallengeMatchType> challengeMatchTypes = new ArrayList<>();
 }

@@ -12,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import vn.payos.model.webhooks.WebhookData;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -21,15 +23,16 @@ import java.util.Optional;
 @Service
 public class WalletPaymentServiceImpl implements WalletPaymentService {
 
-    private final VnPayService  vnPayService;
+    private final VnPayService vnPayService;
     private final WalletService walletService;
     private final PaymentService paymentService;
-    private final PaymentRepository  paymentRepository;
+    private final PaymentRepository paymentRepository;
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
     private final WalletRepository walletRepository;
     private final BookingRepository bookingRepository;
-    private final ChallengeMatchRepository  challengeMatchRepository;
+    private final ChallengeMatchRepository challengeMatchRepository;
+    private final ChallengeParticipantRepository challengeParticipantRepository;
 
     @Transactional
     @Override
@@ -43,7 +46,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         Long paymentId = vnPayService.extractId(params);
         Payment payment = paymentService.getPaymentById(paymentId);
 
-        Transaction transaction =  transactionRepository.findByPayment(payment).orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
+        Transaction transaction = transactionRepository.findByPayment(payment).orElseThrow(() -> new ResourceNotFoundException("Payment not found"));
         if (transaction == null) {
             throw new ResourceNotFoundException("Transaction not found");
         }
@@ -90,7 +93,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
 
         Payment payment = paymentRepository.findById(paymentId).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy payment"));
 
-        Transaction transaction =  transactionRepository.findByPayment(payment).orElseThrow(()  -> new ResourceNotFoundException("Không tìm thấy transaction"));
+        Transaction transaction = transactionRepository.findByPayment(payment).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy transaction"));
         log.info("handlePayOSReturn called, transactionId = {}", transaction.getId());
 
         if (data.getCode().equals("00") && data.getDesc().equals("success")) {
@@ -115,6 +118,9 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
     @Override
     public void payBooking(String paymentToken, String username) {
         Booking booking = paymentService.findByPaymentToken(paymentToken);
+
+        User owner = booking.getSubfield().getField().getOwner();
+        Wallet ownerWallet = owner.getWallet();
 
         if (!booking.getBookingStatus().equals(EBookingStatus.PENDING)) {
             throw new InvalidDataException("Payment paid already");
@@ -141,7 +147,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         if (wallet.getBalance().compareTo(transaction.getAmount()) < 0) {
             transaction.setStatus(ETransactionStatus.FAILED);
             transactionRepository.save(transaction);
-            log.warn("Balance of userId {} not enough for bookingId ", username,  booking.getId());
+            log.warn("Balance of userId {} not enough for bookingId ", username, booking.getId());
             throw new InvalidDataException("Not enough balance");
         }
 
@@ -151,9 +157,23 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         transactionRepository.save(transaction);
         log.info("Transaction update status: " + transaction.getStatus());
 
+
         booking.setBookingStatus(EBookingStatus.PAID);
         bookingRepository.save(booking);
-        log.info("Booking {} paid",  booking.getId());
+        log.info("Booking {} paid", booking.getId());
+
+        Transaction ownerTracsaction = Transaction.builder()
+                .wallet(ownerWallet)
+                .type(ETransactionType.RECEIVED)
+                .amount(booking.getTotalPrice())
+                .status(ETransactionStatus.SUCCESS)
+                .method(EPaymentMethod.WALLET)
+                .booking(booking)
+                .build();
+
+        transactionRepository.save(ownerTracsaction);
+
+        walletService.creditWallet(ownerTracsaction);
 
         ChallengeMatch match = challengeMatchRepository.findByBooking(booking).orElse(null);
 
@@ -172,8 +192,10 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new RuntimeException("Booking not found"));
 
         User user = booking.getUser();
+        User owner = booking.getSubfield().getField().getOwner();
 
         Wallet wallet = walletRepository.findByUser(user);
+        Wallet ownerWallet = owner.getWallet();
 
         if (!booking.getBookingStatus().equals(EBookingStatus.PAID)) {
             throw new InvalidDataException("Invalid booking status");
@@ -207,4 +229,93 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
             throw new InvalidDataException("Refund failed: " + e.getMessage());
         }
     }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void payChallengeMatch(Long matchId, String username) {
+        ChallengeMatch match = challengeMatchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException("Match not found"));
+
+        User player = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        ChallengeParticipant pariticipant = challengeParticipantRepository.findByUserIdAndMatchId(player.getId(), matchId).orElseThrow(() -> new ResourceNotFoundException("Không có sự tham gia nào ở đây"));
+
+        if (!pariticipant.getStatus().equals(EParticipantStatus.ACCEPTED)) {
+            throw new InvalidDataException("Bạn chưa được chấp nhận tham gia trận đấu");
+        }
+
+        if (pariticipant.isPaid()) {
+            throw new InvalidDataException("Bạn đã trả tiền rồi");
+        }
+
+        if (player.getWallet().getBalance().compareTo(match.getParticipationFee()) < 0) {
+            throw new InvalidDataException("Số dư không đủ");
+        }
+
+        Transaction transactionPlayer = Transaction.builder()
+                .status(ETransactionStatus.SUCCESS)
+                .method(EPaymentMethod.WALLET)
+                .amount(match.getParticipationFee())
+                .type(ETransactionType.PAYMENT)
+                .wallet(player.getWallet())
+                .build();
+
+        transactionRepository.save(transactionPlayer);
+
+        walletService.debitWallet(player.getWallet().getId(), transactionPlayer);
+        log.info("playerId {} paid {}", player.getId(), transactionPlayer.getAmount());
+
+        Transaction transactionCreator = Transaction.builder()
+                .amount(transactionPlayer.getAmount())
+                .wallet(match.getCreator().getWallet())
+                .type(ETransactionType.RECEIVED)
+                .method(EPaymentMethod.WALLET)
+                .status(ETransactionStatus.SUCCESS)
+                .build();
+
+        transactionRepository.save(transactionCreator);
+
+        walletService.creditWallet(transactionCreator);
+        log.info("creatorId {} recevied {}", match.getCreator().getId(), transactionCreator.getAmount());
+
+        pariticipant.setPaid(true);
+        pariticipant.setPaidAt(LocalDateTime.now());
+
+        challengeParticipantRepository.save(pariticipant);
+
+        log.info("PlayerId {} pay success for MatchId {}", player.getId(), matchId);
+    }
+
+    @Override
+    @Transactional
+    public void refund(Long fromUserId, Long toUserId, BigDecimal amount) {
+        User userFrom = userRepository.findById(fromUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        User toUser = userRepository.findById(toUserId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Transaction userFromTransaction = Transaction.builder()
+                .status(ETransactionStatus.SUCCESS)
+                .method(EPaymentMethod.WALLET)
+                .amount(amount)
+                .type(ETransactionType.REFUND)
+                .wallet(userFrom.getWallet())
+                .build();
+
+
+        walletService.debitWallet(userFrom.getWallet().getId(), userFromTransaction);
+        transactionRepository.save(userFromTransaction);
+
+        Transaction toUserTransaction = Transaction.builder()
+                .status(ETransactionStatus.SUCCESS)
+                .method(EPaymentMethod.WALLET)
+                .amount(amount)
+                .type(ETransactionType.RECEIVED)
+                .wallet(toUser.getWallet())
+                .build();
+
+        walletService.creditWallet(toUserTransaction);
+        transactionRepository.save(toUserTransaction);
+
+    }
+
+
 }

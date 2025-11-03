@@ -2,6 +2,7 @@ package com.fisport.service.impl;
 
 import com.fisport.common.ETransactionStatus;
 import com.fisport.dto.response.WalletResponse;
+import com.fisport.exception.InvalidDataException;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.Transaction;
 import com.fisport.model.User;
@@ -59,12 +60,17 @@ public class WalletServiceImpl implements WalletService {
 
     @Override
     @Transactional
-    public void debitWallet(Long wardId, Transaction transaction) {
-        Wallet wallet = walletRepository.findById(wardId).orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
+    public void debitWallet(Long walletId, Transaction transaction) {
+        Wallet wallet = walletRepository.findById(walletId).orElseThrow(() -> new ResourceNotFoundException("Wallet not found"));
+
+        if (wallet.getBalance().compareTo(transaction.getAmount()) < 0) {
+            throw new InvalidDataException("Số dự không đủ");
+        }
+
         wallet.setBalance(wallet.getBalance().subtract(transaction.getAmount()));
         walletRepository.save(wallet);
 
-        log.info("Wallet credited: userId={}, txId={}, amount={}",  wallet.getUser().getId(), transaction.getId(), transaction.getAmount());
+        log.info("Wallet debited: userId={}, txId={}, amount={}", wallet.getUser().getId(), transaction.getId(), transaction.getAmount());
     }
 
     @Override
