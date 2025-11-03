@@ -228,7 +228,7 @@
                     </th:block>
                 </select>
 
-                <select id="matchTypeId" name="matchTypeId">
+                <select id="typeId" name="typeId">
                     <option value="">Tất cả loại</option>
                     <th:block th:each="mt : ${matchTypes}">
                         <option th:value="${mt.id}" th:text="${mt.name}"></option>
@@ -310,7 +310,7 @@
     <section layout:fragment="scripts">
         <script th:inline="javascript">
             $(document).ready(function () {
-                const filters = ["status", "matchTypeId", "level", "sportId", "cityId"];
+                const filters = ["status", "typeId", "level", "sportId", "cityId"];
                 const container = $(".grid");
 
                 filters.forEach(id => {
