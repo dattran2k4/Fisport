@@ -3,15 +3,8 @@
     layout:decorate="~{layout/web/web}">
 
 <head>
-    <meta charset="UTF-8">
     <title>Thách đấu</title>
     <style>
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
         h1 {
             font-size: 2rem;
             font-weight: bold;
@@ -65,12 +58,17 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .card-header h2 {
             font-size: 1.25rem;
             font-weight: 600;
             color: #111;
+            margin: 0;
+            flex: 1 1 auto;
+            word-break: break-word;
         }
 
         .card-body {
@@ -86,16 +84,13 @@
 
 
         .badge {
-            padding: 5px 10px;
+            padding: 5px 12px;
             border-radius: 12px;
             font-size: 0.8rem;
             font-weight: 600;
             text-transform: uppercase;
-            color: #fff;
-        }
-
-        .badge-new {
-            background-color: #6c757d;
+            display: inline-block;
+            white-space: nowrap;
         }
 
         .badge-pending {
@@ -105,7 +100,25 @@
 
         .badge-confirmed {
             background-color: #28a745;
+            color: #fff;
         }
+
+        .badge-full {
+            background-color: #6c757d;
+            color: #fff;
+        }
+
+        .badge-matched {
+            background-color: #0d6efd;
+            color: #fff;
+        }
+
+        .badge-cancelled {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+
 
         .card p {
             font-size: 0.9rem;
@@ -150,15 +163,6 @@
         }
 
         /* Button */
-        .btn {
-            padding: 10px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            width: 100%;
-        }
 
         .btn-join {
             background: linear-gradient(90deg, #4ade80, #22c55e);
@@ -212,8 +216,8 @@
 
 <body>
     <div layout:fragment="content">
-        <div class="container">
-            <h1>All Challenge Matches</h1>
+        <div class="container my-5">
+            <h1>Tất cả trận đấu</h1>
 
             <!-- Filter Bar -->
             <div class="filter-bar">
@@ -258,8 +262,12 @@
                 <div class="card" th:each="match : ${matches.data}">
                     <div class="card-header">
                         <h2 th:text="${match.title}">Match Title</h2>
-                        <span th:text="${match.status}"
-                            th:classappend="${match.status == 'OPEN' ? ' badge-pending' : (match.status == 'PENDING' ? ' badge-confirmed' : ' badge-other')}">
+                        <span th:text="${match.status.value}" th:classappend="${match.status.name() == 'OPEN' ? 'badge badge-pending'
+                      : match.status.name() == 'PENDING' ? 'badge badge-confirmed'
+                      : match.status.name() == 'FULL' ? 'badge badge-full'
+                      : match.status.name() == 'MATCHED' ? 'badge badge-matched'
+                      : match.status.name() == 'CANCELLED' ? 'badge badge-cancelled'
+                      : 'badge'}">
                         </span>
                     </div>
 
@@ -323,7 +331,7 @@
                         success: function (json) {
                             const matches = json.data?.data;
 
-                            container.empty(); 
+                            container.empty();
 
                             if (!matches || matches.length === 0) {
                                 container.html("<p>Không tìm thấy trận đấu nào.</p>");
@@ -337,11 +345,12 @@
                         <div class="card">
                             <div class="card-header">
                                 <h2>${m.title}</h2>
-                                <span class="badge ${m.status === "OPEN"
-                                        ? "badge-pending"
-                                        : m.status === "PENDING"
-                                            ? "badge-confirmed"
-                                            : "badge-new"
+                                 <span class="badge ${m.status === "OPEN" ? "badge-pending" :
+                                        m.status === "PENDING" ? "badge-confirmed" :
+                                            m.status === "FULL" ? "badge-full" :
+                                                m.status === "MATCHED" ? "badge-matched" :
+                                                    m.status === "CANCELLED" ? "badge-cancelled" :
+                                                        "badge"
                                     }">${m.status}</span>
                             </div>
                             <div class="card-body">
