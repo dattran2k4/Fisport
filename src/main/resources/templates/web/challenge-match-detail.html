@@ -1,245 +1,249 @@
 <!DOCTYPE html>
 <html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorate="~{layout/web/web}">
+      layout:decorate="~{layout/web/web}">
 
 <head>
-  <title>Chi tiết trận đấu</title>
-  <style>
-    body {
-      background-color: #f8f9fa;
-    }
+    <title>Chi tiết trận đấu</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
 
-    .match-card {
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+        .match-card {
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
 
-    .team-card {
-      border-radius: 8px;
-      background-color: #fff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
+        .team-card {
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
 
-    .participant {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem 1rem;
-      border-bottom: 1px solid #e9ecef;
-    }
+        .participant {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
 
-    .participant:last-child {
-      border-bottom: none;
-    }
+        .participant:last-child {
+            border-bottom: none;
+        }
 
-    .level-badge {
-      font-size: 0.8rem;
-    }
-  </style>
+        .level-badge {
+            font-size: 0.8rem;
+        }
+    </style>
 </head>
 
 <body>
-  <div layout:fragment="content">
+<div layout:fragment="content">
     <div class="container my-5">
 
-      <!-- Nút Trở về -->
-      <div class="mb-3">
-        <a th:href="@{/thach-dau}" class="btn btn-outline-secondary">
-          <i class="bi bi-arrow-left-circle"></i> Trở về
-        </a>
-      </div>
+        <!-- Nút Trở về -->
+        <div class="mb-3">
+            <a th:href="@{/thach-dau}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Trở về
+            </a>
+        </div>
 
-      <!-- Match Detail Card -->
-      <div class="card match-card p-4 mb-5">
-        <div class="d-flex justify-content-between align-items-start mb-3">
-          <h3 class="fw-bold"><i class="bi bi-trophy-fill text-warning"></i>
-            <span th:text="${match.title}">Match Title</span>
-            Friendly Match
-          </h3>
-          <span class="badge fs-6" th:text="'Trạng thái: ' + ${match.challengeStatus.value}">Status</span>
-        </div>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <p><i class="bi bi-person-fill"></i> Chủ kèo: <strong th:text="${match.creator}">Creator Name</strong></p>
-            <p><i class="bi bi-gender-ambiguous"></i> Giới tính: <strong th:text="${match.gender}">Gender</strong></p>
-            <p><i class="bi bi-people-fill"></i> Số người chơi hiện tại:
-              <strong th:text="${match.currentPlayers} + ' / ' + ${match.maxPlayers}">0 / 0</strong>
-            </p>
-            <p><i class="bi bi-currency-dollar"></i> Phí tham gia: <strong th:text="${match.fee}">0</strong></p>
-          </div>
-          <div class="col-md-6">
-            <p><i class="bi bi-flag-fill"></i> Khu vực:
-              <strong th:text="${match.ward} + ', ' + ${match.city}">Ward, City</strong>
-            </p>
-            <p><i class="bi bi-clock-fill"></i> Thời gian diễn ra:
-              <strong th:text="${match.startTime} + ' - ' + ${match.endTime}">00:00 - 00:00</strong>
-            </p>
-            <p><i class="bi bi-calendar-event-fill"></i> Ngày:
-              <strong th:text="${match.date}">YYYY-MM-DD</strong>
-            </p>
-            <p><i class="bi bi-info-circle-fill"></i> Ghi chú:
-              <strong th:text="${match.note}">Note</strong>
-            </p>
-          </div>
-        </div>
-        <div>
+        <!-- Match Detail Card -->
+        <div class="card match-card p-4 mb-5">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <h3 class="fw-bold"><i class="bi bi-trophy-fill text-warning"></i>
+                    <span th:text="${match.title}">Match Title</span>
+                </h3>
+                <span class="badge fs-6" th:text="'Trạng thái: ' + ${match.challengeStatus.value}">Status</span>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><i class="bi bi-person-fill"></i> Chủ kèo: <strong th:text="${match.creator}">Creator
+                        Name</strong></p>
+                    <p><i class="bi bi-gender-ambiguous"></i> Giới tính: <strong
+                            th:text="${match.gender}">Gender</strong></p>
+                    <p><i class="bi bi-people-fill"></i> Số người chơi hiện tại:
+                        <strong th:text="${match.currentPlayers} + ' / ' + ${match.maxPlayers}">0 / 0</strong>
+                    </p>
+                    <p><i class="bi bi-currency-dollar"></i> Phí tham gia: <strong th:text="${match.fee}">0</strong></p>
+                </div>
+                <div class="col-md-6">
+                    <p><i class="bi bi-flag-fill"></i> Khu vực:
+                        <strong th:text="${match.ward} + ', ' + ${match.city}">Ward, City</strong>
+                    </p>
+                    <p><i class="bi bi-clock-fill"></i> Thời gian diễn ra:
+                        <strong th:text="${match.startTime} + ' - ' + ${match.endTime}">00:00 - 00:00</strong>
+                    </p>
+                    <p><i class="bi bi-calendar-event-fill"></i> Ngày:
+                        <strong th:text="${match.date}">YYYY-MM-DD</strong>
+                    </p>
+                    <p><i class="bi bi-info-circle-fill"></i> Ghi chú:
+                        <strong th:text="${match.note}">Note</strong>
+                    </p>
+                </div>
+            </div>
+            <div>
           <span class="badge bg-primary level-badge">
             <i class="bi bi-bar-chart-fill"></i>
             Trình độ: <span th:text="${match.level.value}">Level</span>
           </span>
-          <span class="badge bg-secondary level-badge">
+                <span class="badge bg-secondary level-badge">
             <i class="bi bi-basket-fill"></i>
             Loại môn: <span th:text="${match.sport}">Sport</span>
           </span>
-          <span class="badge bg-info level-badge">
+                <span class="badge bg-info level-badge">
             <i class="bi bi-card-list"></i>
             Nội dung thách đấu: <span th:text="${match.matchType}">Match Type</span>
           </span>
-        </div>
-      </div>
-
-      <div class="row g-4">
-        <div class="col-md-12">
-          <div class="card p-3">
-            <h5 class="fw-bold mb-3"><i class="bi bi-people-fill"></i> Danh sách người chơi đang tham gia</h5>
-
-            <table class="table table-bordered table-striped mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Người chơi</th>
-                  <th>Giới tính</th>
-                  <th>Đội</th>
-                  <th>ELO</th>
-                  <th>Trình độ</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr th:each="player : ${participants}">
-                  <td th:text="${player.username}">Player Name</td>
-                  <td th:text="${player.playerGender.value}">Player Name</td>
-                  <td th:text="${player.team.value}">Team</td>
-                  <td th:text="${player.playerElo}">0</td>
-                  <td th:text="${player.playerLevel.value}">Level</td>
-                </tr>
-              </tbody>
-            </table>
-            <!-- Nút Tham gia -->
-            <div class="mt-3 text-end">
-              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#joinMatchModal">
-                <i class="bi bi-person-plus-fill"></i> Tham gia
-              </button>
             </div>
+        </div>
 
-            <!-- Join Match Modal -->
-            <div class="modal fade" id="joinMatchModal" tabindex="-1" aria-labelledby="joinMatchModalLabel"
-              aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 shadow-lg">
-                  <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title fw-bold" id="joinMatchModalLabel">
-                      <i class="bi bi-person-plus-fill"></i> Yêu cầu tham gia trận đấu
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                      aria-label="Đóng"></button>
-                  </div>
+        <div class="row g-4">
+            <div class="col-md-12">
+                <div class="card p-3">
+                    <h5 class="fw-bold mb-3"><i class="bi bi-people-fill"></i> Danh sách người chơi đang tham gia</h5>
 
-                  <div class="modal-body">
-                    <form id="joinMatchForm" class="needs-validation" novalidate>
-                      <div class="mb-3">
-                        <label class="form-label fw-semibold">Tin nhắn gửi chủ kèo</label>
-                        <textarea class="form-control" name="message" rows="3" maxlength="200" required
-                          placeholder="Ví dụ: Cho mình tham gia nhé!"></textarea>
-                        <div class="form-text text-muted">Tối đa 200 ký tự.</div>
-                      </div>
+                    <table class="table table-bordered table-striped mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Người chơi</th>
+                            <th>Giới tính</th>
+                            <th>Đội</th>
+                            <th>ELO</th>
+                            <th>Trình độ</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="player : ${participants}">
+                            <td th:text="${player.username}">Player Name</td>
+                            <td th:text="${player.playerGender.value}">Player Name</td>
+                            <td th:text="${player.team.value}">Team</td>
+                            <td th:text="${player.playerElo}">0</td>
+                            <td th:text="${player.playerLevel.value}">Level</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <!-- Nút Tham gia -->
+                    <div class="mt-3 text-end">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#joinMatchModal">
+                            <i class="bi bi-person-plus-fill"></i> Tham gia
+                        </button>
+                    </div>
 
-                      <div class="mb-3">
-                        <label class="form-label fw-semibold">Chọn đội</label>
-                        <select class="form-select" name="team" required>
-                          <option value="">-- Chọn đội --</option>
-                          <option th:value="${teamA}" th:disabled="${teamAPlayer >= maxPlayersPerTeam}"
-                            th:text="${'🅰️ ' + teamA.value + ' (' + (teamAPlayer ?: 0) + '/' + maxPlayersPerTeam + ')'}">
-                          </option>
-                          <option th:value="${teamB}" th:disabled="${teamBPlayer >= maxPlayersPerTeam}"
-                            th:text="${'🅱️ ' + teamB.value + ' (' + (teamBPlayer ?: 0) + '/' + maxPlayersPerTeam + ')'}">
-                          </option>
-                        </select>
-                        <div class="form-text text-muted">
-                          Mỗi đội tối đa <span th:text="${maxPlayersPerTeam}">X</span> người.
+                    <!-- Join Match Modal -->
+                    <div class="modal fade" id="joinMatchModal" tabindex="-1" aria-labelledby="joinMatchModalLabel"
+                         aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow-lg">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title fw-bold" id="joinMatchModalLabel">
+                                        <i class="bi bi-person-plus-fill"></i> Yêu cầu tham gia trận đấu
+                                    </h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                                            aria-label="Đóng"></button>
+                                </div>
+
+                                <div class="modal-body">
+                                    <form id="joinMatchForm" class="needs-validation" novalidate>
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Tin nhắn gửi chủ kèo</label>
+                                            <textarea class="form-control" name="message" rows="3" maxlength="200"
+                                                      required
+                                                      placeholder="Ví dụ: Cho mình tham gia nhé!"></textarea>
+                                            <div class="form-text text-muted">Tối đa 200 ký tự.</div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold">Chọn đội</label>
+                                            <select class="form-select" name="team" required>
+                                                <option value="">-- Chọn đội --</option>
+                                                <option th:value="${teamA}"
+                                                        th:disabled="${teamAPlayer >= maxPlayersPerTeam}"
+                                                        th:text="${'🅰️ ' + teamA.value + ' (' + (teamAPlayer ?: 0) + '/' + maxPlayersPerTeam + ')'}">
+                                                </option>
+                                                <option th:value="${teamB}"
+                                                        th:disabled="${teamBPlayer >= maxPlayersPerTeam}"
+                                                        th:text="${'🅱️ ' + teamB.value + ' (' + (teamBPlayer ?: 0) + '/' + maxPlayersPerTeam + ')'}">
+                                                </option>
+                                            </select>
+                                            <div class="form-text text-muted">
+                                                Mỗi đội tối đa <span th:text="${maxPlayersPerTeam}">X</span> người.
+                                            </div>
+                                            <div class="modal-footer d-flex justify-content-between">
+                                                <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                                    <i class="bi bi-arrow-left-circle"></i> Trở về
+                                                </button>
+                                                <button type="submit" class="btn btn-primary" id="btnJoinSubmit">
+                                                    <i class="bi bi-send-fill"></i> Gửi yêu cầu
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+
+                            </div>
                         </div>
-                        <div class="modal-footer d-flex justify-content-between">
-                          <button class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                            <i class="bi bi-arrow-left-circle"></i> Trở về
-                          </button>
-                          <button type="submit" class="btn btn-primary" id="btnJoinSubmit">
-                            <i class="bi bi-send-fill"></i> Gửi yêu cầu
-                          </button>
-                        </div>
-                      </div>
-                    </form>
-                  </div>
-
-
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
 
 
     </div>
-  </div>
-  <section layout:fragment="scripts">
+</div>
+<section layout:fragment="scripts">
     <script th:inline="javascript">
-      $(document).ready(function () {
-        $('#joinMatchForm').on('submit', function (e) {
-          e.preventDefault();
-          const matchId = /*[[${match.id}]]*/ 0;
-          const formData = {};
-          $(this).serializeArray().forEach(f => formData[f.name] = f.value);
-          if (!formData.message?.trim() || !formData.team) {
-            Swal.fire({
-              icon: 'warning',
-              title: 'Thiếu thông tin!',
-              text: 'Vui lòng nhập tin nhắn và chọn đội trước khi gửi.'
-            });
-            return;
-          }
-          $.ajax({
-            url: `/api/v1/challenge-matchs/${matchId}/join`,
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(formData),
-            success: function (res) {
-              if (res.status === 202) {
-                Swal.fire({
-                  icon: 'success',
-                  title: 'Thành công!',
-                  text: res.message || 'Yêu cầu tham gia đã được gửi.',
-                  timer: 5000,
-                  showConfirmButton: false
-                }).then(() => window.location.reload());
-              } else {
-                Swal.fire({
-                  icon: 'error',
-                  title: 'Thất bại!',
-                  text: res.message || 'Có lỗi xảy ra, vui lòng thử lại.'
+        $(document).ready(function () {
+            $('#joinMatchForm').on('submit', function (e) {
+                e.preventDefault();
+                const matchId = /*[[${match.id}]]*/ 0;
+                const formData = {};
+                $(this).serializeArray().forEach(f => formData[f.name] = f.value);
+                if (!formData.message?.trim() || !formData.team) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Thiếu thông tin!',
+                        text: 'Vui lòng nhập tin nhắn và chọn đội trước khi gửi.'
+                    });
+                    return;
+                }
+                $.ajax({
+                    url: `/api/v1/challenge-matchs/${matchId}/join`,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (res) {
+                        if (res.status === 202) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Thành công!',
+                                text: res.message || 'Yêu cầu tham gia đã được gửi.',
+                                timer: 5000,
+                                showConfirmButton: false
+                            }).then(() => window.location.reload());
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Thất bại!',
+                                text: res.message || 'Có lỗi xảy ra, vui lòng thử lại.'
+                            });
+                        }
+                    },
+                    error: function (xhr) {
+                        const errMsg = xhr.responseJSON?.message || 'Có lỗi xảy ra, vui lòng thử lại.';
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Thất bại!',
+                            text: errMsg
+                        });
+                    }
                 });
-              }
-            },
-            error: function (xhr) {
-              const errMsg = xhr.responseJSON?.message || 'Có lỗi xảy ra, vui lòng thử lại.';
-              Swal.fire({
-                icon: 'error',
-                title: 'Thất bại!',
-                text: errMsg
-              });
-            }
-          });
 
+            });
         });
-      });
     </script>
-  </section>
+</section>
 </body>
 
 </html>

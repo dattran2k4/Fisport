@@ -13,7 +13,7 @@ INSERT INTO user (username, email, password, phone, birth_day, status, gender, i
 VALUES
     ('dattran0901', 'tranquocdat@gmail.com', '$2a$10$s3go5e.GYivSMmrJXG6jceddjfSAbg6O832Sip8XIVNRRLIjXNP6G', '0785819692', '2004-01-09', 'ACTIVE', 'MALE', 0, NULL, 1),
     ('johndoe', 'dattranquoc@gmail.com', '$2a$10$EeSehs49igNMz6Vuk69cDuaAGHFrWSjeOvMmNkaAr6ZwyZtltKStS', '0912345678', '1998-08-15', 'ACTIVE', 'FEMALE', 0,  NULL, 2),
-    ('vitidsarn', 'dattran@gmail.com', '$2a$10$llGgE5VlZzM0.pCzbOLGWev.cqdovrjSsq0lGM87wo0FVgATXsh12', '0934567890', '1990-01-10', 'ACTIVE', 'MALE', 0, NULL, 3),
+    ('vitidsarn', 'dattran@gmail.com', '$2a$10$llGgE5VlZzM0.pCzbOLGWev.cqdovrjSsq0lGM87wo0FVgATXsh12', '0934567890', '1990-01-10', 'ACTIVE', 'FEMALE', 0, NULL, 3),
     ('dt12', 'tranquocthanhdat@gmail.com', '$2a$10$L1RrZcmnBVdz5EzZ9LtP9eNcPV1CiYvKwhEK/Qs9ocuqHakirdqg6', '0785819680', '2004-09-20', 'ACTIVE', 'MALE', 1, '4EFZSYXKQ6BFDGMAXWQKSFSTZFUYYLQD', 2);
 
 
@@ -491,15 +491,18 @@ VALUES
 
 INSERT INTO booking (booking_date, payment_method, start_time, end_time, duration, total_price, status, subfield_id, user_id, created_at, expired_at)
 VALUES
-(DATE_ADD(CURDATE(), INTERVAL -1 DAY), 'VNPAY', '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 2, DATE_ADD(CURDATE(), INTERVAL -2 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 15 MINUTE)),
+(DATE_ADD(CURDATE(), INTERVAL -1 DAY), 'VNPAY', '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 1, DATE_ADD(CURDATE(), INTERVAL -2 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 15 MINUTE)),
 (DATE_ADD(CURDATE(), INTERVAL -3 DAY), 'PAYOS', '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 2, DATE_ADD(CURDATE(), INTERVAL -4 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -4 DAY), INTERVAL 15 MINUTE)),
-(DATE_ADD(CURDATE(), INTERVAL 6 DAY), 'MOMO', '18:00:00', '19:30:00', 90, 200000.00, 'PAID', 27, 2, DATE_ADD(CURDATE(), INTERVAL -2 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 5 DAY), INTERVAL 15 MINUTE)),
+(DATE_ADD(CURDATE(), INTERVAL 6 DAY), 'MOMO', '18:00:00', '19:30:00', 120, 200000.00, 'PAID', 27, 3, DATE_ADD(CURDATE(), INTERVAL -2 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 5 DAY), INTERVAL 15 MINUTE)),
 (DATE_ADD(CURDATE(), INTERVAL 2 DAY), 'ZALOPAY', '19:00:00', '20:00:00', 60, 120000.00, 'PAID', 26, 2, DATE_ADD(CURDATE(), INTERVAL -1 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 5 DAY), INTERVAL 15 MINUTE)),
 
 (DATE_ADD(CURDATE(), INTERVAL -2 DAY), 'PAYOS', '08:00:00', '09:00:00', 60, 120000.00, 'COMPLETED', 26, 4, DATE_ADD(CURDATE(), INTERVAL -3 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -3 DAY), INTERVAL 15 MINUTE)),
 (DATE_ADD(CURDATE(), INTERVAL 5 DAY), 'VNPAY', '18:00:00', '19:30:00', 90, 180000.00, 'PENDING', 3, 4, DATE_SUB(NOW(), INTERVAL 3 MINUTE), DATE_SUB(NOW(), INTERVAL 15 MINUTE)),
 (DATE_ADD(CURDATE(), INTERVAL 5 DAY), 'PAYOS', '09:00:00', '10:00:00', 60, 150000.00, 'CANCELLED', 5, 4, DATE_ADD(CURDATE(), INTERVAL 4 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 4 DAY), INTERVAL 15 MINUTE)),
-(DATE_ADD(CURDATE(), INTERVAL 6 DAY), 'VNPAY', '17:30:00', '18:00:00', 90, 220000.00, 'PENDING', 27, 4, DATE_SUB(NOW(), INTERVAL 2 MINUTE), DATE_SUB(NOW(), INTERVAL 15 MINUTE));
+(DATE_ADD(CURDATE(), INTERVAL 6 DAY), 'VNPAY', '17:30:00', '18:00:00', 90, 220000.00, 'PAID', 27, 4, DATE_SUB(NOW(), INTERVAL 2 MINUTE), DATE_SUB(NOW(), INTERVAL 15 MINUTE)),
+--PAID
+(DATE_ADD(CURDATE(), INTERVAL 4 DAY), 'MOMO', '18:00:00', '19:30:00', 60, 190000.00, 'PAID', 27, 2, DATE_ADD(CURDATE(), INTERVAL -3 DAY), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -3 DAY), INTERVAL 15 MINUTE));
+
 
 INSERT INTO payment (booking_id, method, status, amount, transaction_code, payment_time, created_at)
 VALUES
@@ -515,48 +518,88 @@ VALUES
 INSERT INTO review (rating, comment, user_id, field_id, booking_id, create_at, updated_at)
 VALUES
 (5, 'Dịch vụ rất tốt, hài lòng!', 2, 26, 1, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -1 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -1 DAY), INTERVAL 1 HOUR)),
-(5, 'Rất chuyên nghiệp và nhiệt tình.', 2, 26, 4, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 6 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 6 DAY), INTERVAL 1 HOUR)),
-(4, 'Ok, sẽ quay lại lần sau.', 4, 26, 5, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 1 HOUR));
+(5, 'Rất chuyên nghiệp và nhiệt tình.', 2, 26, 5, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 6 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 6 DAY), INTERVAL 1 HOUR)),
+(4, 'Ok, sẽ quay lại lần sau.', 4, 26, 6, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 1 HOUR));
 
 INSERT INTO Wallet (balance, created_at, updated_at, user_id)
 VALUES
-(0, NOW(), NOW(), 1),
+(500000, NOW(), NOW(), 1),
 (2000000, NOW(), NOW(), 2),
-(0, NOW(), NOW(), 3),
+(600000, NOW(), NOW(), 3),
 (500000, NOW(), NOW(), 4);
 
 INSERT INTO challenge_match_type(name, max_players, field_type_id)
 VALUES
-("Đơn", 2, 6),
+("Đơn nam", 2, 6),
 ("Đôi nam", 4, 6),
+("Đơn nữ", 2, 6),
 ("Đôi nữ", 4, 6),
-("Đôi nam nữ", 4, 6);
+("Đôi nam nữ", 4, 6),
+("5V5", 10, 1),
+("7V7", 14, 1),
+("9V9", 18, 1),
+("11V11", 22, 1),
+("Đôi nam nữ", 4, 1),
+("Đơn name", 2, 2),
+("Đôi nam", 4, 2),
+("Đơn nữ", 2, 2),
+("Đôi nữ", 4, 2),
+("Đôi nam nữ", 4, 2);
+
+
 
 INSERT INTO challenge_match
 (creator_id, challenge_match_type_id, field_type_id, title, suggested_level, fee, note, status, booking_id, created_at, updated_at)
 VALUES
-(1, 1, 6,  'Thách đấu giao hữu sân 5', 'TRUNGBINH', 50000,   'Giao hữu vui vẻ, không phân biệt trình độ.', 'PENDING', 1, NOW(), NOW()),
 
-(2, 2, 6,  'Giao hữu chiều thứ 4', 'KHA', 80000,  'Ưu tiên các bạn đá cánh nhanh nhẹn.', 'MATCHED', 2, NOW(), NOW()),
+-- BookingID: 1: COMPLETED, US 1
+(1, 1, 6,  'Bạn có dám?', 'TRUNGBINH', 50000,   'Giao hữu vui vẻ, không phân biệt trình độ.', 'MATCHED', 1, NOW(), NOW()),
 
-(3, 4, 6,  'Trận test sân mới', 'TRUNGBINH_KHA', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
+-- BK:2: COMPLETE, US 2
+(2, 2, 6,  'Lâu ngày không gặp', 'KHA', 80000,  'Ưu tiên các bạn đá cánh nhanh nhẹn.', 'MATCHED', 2, NOW(), NOW()),
 
---(1, 3, 1,  'Trận test sân mới', 'TRUNGBINH', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
+-- BK: 3: PAID, US 3
+(3, 5, 6,  'Kiếm tí mồ hôi', 'TRUNGBINH_KHA', 0,   'Không có gì', 'OPEN', 3, NOW(), NOW()),
+
+-- BK: 9 PAID, US 2
+(2, 2, 6,  'Cuộc chiến sinh tử', 'TRUNGBINH', 0,   'Đánh xong đi nhậu', 'PENDING', 9, NOW(), NOW()),
+
+-- BK: 8 PAID, US 4
+(4, 1, 6,  'Thử thách bạn chơi', 'YEU', 0,   'Đánh uống bia', 'FULL', 8, NOW(), NOW());
+
+-- (3, 3, 1,  'Trận test sân mới', 'YEU', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
 --
---(3, 3, 1,  'Trận test sân mới', 'YEU', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
+-- (4, 3, 1,  'Trận test sân mới', 'YEU', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
 --
---(4, 3, 1,  'Trận test sân mới', 'YEU', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
---
---(4, 3, 1,  'Trận test sân mới', 'YEU', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
+-- (4, 3, 1,  'Trận test sân mới', 'YEU', 0,   'Test sân trước giải đấu nội bộ.', 'OPEN', 3, NOW(), NOW());
 
 INSERT INTO challenge_participant
-(match_id, user_id, team, status, request_message, paid, created_at, updated_at)
+(match_id, user_id, team, status, request_message, response_message, paid, created_at, updated_at)
 VALUES
-(1, 2, 'TEAM_A', 'PENDING', 'Cho mình tham gia nhé!', FALSE, NOW(), NOW()),
-(1, 3, 'TEAM_A', 'ACCEPTED', 'Rất mong được đá chung!', TRUE, NOW(), NOW()),
+-- MATCH 1: ĐƠN NAM, MATCHED
+(1, 1, 'TEAM_A', 'ACCEPTED', NULL, NULL, TRUE, NOW(), NOW()),
+(1, 2, 'TEAM_A', 'ACCEPTED', 'Rất mong được giao hữu!', "OK", FALSE, NOW(), NOW()),
 
-(2, 2, 'TEAM_A', 'ACCEPTED', 'Cho mình tham gia trận này.', TRUE, NOW(), NOW()),
-(2, 3, 'TEAM_B', 'ACCEPTED', 'Hi.', TRUE, NOW(), NOW());
+-- MATCH 2: ĐÔI NAM, MATCHED
+(2, 2, 'TEAM_A', 'ACCEPTED', NULL, NULL,  TRUE, NOW(), NOW()),
+(2, 3, 'TEAM_A', 'ACCEPTED', 'Em xin.', 'OK NHE', TRUE, NOW(), NOW()),
+(2, 4, 'TEAM_B', 'ACCEPTED', 'Hi.', 'OK NE', TRUE, NOW(), NOW()),
+(2, 1, 'TEAM_B', 'ACCEPTED', 'Cho t 1 slot.', 'OK BAN', TRUE, NOW(), NOW()),
+
+-- MATCH 3: ĐÔI NAM NỮ, OPEN, VITISARN
+(3, 3, 'TEAM_A', 'ACCEPTED', NULL, NULL, TRUE, NOW(), NOW()),
+
+-- MATCH 4: JOHN DOE, PENDING, ĐÔI NAM
+(4, 2, 'TEAM_A', 'ACCEPTED', NULL, NULL,  TRUE, NOW(), NOW()),
+(4, 4, 'TEAM_A', 'ACCEPTED', 'Cho mình tham gia trận này.', NULL,  FALSE, NOW(), NOW()),
+
+
+-- MATCH 5: US 4, FULL
+(5, 4, 'TEAM_A', 'ACCEPTED', NULL, NULL,  TRUE, NOW(), NOW()),
+(5, 3, 'TEAM_B', 'ACCEPTED', 'Hi.', 'OK NE', TRUE, NOW(), NOW());
+
+-- MATCH 6: DATTRAN0901 FULL
+
 
 
 INSERT INTO user_sport_elo(user_id, field_type_id, level, elo)
@@ -587,6 +630,6 @@ VALUES
 
 
 
-INSERT INTO challenge_result (match_id, team_a_scort, team_b_scort, created_at)
-VALUES
+-- INSERT INTO challenge_result (match_id, team_a_scort, team_b_scort, created_at)
+-- VALUES
 --(2, 1, 2, NOW()),   -- Creator:
