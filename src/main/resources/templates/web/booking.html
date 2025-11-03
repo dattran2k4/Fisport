@@ -11,12 +11,13 @@
 
         .card {
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.3s ease;
         }
+
         .card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
 
         .section-title {
@@ -27,15 +28,20 @@
             margin-bottom: 1rem;
         }
 
-        .hour-btn, .duration-btn, .voucher-btn {
+        .hour-btn,
+        .duration-btn,
+        .voucher-btn {
             border-radius: 8px;
             transition: all 0.2s ease;
         }
-        .hour-btn.active, .duration-btn.active {
+
+        .hour-btn.active,
+        .duration-btn.active {
             background-color: #0d6efd;
             color: #fff;
             font-weight: 600;
         }
+
         .voucher-btn.active {
             background-color: #198754 !important;
             color: #fff;
@@ -48,11 +54,13 @@
             margin-bottom: 4px;
             font-weight: 500;
         }
+
         #grandTotal {
             font-size: 1.3rem;
             font-weight: 700;
             color: #0d6efd;
         }
+
         .sticky-summary {
             position: sticky;
             top: 20px;
@@ -69,11 +77,14 @@
             color: #0d6efd;
         }
 
-        .day-btn, .hour-btn, .duration-btn {
+        .day-btn,
+        .hour-btn,
+        .duration-btn {
             margin: 2px;
         }
 
-        .hour-btn.disabled, .hour-btn:disabled {
+        .hour-btn.disabled,
+        .hour-btn:disabled {
             background-color: #e9ecef !important;
             color: #6c757d !important;
             text-decoration: line-through;
@@ -83,101 +94,109 @@
 
 <body>
     <div layout:fragment="content">
-    <div class="container mt-4">
-        <h2 class="mb-3">Đặt sân: <span th:text="${field.name}"></span></h2>
-        <p>Địa chỉ: <span th:text="${field.address + ', ' + field.ward + ', ' + field.city}"></span></p>
+        <div class="container mt-4">
+            <h2 class="mb-3">Đặt sân: <span th:text="${field.name}"></span></h2>
+            <p>Địa chỉ: <span th:text="${field.address + ', ' + field.ward + ', ' + field.city}"></span></p>
 
-        <!-- Lỗi chung -->
-        <div th:if="${error != null}" class="alert alert-danger">
-            <span th:text="${error}"></span>
-        </div>
+            <!-- Lỗi chung -->
+            <div th:if="${error != null}" class="alert alert-danger">
+                <span th:text="${error}"></span>
+            </div>
 
-        <form th:action="@{/san/{fieldTypeSlug}/{fieldNameSlug}/dat-san(fieldTypeSlug=${field.typeSlug}, fieldNameSlug=${field.slug})}" th:object="${booking}" method="POST" id="bookingForm">
-            <div class="row g-4">
-                <!-- Left Column -->
-                <div class="col-lg-8">
+            <form
+                th:action="@{/san/{fieldTypeSlug}/{fieldNameSlug}/dat-san(fieldTypeSlug=${field.typeSlug}, fieldNameSlug=${field.slug})}"
+                th:object="${booking}" method="POST" id="bookingForm">
+                <div class="row g-4">
+                    <!-- Left Column -->
+                    <div class="col-lg-8">
 
-                    <!-- Chọn ngày -->
-                    <div class="card p-3 mb-3">
-                        <h4 class="section-title">Chọn ngày</h4>
-                        <div class="d-flex flex-wrap mb-3" id="day-container"></div>
-                        <input type="date" class="form-control mb-3" id="customDate">
-                    </div>
-
-                    <!-- Chọn sân con -->
-                    <div class="card p-3 mb-3">
-                        <h4 class="section-title">Chọn sân con</h4>
-                        <div class="list-group">
-                            <label class="list-group-item rounded-3 border shadow-sm mb-2" th:each="sub, iter : ${subField}">
-                                <span th:text="${sub.name}"></span>
-                                <input type="radio" class="form-check-input subfield-radio" th:field="*{subFieldId}" th:value="${sub.id}" />
-                            </label>
+                        <!-- Chọn ngày -->
+                        <div class="card p-3 mb-3">
+                            <h4 class="section-title">Chọn ngày</h4>
+                            <div class="d-flex flex-wrap mb-3" id="day-container"></div>
+                            <input type="date" class="form-control mb-3" id="customDate">
                         </div>
-                    </div>
 
-                    <!-- Chọn khung giờ -->
-                    <div class="card p-3 mb-3">
-                        <h4 class="section-title">Chọn khung giờ</h4>
-                        <div id="hours-container" class="d-flex flex-wrap gap-2 mb-3"></div>
-                        <div id="durationContainer"></div>
-                    </div>
+                        <!-- Chọn sân con -->
+                        <div class="card p-3 mb-3">
+                            <h4 class="section-title">Chọn sân con</h4>
+                            <div class="list-group">
+                                <label class="list-group-item rounded-3 border shadow-sm mb-2"
+                                    th:each="sub, iter : ${subField}">
+                                    <span th:text="${sub.name}"></span>
+                                    <input type="radio" class="form-check-input subfield-radio" th:field="*{subFieldId}"
+                                        th:value="${sub.id}" />
+                                </label>
+                            </div>
+                        </div>
 
-                    <!-- Chọn dịch vụ -->
-                    <div class="card p-3 mb-3">
-                        <h4 class="section-title">Dịch vụ kèm theo</h4>
-                        <div class="list-group">
-                            <div class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2" th:each="item, iter : ${items}">
-                                <div>
-                                    <input class="form-check-input me-2 service-checkbox" type="checkbox"
-                                           th:id="${'item-' + item.id}" th:value="${item.serviceItemId}" />
-                                    <label th:for="${'item-' + item.id}">
-                                        <span th:text="${item.serviceItemName}"></span>
-                                        <small class="text-muted" th:text="'(' + ${item.serviceName} + ')'"></small>
-                                    </label>
-                                </div>
-                                <div class="text-end d-flex align-items-center gap-2">
-                                    <input type="number" class="form-control form-control-sm service-qty" min="1" value="1" style="display:none;">
-                                    <span class="fw-bold service-total" th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + '₫'"></span>
+                        <!-- Chọn khung giờ -->
+                        <div class="card p-3 mb-3">
+                            <h4 class="section-title">Chọn khung giờ</h4>
+                            <div id="hours-container" class="d-flex flex-wrap gap-2 mb-3"></div>
+                            <div id="durationContainer"></div>
+                        </div>
+
+                        <!-- Chọn dịch vụ -->
+                        <div class="card p-3 mb-3">
+                            <h4 class="section-title">Dịch vụ kèm theo</h4>
+                            <div class="list-group">
+                                <div class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2"
+                                    th:each="item, iter : ${items}">
+                                    <div>
+                                        <input class="form-check-input me-2 service-checkbox" type="checkbox"
+                                            th:id="${'item-' + item.id}" th:value="${item.serviceItemId}" />
+                                        <label th:for="${'item-' + item.id}">
+                                            <span th:text="${item.serviceItemName}"></span>
+                                            <small class="text-muted" th:text="'(' + ${item.serviceName} + ')'"></small>
+                                        </label>
+                                    </div>
+                                    <div class="text-end d-flex align-items-center gap-2">
+                                        <input type="number" class="form-control form-control-sm service-qty" min="1"
+                                            value="1" style="display:none;">
+                                        <span class="fw-bold service-total"
+                                            th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + '₫'"></span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
-                </div>
+                    <!-- Right Column: Summary -->
+                    <div class="col-lg-4">
+                        <div class="card p-3 shadow-sm sticky-summary">
+                            <h4 class="section-title">Tóm tắt</h4>
+                            <div id="pricePreview" class="fs-5 fw-bold text-success mb-2"></div>
+                            <div id="servicesTotal" class="fs-6 fw-semibold text-info mb-2"></div>
+                            <div id="voucherFeedback" class="fs-6 text-success mb-2"></div>
+                            <div id="grandTotal" class="fs-4 fw-bold text-primary mb-3"></div>
 
-                <!-- Right Column: Summary -->
-                <div class="col-lg-4">
-                    <div class="card p-3 shadow-sm sticky-summary">
-                        <h4 class="section-title">Tóm tắt</h4>
-                        <div id="pricePreview" class="fs-5 fw-bold text-success mb-2"></div>
-                        <div id="servicesTotal" class="fs-6 fw-semibold text-info mb-2"></div>
-                        <div id="voucherFeedback" class="fs-6 text-success mb-2"></div>
-                        <div id="grandTotal" class="fs-4 fw-bold text-primary mb-3"></div>
-
-                        <h5>Chọn voucher:</h5>
-                        <div id="voucher-list" class="d-flex flex-wrap gap-2 mb-3">
-                            <button type="button" th:each="v : ${vouchers}" th:data-discount="${v.discount}"
+                            <h5>Chọn voucher:</h5>
+                            <div id="voucher-list" class="d-flex flex-wrap gap-2 mb-3">
+                                <button type="button" th:each="v : ${vouchers}" th:data-discount="${v.discount}"
                                     th:data-id="${v.id}" th:text="${v.code + ' - ' + v.discount + '%'}"
                                     class="btn btn-outline-success btn-sm voucher-btn"></button>
-                        </div>
+                            </div>
 
-                        <button type="submit" class="btn btn-success w-100"><i class="fa fa-check"></i> Đặt sân</button>
+                            <button type="submit" class="btn btn-success w-100"><i class="fa fa-check"></i> Đặt
+                                sân</button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Hidden fields -->
-            <input type="hidden" th:field="*{startTime}" id="startTime">
-            <input type="hidden" th:field="*{endTime}" id="endTime">
-            <input type="hidden" th:field="*{duration}" id="duration">
-            <input type="hidden" th:field="*{date}" id="date">
-            <input type="hidden" th:field="*{subFieldId}" id="subFieldId">
-            <input type="hidden" id="fieldTypeId" th:value="${field.typeId}">
-            <div id="service-hidden-inputs"></div>
+                <!-- Hidden fields -->
+                <input type="hidden" th:field="*{startTime}" id="startTime">
+                <input type="hidden" th:field="*{endTime}" id="endTime">
+                <input type="hidden" th:field="*{duration}" id="duration">
+                <input type="hidden" th:field="*{date}" id="date">
+                <input type="hidden" th:field="*{subFieldId}" id="subFieldId">
+                <input type="hidden" id="fieldTypeId" th:value="${field.typeId}">
+                <div id="service-hidden-inputs"></div>
 
-        </form>
+            </form>
+        </div>
     </div>
-</div>
     <section layout:fragment="scripts">
         <script th:inline="javascript">
             $(document).ready(function () {

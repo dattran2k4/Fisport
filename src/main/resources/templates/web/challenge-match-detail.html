@@ -210,13 +210,21 @@
             contentType: 'application/json',
             data: JSON.stringify(formData),
             success: function (res) {
-              Swal.fire({
-                icon: 'success',
-                title: 'Thành công!',
-                text: res.message || 'Yêu cầu tham gia đã được gửi.',
-                timer: 5000,
-                showConfirmButton: false
-              }).then(() => window.location.reload());
+              if (res.status === 202) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Thành công!',
+                  text: res.message || 'Yêu cầu tham gia đã được gửi.',
+                  timer: 5000,
+                  showConfirmButton: false
+                }).then(() => window.location.reload());
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Thất bại!',
+                  text: res.message || 'Có lỗi xảy ra, vui lòng thử lại.'
+                });
+              }
             },
             error: function (xhr) {
               const errMsg = xhr.responseJSON?.message || 'Có lỗi xảy ra, vui lòng thử lại.';

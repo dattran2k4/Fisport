@@ -62,9 +62,10 @@ public class PaymentServiceImpl implements PaymentService {
                 .method(request.getPaymentMethod())
                 .build();
 
+        transactionRepository.save(transaction);
         payment.setTransaction(transaction);
         paymentRepository.save(payment);
-        transactionRepository.save(transaction);
+
 
         switch (request.getPaymentMethod()) {
             case VNPAY:

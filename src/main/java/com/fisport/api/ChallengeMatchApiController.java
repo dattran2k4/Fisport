@@ -89,7 +89,7 @@ public class ChallengeMatchApiController {
     public ApiResponse joinMatch(@PathVariable Long id, @Valid @RequestBody JoinMatchRequest request, Principal principal) {
         challengeParticipantService.joinMatch(id, request, principal.getName());
         return ApiResponse.builder()
-                .status(HttpStatus.OK.value())
+                .status(HttpStatus.ACCEPTED.value())
                 .message("Đã yêu cầu tham gia, đợi creator phản hồi")
                 .build();
     }
@@ -98,7 +98,7 @@ public class ChallengeMatchApiController {
     public ApiResponse updateResultMatch(@PathVariable Long id, @Valid @RequestBody MatchResultRequest request, Principal principal) {
         challengeResultService.updateMatchResult(id, request, principal.getName());
         return ApiResponse.builder()
-                .status(HttpStatus.OK.value())
+                .status(202)
                 .message("Cập nhật kết quả thành công!")
                 .build();
     }
@@ -107,7 +107,7 @@ public class ChallengeMatchApiController {
     public ApiResponse cancelMatch(@PathVariable Long id, Principal principal) {
         challengeMatchService.cancelMatch(id, principal.getName());
         return ApiResponse.builder()
-                .status(200)
+                .status(202)
                 .message("Đã hủy trận đấu và hoàn trả giao dịch cho các người chơi!")
                 .build();
     }

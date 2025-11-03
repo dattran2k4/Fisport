@@ -413,7 +413,7 @@
                 // ===== Hủy trận đấu =====
                 $('.cancel-btn').click(function (e) {
                     e.preventDefault();
-                    const matchId = $(this).data('id'); 
+                    const matchId = $(this).data('id');
 
                     Swal.fire({
                         title: 'Xác nhận hủy trận đấu?',
@@ -431,9 +431,13 @@
                                 type: 'POST',
                                 success: function (res) {
                                     Swal.close();
-                                    SwalUtil.success(res.message || 'Đã hủy trận đấu thành công!');
-                                    // reload lại trang hoặc xóa dòng khỏi bảng
-                                    setTimeout(() => location.reload(), 1500);
+
+                                    if (res.status === 202) {
+                                        SwalUtil.success(res.message || 'Đã hủy trận đấu thành công!');
+                                        setTimeout(() => location.reload(), 1500);
+                                    } else {
+                                        SwalUtil.error(res.message || 'Không thể hủy trận đấu!');
+                                    }
                                 },
                                 error: function (err) {
                                     Swal.close();
@@ -500,9 +504,14 @@
                         }),
                         success: function (res) {
                             Swal.close();
-                            SwalUtil.success(res.message || 'Cập nhật kết quả thành công!');
-                            $('#resultModal').modal('hide');
-                            // TODO: update UI nếu cần, ví dụ reload bảng hoặc cập nhật row match
+
+                            if (res.status === 202) {
+                                SwalUtil.success(res.message || 'Cập nhật kết quả thành công!');
+                                $('#resultModal').modal('hide');
+                                // TODO: update UI nếu cần, ví dụ reload bảng hoặc cập nhật row match
+                            } else {
+                                SwalUtil.error(res.message || 'Cập nhật thất bại!');
+                            }
                         },
                         error: function (err) {
                             Swal.close();

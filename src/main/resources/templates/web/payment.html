@@ -190,7 +190,7 @@
                 /* ---------- EXTERNAL PAYMENT (VNPAY, MOMO, etc.) ---------- */
                 function createExternalPayment() {
                     $.ajax({
-                        url: '/api/payment/create-payment-wallet',
+                        url: '/api/payment/create-payment',
                         type: 'POST',
                         contentType: 'application/json',
                         data: JSON.stringify({
@@ -202,7 +202,7 @@
                             if (paymentUrl) {
                                 window.open(paymentUrl, 'Thanh toán', 'width=700,height=900');
                             } else {
-                                showAlert('warning', 'Không nhận được URL thanh toán');
+                                showAlert('warning', res.message);
                             }
                         },
                         error: function (xhr) {
