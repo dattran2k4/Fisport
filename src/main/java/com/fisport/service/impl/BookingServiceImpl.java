@@ -11,10 +11,7 @@ import com.fisport.exception.InvalidDataException;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.*;
 import com.fisport.repository.*;
-import com.fisport.service.BookingService;
-import com.fisport.service.ChallengeMatchTypeService;
-import com.fisport.service.FieldHasTimeSlotService;
-import com.fisport.service.VoucherService;
+import com.fisport.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -42,6 +39,7 @@ public class BookingServiceImpl implements BookingService {
     private final FieldTypeBookDurationRepository fieldTypeBookDurationRepository;
     private final VoucherRepository voucherRepository;
     private final VoucherService voucherService;
+    private final ChallengeMatchService challengeMatchService;
     private final ChallengeMatchTypeService challengeMatchTypeService;
     private final int SLOT_INTERVAL = 30;
 
@@ -56,7 +54,7 @@ public class BookingServiceImpl implements BookingService {
                 .build()).toList();
     }
 
-    @Transactional
+    @Transactional(rollbackFor =  Exception.class)
     @Override
     public String createBooking(BookingRequest request, Long userId) {
 
@@ -188,7 +186,7 @@ public class BookingServiceImpl implements BookingService {
                 .toList();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void cancelBooking(Long id, String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không thấy user"));
@@ -217,6 +215,11 @@ public class BookingServiceImpl implements BookingService {
         } else {
             throw new BookingException("Cannot cancel booking with status: " + booking.getBookingStatus());
         }
+
+        if (booking.getChallengeMatch() != null) {
+            challengeMatchService.cancelMatch(booking.getChallengeMatch().getId(), name);
+        }
+
     }
 
     @Override
@@ -230,9 +233,12 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingForUserResponse> getBookingsForUser(String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        List<Booking> bookings = user.getBookings().stream()
+
+        List<Booking> bookings = bookingRepository.findByUserId(user.getId())
+                .stream()
                 .sorted(Comparator.comparing(Booking::getId).reversed())
                 .toList();
+
         return bookings.stream().map(b -> BookingForUserResponse.builder()
                 .id(b.getId())
                 .date(b.getBookingDate())

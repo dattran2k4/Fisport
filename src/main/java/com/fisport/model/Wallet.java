@@ -19,7 +19,7 @@ import java.util.List;
 @Table(name = "wallet")
 public class Wallet extends AbstractEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 

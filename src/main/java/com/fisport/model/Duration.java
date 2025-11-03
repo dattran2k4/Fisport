@@ -17,6 +17,6 @@ public class Duration extends AbstractEntity {
     @Column(name ="minutes", nullable = false)
     private int minutes;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL,  orphanRemoval = true, mappedBy = "duration")
+    @OneToMany(mappedBy = "duration")
     private Set<FieldTypeBookDuration> fieldTypeBookDuration;
 }

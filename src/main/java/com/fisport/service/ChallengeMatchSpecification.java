@@ -44,7 +44,7 @@ public class ChallengeMatchSpecification {
             }
 
             if (fieldTypeId != null) {
-                predicate = cb.and(predicate, cb.equal(root.get("sportId"), fieldTypeId));
+                predicate = cb.and(predicate, cb.equal(root.get("fieldTypeId"), fieldTypeId));
             }
 
             return predicate;

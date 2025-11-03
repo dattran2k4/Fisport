@@ -11,9 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -43,26 +41,26 @@ public class Booking extends AbstractEntity {
     @Column(name = "status", nullable = false, length = 50)
     private EBookingStatus bookingStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "subfield_id")
     private SubField subfield;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "booking")
+    @OneToOne(mappedBy = "booking")
     private Review review;
 
     @Builder.Default
     @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookingServiceItem> bookingServiceItems = new HashSet<>();
 
-    @OneToOne(mappedBy = "booking")
+    @OneToOne(mappedBy = "booking", fetch = FetchType.EAGER)
     private ChallengeMatch challengeMatch;
 
-    @OneToOne(mappedBy = "booking")
-    private Transaction transaction;
+    @OneToMany(mappedBy = "booking")
+    private List<Transaction> transaction = new ArrayList<>();
 
     @OneToOne(mappedBy = "booking")
     private Payment payment;

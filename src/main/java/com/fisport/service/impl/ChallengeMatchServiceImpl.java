@@ -42,14 +42,18 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void createChallengeMatch(ChallengeMatchCreateRequest request, String username) {
-        log.info("create challenge match");
+        log.info("Create challenge match");
         User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         Booking booking = bookingRepository.findById(request.getBookingId()).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
-        log.info("bookingId for match: ", booking.getId());
+        log.info("bookingId {}: for match", booking.getId());
 
         if (!booking.getBookingStatus().equals(EBookingStatus.PAID)) {
             throw new InvalidDataException("Phải thanh toán booking trước");
+        }
+
+        if (booking.getChallengeMatch() != null) {
+            throw new InvalidDataException("Đã tạo trận đấu này từ trước rồi!");
         }
 
         ChallengeMatchType type = challengeMatchTypeRepository.findById(request.getChallengeMatchTypeId()).orElseThrow(() -> new ResourceNotFoundException("Challenge Match Type not found"));
@@ -62,13 +66,15 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
                 .status(EChallengeStatus.OPEN)
                 .challengeMatchType(type)
                 .suggestedLevel(request.getLevel())
-                .booking(booking)
                 .fieldTypeId(booking.getSubfield().getField().getFieldType().getId())
                 .build();
-        challengeMatchRepository.save(challengeMatch);
+
+        challengeMatch.setBooking(booking);
+        challengeMatch = challengeMatchRepository.save(challengeMatch);
 
         booking.setChallengeMatch(challengeMatch);
         bookingRepository.save(booking);
+        log.info("bookingId {} set match {}", booking.getId(), booking.getChallengeMatch().toString());
 
         ChallengeParticipant participant = ChallengeParticipant.builder()
                 .team(ETeam.TEAM_A)

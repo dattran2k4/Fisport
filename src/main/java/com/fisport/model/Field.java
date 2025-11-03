@@ -59,10 +59,10 @@ public class Field extends AbstractEntity {
     @JoinColumn(name = "ward_id")
     private Ward ward;
 
-    @OneToMany(mappedBy = "field", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "field")
     private Set<FieldHasTimeSlot> fieldTimeSlots = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "field_type_id")
     private FieldType fieldType;
 
@@ -78,10 +78,10 @@ public class Field extends AbstractEntity {
                 .collect(Collectors.toSet());
     }
 
-    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "field")
     private Set<FieldServiceItem> fieldServiceItems = new HashSet<>();
 
-    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "field")
     private Set<Review> reviews = new HashSet<>();
 
     @CreationTimestamp

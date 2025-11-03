@@ -12,11 +12,11 @@ import lombok.*;
 @Table(name = "field_type_duration")
 public class FieldTypeBookDuration extends AbstractEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name ="field_type_id")
     private FieldType fieldType;
 
-    @ManyToOne(fetch = FetchType.LAZY,  cascade = CascadeType.ALL,  optional = false)
+    @ManyToOne()
     @JoinColumn(name = "duration_id")
     private Duration duration;
 }

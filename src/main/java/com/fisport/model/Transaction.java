@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "transaction")
 public class Transaction extends AbstractEntity {
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "wallet_id")
     private Wallet wallet;
 
@@ -33,7 +33,7 @@ public class Transaction extends AbstractEntity {
     @Column(nullable = false)
     private ETransactionStatus status;// PENDING, SUCCESS, FAILED
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "booking_id")
     private Booking booking;
 

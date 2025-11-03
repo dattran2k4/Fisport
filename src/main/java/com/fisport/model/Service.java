@@ -18,6 +18,6 @@ public class Service extends AbstractEntity {
     @Column(name = "name",  nullable = false)
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "service",  orphanRemoval = true)
+    @OneToMany(mappedBy = "service")
     private Set<ServiceItem> serviceItems = new HashSet<ServiceItem>();
 }

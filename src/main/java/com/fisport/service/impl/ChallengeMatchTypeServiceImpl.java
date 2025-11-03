@@ -30,7 +30,7 @@ public class ChallengeMatchTypeServiceImpl implements ChallengeMatchTypeService 
 
     @Override
     public List<ChallengeMatchTypeResponse> getAllChallengeMatchTypesByFieldType(Long fieldTypeId) {
-
+        log.info("Get Match Types By Field Type Id {}", fieldTypeId);
         List<ChallengeMatchType> matchTypes = challengeMatchTypeRepository.findByFieldTypeId(fieldTypeId);
 
         return matchTypes.stream().map(t -> ChallengeMatchTypeResponse.builder()

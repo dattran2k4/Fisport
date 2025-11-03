@@ -20,7 +20,7 @@ public class Role extends AbstractEntity {
     @Column(name = "name", nullable = false)
     private ERole name;
 
-    @OneToMany(mappedBy = "role",  fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "role")
     @JsonIgnore
     private Set<User> users;
 }

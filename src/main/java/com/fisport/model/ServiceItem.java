@@ -18,10 +18,10 @@ public class ServiceItem extends AbstractEntity {
     @Column(name = "name")
     private String name;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "service_id")
     private Service service;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "serviceItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "serviceItem")
     private Set<FieldServiceItem> fieldServiceItems = new HashSet<FieldServiceItem>();
 }

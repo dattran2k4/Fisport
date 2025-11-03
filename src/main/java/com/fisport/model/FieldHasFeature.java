@@ -12,11 +12,11 @@ import lombok.*;
 @Table(name = "field_feature")
 public class FieldHasFeature extends AbstractEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "feature_id")
     private Feature feature;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "field_id")
     private Field field;
 }

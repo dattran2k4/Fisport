@@ -19,7 +19,7 @@ public class FieldType extends AbstractEntity {
     @Column(nullable = false, unique = true)
     private String slug;
 
-    @OneToMany(mappedBy = "fieldType", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "fieldType")
     private Set<Field> fields = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "fieldType")

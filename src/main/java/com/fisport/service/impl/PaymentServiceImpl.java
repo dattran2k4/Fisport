@@ -13,10 +13,10 @@ import com.fisport.repository.TransactionRepository;
 import com.fisport.repository.WalletRepository;
 import com.fisport.service.*;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import vn.payos.model.webhooks.WebhookData;
 
 import java.time.LocalDateTime;
@@ -33,16 +33,18 @@ public class PaymentServiceImpl implements PaymentService {
     private final VnPayService vnPayService;
     private final PaymentRepository paymentRepository;
     private final PayOSService payOSService;
-    private final BookingService bookingService;
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
 
     @Override
+    @Transactional(rollbackFor =  Exception.class)
     public String createPayment(PaymentRequest request, HttpServletRequest httpServletRequest) {
         Booking booking = findByPaymentToken(request.getPaymentToken());
         booking.setPaymentMethod(request.getPaymentMethod());
 
-        bookingService.isExpiredBooking(booking);
+        if (booking.getBookingStatus().equals(EBookingStatus.PENDING) && booking.getExpiredAt().isBefore(LocalDateTime.now())) {
+            throw new InvalidDataException("Booking is expired");
+        }
         
         bookingRepository.save(booking);
         Payment payment = Payment.builder()
@@ -82,7 +84,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor =   Exception.class)
     public String createWalletPayment(WalletTopUpRequest request, HttpServletRequest httpServletRequest) {
 
         Payment payment = Payment.builder()
@@ -124,7 +126,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor =   Exception.class)
     public PaymentResponse handleVnpayReturn(Map<String, String> params) {
         boolean valid = vnPayService.validatePayment(params);
         if (!valid) {
@@ -196,7 +198,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor =   Exception.class)
     public void handlePayOSWebHook(WebhookData data) {
         Long bookingId = data.getOrderCode() % 100000;
 

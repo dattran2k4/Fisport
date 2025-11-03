@@ -14,11 +14,11 @@ import java.math.BigDecimal;
 @Table(name = "field_time_slot")
 public class FieldHasTimeSlot extends AbstractEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "field_id",  nullable = false)
     private Field field;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "time_slot_id", nullable = false)
     private TimeSlot timeSlot;
 

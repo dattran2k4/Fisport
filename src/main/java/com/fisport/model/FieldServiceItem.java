@@ -26,14 +26,14 @@ public class FieldServiceItem extends AbstractEntity {
     @Column(name = "status", nullable = false)
     private EFieldServiceItem status;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "field_id")
     private Field field;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "service_item_id")
     private ServiceItem serviceItem;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "fieldServiceItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "fieldServiceItem")
     private Set<BookingServiceItem> bookingServiceItems;
 }

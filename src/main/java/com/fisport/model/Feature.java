@@ -21,6 +21,6 @@ public class Feature extends AbstractEntity {
     @Column(name = "slug", nullable = false, unique = true)
     private String slug;
 
-    @OneToMany(mappedBy = "feature", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "feature")
     private Set<FieldHasFeature> fieldHasFeatures =  new HashSet<>();
 }

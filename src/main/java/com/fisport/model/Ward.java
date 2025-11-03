@@ -24,7 +24,7 @@ public class Ward extends AbstractEntity {
     @Column(name = "longitude", nullable = false)
     private Double longitude;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "city_id")
     private City city;
 }

@@ -21,6 +21,6 @@ public class City extends AbstractEntity {
     @Column(name = "slug", nullable = false, unique = true)
     private String slug;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "city")
+    @OneToMany(mappedBy = "city")
     private Set<Ward> wards = new HashSet<>();
 }
