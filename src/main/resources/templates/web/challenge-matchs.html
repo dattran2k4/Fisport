@@ -227,11 +227,10 @@
                         <option th:value="${st.name()}" th:text="${st.value}"></option>
                     </th:block>
                 </select>
-
-                <select id="typeId" name="typeId">
-                    <option value="">Tất cả loại</option>
-                    <th:block th:each="mt : ${matchTypes}">
-                        <option th:value="${mt.id}" th:text="${mt.name}"></option>
+                <select id="cityId" name="cityId">
+                    <option value="">Tất cả thành phố</option>
+                    <th:block th:each="city : ${cities}">
+                        <option th:value="${city.id}" th:text="${city.name}"></option>
                     </th:block>
                 </select>
 
@@ -249,10 +248,10 @@
                     </th:block>
                 </select>
 
-                <select id="cityId" name="cityId">
-                    <option value="">Tất cả thành phố</option>
-                    <th:block th:each="city : ${cities}">
-                        <option th:value="${city.id}" th:text="${city.name}"></option>
+                <select id="typeId" name="typeId" disabled>
+                    <option value="">Tất cả loại</option>
+                    <th:block th:each="mt : ${matchTypes}">
+                        <option th:value="${mt.id}" th:text="${mt.name}"></option>
                     </th:block>
                 </select>
             </div>
@@ -312,6 +311,37 @@
             $(document).ready(function () {
                 const filters = ["status", "typeId", "level", "sportId", "cityId"];
                 const container = $(".grid");
+
+                $('#sportId').on('change', function () {
+                    var sportId = $(this).val();
+                    var typeSelect = $('#typeId');
+
+                    if (sportId) {
+                        // Enable type select
+                        typeSelect.prop('disabled', false);
+
+                        $.ajax({
+                            url: '/api/v1/challenge-types',
+                            type: 'GET',
+                            data: { fieldTypeId: sportId }, 
+                            success: function (response) {
+                                typeSelect.empty();
+                                typeSelect.append('<option value="">Tất cả loại</option>');
+                                response.data.forEach(function (type) {
+                                    typeSelect.append('<option value="' + type.id + '">' + type.name + '</option>');
+                                });
+                            },
+                            error: function () {
+                                typeSelect.empty();
+                                typeSelect.append('<option value="">Không tải được loại</option>');
+                            }
+                        });
+
+                    } else {
+                        // Nếu không chọn sport, disable và reset type select
+                        typeSelect.prop('disabled', true).val('');
+                    }
+                });
 
                 filters.forEach(id => {
                     $("#" + id).on("change", renderMatches);

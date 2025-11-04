@@ -228,6 +228,8 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
                 .title(p.getMatch().getTitle())
                 .isPaid(p.isPaid())
                 .status(p.getStatus())
+                .messageRequest(p.getRequestMessage())
+                .messageResponse(p.getRequestMessage())
                 .matchType(p.getMatch().getChallengeMatchType().getName())
                 .canPay(p.getStatus().equals(EParticipantStatus.ACCEPTED) && !p.isPaid())
                 .build()).toList();

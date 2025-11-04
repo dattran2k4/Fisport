@@ -7,6 +7,7 @@ import com.fisport.model.Field;
 import com.fisport.model.FieldType;
 import com.fisport.model.SubField;
 import com.fisport.repository.BookingRepository;
+import com.fisport.service.BookingService;
 import com.fisport.service.ChallengeMatchTypeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,21 +24,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/challenge-types")
 public class ChallengeTypeApiController {
 
-    private final BookingRepository bookingRepository;
+    private final BookingService bookingService;
     private final ChallengeMatchTypeService challengeMatchTypeService;
 
     @GetMapping
-    public ApiResponse getAllChallengeTypes(@RequestParam(required = false) Long bookingId) {
-        log.info("Get bookingId {}",  bookingId);
-        Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
-        SubField subField = booking.getSubfield();
-        log.info("Get subfield {}",  subField);
-        Field field = subField.getField();
-        log.info("Get field {}",  field);
-        FieldType fieldType = field.getFieldType();
-        log.info("Get fieldType {}",  fieldType);
-        Long id = booking.getSubfield().getField().getFieldType().getId();
-        log.info("Get id {}",  id);
+    public ApiResponse getAllChallengeTypes(@RequestParam(required = false) Long bookingId, @RequestParam(required = false) Long fieldTypeId) {
+        Long id = null;
+
+        if (bookingId != null) {
+            Booking booking = bookingService.findBooking(bookingId);
+            id = booking.getSubfield().getField().getFieldType().getId();
+        } else if (fieldTypeId != null) {
+            id =  fieldTypeId;
+        }
 
         return ApiResponse.builder()
                 .status(200)

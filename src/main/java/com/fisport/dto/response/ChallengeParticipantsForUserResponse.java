@@ -22,6 +22,8 @@ public class ChallengeParticipantsForUserResponse {
     private EParticipantStatus status;
     private boolean canPay;
     private boolean isPaid;
+    private String messageRequest;
+    private String messageResponse;
 
     private ChallengeResultResponse result;
 }

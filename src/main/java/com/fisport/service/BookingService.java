@@ -29,4 +29,6 @@ public interface BookingService {
     List<Integer> getAvailableDurationsBooking(Long id, LocalDate date, LocalTime startTime);
 
     List<SlotAvailableResponse> getAvailableSlots(Long id, LocalDate date);
+
+    Booking findBooking(Long id);
 }

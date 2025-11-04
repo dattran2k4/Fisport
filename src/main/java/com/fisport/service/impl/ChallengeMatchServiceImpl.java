@@ -334,7 +334,9 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
             case CANCELLED:
                 break;
             case MATCHED:
-                actions.add("View Result");
+                if (m.getResult() != null) {
+                    actions.add("View Result");
+                }
                 break;
             default:
                 break;

@@ -356,7 +356,8 @@ public class BookingServiceImpl implements BookingService {
         return true;
     }
 
-    private Booking findBooking(Long id) {
+    @Override
+    public Booking findBooking(Long id) {
         return bookingRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
     }
 

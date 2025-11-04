@@ -152,7 +152,7 @@ VALUES
 ('Sân bóng đá 12', 'san-bong-da-12', '258 Phạm Ngọc Thạch, Hải Châu', 1, 3, 1, 'Sân bóng 5 người, có mái che và đèn', '/web/img/field/football/san-bong-da-4.jpg', '08:00:00', '22:00:00', 'PENDING', 16.0618, 108.2168, NOW(), NOW()),
 
 -- Cầu lông (field_type_id = 2)
-('Sân cầu lông 1', 'san-cau-long-1', '12 Trần Phú, Hải Châu', 2, 3, 2, 'Sân cầu lông tiêu chuẩn, nền gỗ chống trơn trượt', '/web/img/field/badminton/football/san-cau-long-1.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0589, 108.2140, NOW(), NOW()),
+('Sân cầu lông 1', 'san-cau-long-1', '12 Trần Phú, Hải Châu', 2, 3, 2, 'Sân cầu lông tiêu chuẩn, nền gỗ chống trơn trượt', '/web/img/field/badminton/san-cau-long-1.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0589, 108.2140, NOW(), NOW()),
 ('Sân cầu lông 2', 'san-cau-long-2', '34 Phan Chu Trinh, Hải Châu', 2, 3, 2, 'Sân cầu lông trong nhà, có điều hòa', '/web/img/field/badminton/san-cau-long-2.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0591, 108.2143, NOW(), NOW()),
 ('Sân cầu lông 3', 'san-cau-long-3', '56 Lý Thường Kiệt, Hải Châu', 2, 3, 2, 'Sân cầu lông 2 người, nền gỗ chất lượng', '/web/img/field/badminton/san-cau-long-3.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0593, 108.2146, NOW(), NOW()),
 ('Sân cầu lông 4', 'san-cau-long-4', '78 Nguyễn Trãi, Hải Châu', 2, 3, 2, 'Sân cầu lông trong nhà, có đèn chiếu sáng', '/web/img/field/badminton/san-cau-long-4.jpg', '07:00:00', '21:00:00', 'ACTIVE', 16.0595, 108.2148, NOW(), NOW()),
@@ -540,7 +540,7 @@ VALUES
 ("9V9", 18, 1),
 ("11V11", 22, 1),
 ("Đôi nam nữ", 4, 1),
-("Đơn name", 2, 2),
+("Đơn nam", 2, 2),
 ("Đôi nam", 4, 2),
 ("Đơn nữ", 2, 2),
 ("Đôi nữ", 4, 2),

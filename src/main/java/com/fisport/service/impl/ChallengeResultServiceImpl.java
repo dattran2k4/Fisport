@@ -50,7 +50,9 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
         }
 
         //TO-DO CHECK != NULL AND ROLL-BACK
-
+        if (match.getResult() != null) {
+            throw new InvalidDataException("Không thể cập nhật lại kết quả");
+        }
 
         //TO-DO UPDATE MATCHED REAL TIME
 
