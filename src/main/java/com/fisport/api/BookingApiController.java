@@ -10,6 +10,7 @@ import com.fisport.service.FieldHasTimeSlotService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +25,7 @@ import java.time.LocalTime;
 @RequiredArgsConstructor
 @Validated
 @RestController
+@Slf4j(topic = "BOOKING-API-CONTROLLER")
 @RequestMapping("/api/v1/bookings")
 public class BookingApiController {
 

@@ -6,6 +6,7 @@ import com.fisport.service.AuthService;
 import com.fisport.service.TwoFAService;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j(topic = "2FA-API-CONTROLLER")
 @RequestMapping("/api/auth/2fa")
 public class TwoFactorAuthApiController {
 

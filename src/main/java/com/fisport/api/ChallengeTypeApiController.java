@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@Slf4j
 @RequiredArgsConstructor
 @RestController
 @Validated
+@Slf4j(topic = "MATCH-TYPE-API-CONTROLLER")
 @RequestMapping("/api/v1/challenge-types")
 public class ChallengeTypeApiController {
 

@@ -8,6 +8,7 @@ import com.fisport.service.WalletPaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @RestController
 @Validated
+@Slf4j(topic = "PAYMENT-API-CONTROLLER")
 @RequestMapping("/api/payment")
 public class PaymentApiController {
 
@@ -86,6 +88,16 @@ public class PaymentApiController {
         return ApiResponse.builder()
                 .status(200)
                 .message("Payment successfully")
+                .build();
+    }
+
+    @PostMapping("/match-wallet-pay")
+    public ApiResponse matchWalletPaymentWallet(@RequestParam Long matchId, Principal principal) {
+        walletPaymentService.payChallengeMatch(matchId, principal.getName());
+
+        return ApiResponse.builder()
+                .status(202)
+                .message("Thanh toán thành công!")
                 .build();
     }
 }

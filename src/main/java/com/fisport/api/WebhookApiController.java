@@ -16,7 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/webhook")
 @RequiredArgsConstructor
-@Slf4j
+@Slf4j(topic = "WEBHOOK-API-CONTROLLER")
 @Validated
 public class WebhookApiController {
 

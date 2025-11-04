@@ -13,6 +13,7 @@ import com.fisport.service.ChallengeParticipantService;
 import com.fisport.service.ChallengeResultService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @RestController
 @Validated
+@Slf4j(topic = "MATCH-API-CONTROLLER")
 @RequestMapping("/api/v1/challenge-matchs")
 public class ChallengeMatchApiController {
 

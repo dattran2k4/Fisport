@@ -5,6 +5,7 @@ import com.fisport.dto.response.ApiResponse;
 import com.fisport.service.ChallengeParticipantService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @RestController
 @Validated
+@Slf4j(topic = "PARTICIPANTS-API-CONTROLLER")
 @RequestMapping("/api/v1/challenge-participants")
 public class ChallengeParticipantApiController {
 

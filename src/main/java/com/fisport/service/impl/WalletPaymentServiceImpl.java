@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-@Slf4j
+@Slf4j(topic = "WALLET-PAYMENT-SERVICE")
 @Service
 public class WalletPaymentServiceImpl implements WalletPaymentService {
 
@@ -128,7 +128,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
 
         booking.setPaymentMethod(EPaymentMethod.WALLET);
 
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("Không thấy user"));
 
         Wallet wallet = walletRepository.findByUser(user);
         log.info("Wallet id: " + wallet.getId());
@@ -235,7 +235,7 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
     public void payChallengeMatch(Long matchId, String username) {
         ChallengeMatch match = challengeMatchRepository.findById(matchId).orElseThrow(() -> new ResourceNotFoundException("Match not found"));
 
-        User player = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User player = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
 
         ChallengeParticipant pariticipant = challengeParticipantRepository.findByUserIdAndMatchId(player.getId(), matchId).orElseThrow(() -> new ResourceNotFoundException("Không có sự tham gia nào ở đây"));
 
