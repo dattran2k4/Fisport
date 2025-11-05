@@ -89,6 +89,32 @@
             color: #6c757d !important;
             text-decoration: line-through;
         }
+
+        /* Nút thời lượng */
+        .custom-duration-btn {
+            border: 2px solid #0d6efd;
+            /* xanh Bootstrap */
+            color: #0d6efd;
+            background-color: #fff;
+            border-radius: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .custom-duration-btn:hover {
+            background-color: #0d6efd;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 6px rgba(13, 110, 253, 0.4);
+        }
+
+        /* Khi được chọn (active) */
+        .custom-duration-btn.active {
+            background-color: #198754;
+            /* xanh lá nhẹ */
+            border-color: #198754;
+            color: #fff;
+            box-shadow: 0 2px 6px rgba(25, 135, 84, 0.4);
+        }
     </style>
 </head>
 
@@ -133,7 +159,9 @@
                         <!-- Chọn khung giờ -->
                         <div class="card p-3 mb-3">
                             <h4 class="section-title">Chọn khung giờ</h4>
+
                             <div id="hours-container" class="d-flex flex-wrap gap-2 mb-3"></div>
+                            <!-- Duration -->
                             <div id="durationContainer"></div>
                         </div>
 
@@ -154,7 +182,7 @@
                                     <div class="text-end d-flex align-items-center gap-2">
                                         <input type="number" class="form-control form-control-sm service-qty" min="1"
                                             value="1" style="display:none;">
-                                        <span class="fw-bold service-total"
+                                        <span class="fw-bold service-total" th:attr="data-price=${item.price}"
                                             th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + '₫'"></span>
                                     </div>
                                 </div>
@@ -365,14 +393,16 @@
                         startTime: timeStr
                     })
                         .done(function (resp) {
-                            const durations = (resp && resp.data) ? resp.data : resp; // accommodate different shapes
+                            const durations = (resp && resp.data) ? resp.data : resp;
                             const container = $('#durationContainer');
                             container.empty();
+
+                            container.append('<h6 class="mt-3 mb-2 text-primary fw-semibold">Chọn khoảng thời gian chơi quy định:</h6>');
 
                             // render buttons durations
                             durations.forEach(minutes => {
                                 const btn = $('<button>')
-                                    .addClass('btn btn-outline-primary m-1 duration-btn')
+                                    .addClass('btn custom-duration-btn m-1 duration-btn')
                                     .data('minutes', minutes)
                                     .text(`${minutes} phút`)
                                     .attr('type', 'button');
@@ -438,11 +468,11 @@
                 });
 
                 // Show/hide số lượng khi chọn checkbox
-                $(document).on('change', '.service-checkbox', function () {
-                    const qtyInput = $(this).closest('.list-group-item').find('.service-qty');
-                    if ($(this).is(':checked')) qtyInput.show();
-                    else qtyInput.hide();
-                });
+                // $(document).on('change', '.service-checkbox', function () {
+                //     const qtyInput = $(this).closest('.list-group-item').find('.service-qty');
+                //     if ($(this).is(':checked')) qtyInput.show();
+                //     else qtyInput.hide();
+                // });
 
 
                 // Hàm định dạng giá (dùng dấu phẩy ngăn cách nghìn)
@@ -452,15 +482,14 @@
                 }
 
                 function getUnitPrice(itemEl) {
-                    const priceAttr = itemEl.find('.service-price').data('price');
-                    // ensure number
-                    return parseFloat(priceAttr) || 0;
+                    const base = parseFloat(itemEl.data('price')) || 0;
+                    return base;
                 }
 
                 // Cập nhật tổng cho một item (hiển thị)
                 function updateServiceTotal(itemEl) {
                     const unitPrice = getUnitPrice(itemEl);
-                    const qty = parseInt(itemEl.find('.service-qty').val()) || 0;
+                    const qty = parseInt(itemEl.find('.service-qty').val()) || 1;
                     const total = unitPrice * qty;
                     itemEl.find('.service-total').data('total', total).text(formatCurrency(total));
                 }
@@ -530,6 +559,10 @@
                     updateServiceTotal(itemEl);
                     updateAllTotals();
                 });
+
+                // console.log('checkbox clicked', $(this).val(), 'checked=', $(this).is(':checked'));
+                // console.log('basePrice=', itemEl.data('price'), 'service-total data-base-price=', itemEl.find('.service-total').data('base-price'));
+                // console.log('qty=', itemEl.find('.service-qty').val(), 'unitPrice=', getUnitPrice(itemEl));
 
                 // Khi click vào voucher
                 $(document).on('click', '.voucher-btn', function () {
