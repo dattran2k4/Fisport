@@ -75,7 +75,7 @@
                         <strong th:text="${match.startTime} + ' - ' + ${match.endTime}">00:00 - 00:00</strong>
                     </p>
                     <p><i class="bi bi-calendar-event-fill"></i> Ngày:
-                        <strong th:text="${match.date}">YYYY-MM-DD</strong>
+                        <strong th:text="${#temporals.format(match.date, 'dd/MM/yyyy')}">YYYY-MM-DD</strong>
                     </p>
                     <p><i class="bi bi-info-circle-fill"></i> Ghi chú:
                         <strong th:text="${match.note}">Note</strong>

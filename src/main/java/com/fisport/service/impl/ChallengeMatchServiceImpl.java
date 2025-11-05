@@ -28,7 +28,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-@Slf4j
+@Slf4j(topic = "CHALLENGE-MATCH-SERVICE")
 public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
     private final ChallengeMatchRepository challengeMatchRepository;
@@ -165,6 +165,7 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
                 .id(m.getId())
                 .title(m.getTitle())
                 .status(m.getStatus())
+                .fee(m.getParticipationFee())
                 .city(m.getBooking().getSubfield().getField().getWard().getCity().getName())
                 .ward(m.getBooking().getSubfield().getField().getWard().getName())
                 .fieldName(m.getBooking().getSubfield().getField().getName())
@@ -234,7 +235,10 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
             if (match.getParticipants() != null) {
                 for (ChallengeParticipant c : match.getParticipants()) {
                     Long playerId = c.getUser().getId();
-                    walletPaymentService.refund(match.getCreator().getId(), playerId, match.getParticipationFee());
+                    if (match.getParticipationFee() == null || match.getParticipationFee().compareTo(BigDecimal.ZERO) == 0) {
+                    } else {
+                        walletPaymentService.refund(match.getCreator().getId(), playerId, match.getParticipationFee());
+                    }
                 }
             }
             match.setStatus(EChallengeStatus.CANCELLED);

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vn" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-    layout:decorate="~{layout/web/web}">
+      layout:decorate="~{layout/web/web}">
 
 <head>
     <title>Thách đấu</title>
@@ -119,7 +119,6 @@
         }
 
 
-
         .card p {
             font-size: 0.9rem;
             color: #555;
@@ -202,7 +201,7 @@
             opacity: 0.9;
         }
 
-        @media(max-width:768px) {
+        @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
             }
@@ -215,173 +214,173 @@
 </head>
 
 <body>
-    <div layout:fragment="content">
-        <div class="container my-5">
-            <h1>Tất cả trận đấu</h1>
+<div layout:fragment="content">
+    <div class="container my-5">
+        <h1>Tất cả trận đấu</h1>
 
-            <!-- Filter Bar -->
-            <div class="filter-bar">
-                <select id="status" name="status">
-                    <option value="">Tất cả trạng thái sân</option>
-                    <th:block th:each="st : ${status}">
-                        <option th:value="${st.name()}" th:text="${st.value}"></option>
-                    </th:block>
-                </select>
-                <select id="cityId" name="cityId">
-                    <option value="">Tất cả thành phố</option>
-                    <th:block th:each="city : ${cities}">
-                        <option th:value="${city.id}" th:text="${city.name}"></option>
-                    </th:block>
-                </select>
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <select id="status" name="status">
+                <option value="">Tất cả trạng thái sân</option>
+                <th:block th:each="st : ${status}">
+                    <option th:value="${st.name()}" th:text="${st.value}"></option>
+                </th:block>
+            </select>
+            <select id="cityId" name="cityId">
+                <option value="">Tất cả thành phố</option>
+                <th:block th:each="city : ${cities}">
+                    <option th:value="${city.id}" th:text="${city.name}"></option>
+                </th:block>
+            </select>
 
-                <select id="level" name="level">
-                    <option value="">Tất cả trình độ</option>
-                    <th:block th:each="lv : ${level}">
-                        <option th:value="${lv.name()}" th:text="${lv.value}"></option>
-                    </th:block>
-                </select>
+            <select id="level" name="level">
+                <option value="">Tất cả trình độ</option>
+                <th:block th:each="lv : ${level}">
+                    <option th:value="${lv.name()}" th:text="${lv.value}"></option>
+                </th:block>
+            </select>
 
-                <select id="sportId" name="sportId">
-                    <option value="">Tất cả môn thể thao</option>
-                    <th:block th:each="s : ${sports}">
-                        <option th:value="${s.id}" th:text="${s.name}"></option>
-                    </th:block>
-                </select>
+            <select id="sportId" name="sportId">
+                <option value="">Tất cả môn thể thao</option>
+                <th:block th:each="s : ${sports}">
+                    <option th:value="${s.id}" th:text="${s.name}"></option>
+                </th:block>
+            </select>
 
-                <select id="typeId" name="typeId" disabled>
-                    <option value="">Tất cả loại</option>
-                    <th:block th:each="mt : ${matchTypes}">
-                        <option th:value="${mt.id}" th:text="${mt.name}"></option>
-                    </th:block>
-                </select>
-            </div>
+            <select id="typeId" name="typeId" disabled>
+                <option value="">Tất cả loại</option>
+                <th:block th:each="mt : ${matchTypes}">
+                    <option th:value="${mt.id}" th:text="${mt.name}"></option>
+                </th:block>
+            </select>
+        </div>
 
-            <!-- Match Grid -->
-            <div class="grid">
-                <div class="card" th:each="match : ${matches.data}">
-                    <div class="card-header">
-                        <h2 th:text="${match.title}">Match Title</h2>
-                        <span th:text="${match.status.value}" th:classappend="${match.status.name() == 'OPEN' ? 'badge badge-pending'
+        <!-- Match Grid -->
+        <div class="grid">
+            <div class="card" th:each="match : ${matches.data}">
+                <div class="card-header">
+                    <h2 th:text="${match.title}">Match Title</h2>
+                    <span th:text="${match.status.value}" th:classappend="${match.status.name() == 'OPEN' ? 'badge badge-pending'
                       : match.status.name() == 'PENDING' ? 'badge badge-confirmed'
                       : match.status.name() == 'FULL' ? 'badge badge-full'
                       : match.status.name() == 'MATCHED' ? 'badge badge-matched'
                       : match.status.name() == 'CANCELLED' ? 'badge badge-cancelled'
                       : 'badge'}">
                         </span>
-                    </div>
+                </div>
 
-                    <div class="card-body">
-                        <p><i class="fas fa-map-marker-alt icon"></i>
-                            <span th:text="${match.ward + ', ' + match.city}">Ward, City</span>
-                        </p>
-                        <p><i class="fas fa-calendar-alt icon"></i>
-                            <span th:text="${#temporals.format(match.date, 'dd-MM-yyyy')}">Date</span>
-                        </p>
-                        <p class="fee"><i class="fas fa-money-bill-wave icon"></i>
-                            <span
-                                th:text="${#numbers.formatDecimal(match.fee, 0, 'COMMA', 0, 'POINT') + ' VND'}">Fee</span>
-                        </p>
-                        <p><i class="fas fa-users icon"></i>
-                            <span
+                <div class="card-body">
+                    <p><i class="fas fa-map-marker-alt icon"></i>
+                        <span th:text="${match.ward + ', ' + match.city}">Ward, City</span>
+                    </p>
+                    <p><i class="fas fa-calendar-alt icon"></i>
+                        <span th:text="${#temporals.format(match.date, 'dd-MM-yyyy')}">Date</span>
+                    </p>
+                    <p class="fee"><i class="fas fa-money-bill-wave icon"></i>
+                        <span
+                                th:text="${match.fee == null or match.fee == 0 ? 'Miễn phí' : #numbers.formatDecimal(match.fee, 0, 'COMMA', 0, 'POINT') + ' VND'}">Fee</span>
+                    </p>
+                    <p><i class="fas fa-users icon"></i>
+                        <span
                                 th:text="${match.currentPlayers + ' / ' + match.maxPlayers + ' players'}">Players</span>
-                        </p>
-                        <p><i class="fas fa-futbol icon"></i>
-                            <span th:text="${match.sport}">Sport</span>
-                        </p>
+                    </p>
+                    <p><i class="fas fa-futbol icon"></i>
+                        <span th:text="${match.sport}">Sport</span>
+                    </p>
 
-                        <!-- Progress bar -->
-                        <div class="progress-container">
-                            <div class="progress-bar"
-                                th:style="'width:' + (${match.currentPlayers} * 100 / ${match.maxPlayers}) + '%'"></div>
-                        </div>
-                        <div class="progress-text"
-                            th:text="${match.currentPlayers + ' / ' + match.maxPlayers + ' players'}"></div>
+                    <!-- Progress bar -->
+                    <div class="progress-container">
+                        <div class="progress-bar"
+                             th:style="'width:' + (${match.currentPlayers} * 100 / ${match.maxPlayers}) + '%'"></div>
                     </div>
+                    <div class="progress-text"
+                         th:text="${match.currentPlayers + ' / ' + match.maxPlayers + ' players'}"></div>
+                </div>
 
-                    <div class="card-footer">
-                        <a th:href="@{'/thach-dau/' + ${match.id} + '/chi-tiet'}" class="btn btn-detail">Xem chi
-                            tiết</a>
-                    </div>
+                <div class="card-footer">
+                    <a th:href="@{'/thach-dau/' + ${match.id} + '/chi-tiet'}" class="btn btn-detail">Xem chi
+                        tiết</a>
                 </div>
             </div>
         </div>
     </div>
-    <section layout:fragment="scripts">
-        <script th:inline="javascript">
-            $(document).ready(function () {
-                const filters = ["status", "typeId", "level", "sportId", "cityId"];
-                const container = $(".grid");
+</div>
+<section layout:fragment="scripts">
+    <script th:inline="javascript">
+        $(document).ready(function () {
+            const filters = ["status", "typeId", "level", "sportId", "cityId"];
+            const container = $(".grid");
 
-                $('#sportId').on('change', function () {
-                    var sportId = $(this).val();
-                    var typeSelect = $('#typeId');
+            $('#sportId').on('change', function () {
+                var sportId = $(this).val();
+                var typeSelect = $('#typeId');
 
-                    if (sportId) {
-                        // Enable type select
-                        typeSelect.prop('disabled', false);
+                if (sportId) {
+                    // Enable type select
+                    typeSelect.prop('disabled', false);
 
-                        $.ajax({
-                            url: '/api/v1/challenge-types',
-                            type: 'GET',
-                            data: { fieldTypeId: sportId }, 
-                            success: function (response) {
-                                typeSelect.empty();
-                                typeSelect.append('<option value="">Tất cả loại</option>');
-                                response.data.forEach(function (type) {
-                                    typeSelect.append('<option value="' + type.id + '">' + type.name + '</option>');
-                                });
-                            },
-                            error: function () {
-                                typeSelect.empty();
-                                typeSelect.append('<option value="">Không tải được loại</option>');
-                            }
-                        });
+                    $.ajax({
+                        url: '/api/v1/challenge-types',
+                        type: 'GET',
+                        data: {fieldTypeId: sportId},
+                        success: function (response) {
+                            typeSelect.empty();
+                            typeSelect.append('<option value="">Tất cả loại</option>');
+                            response.data.forEach(function (type) {
+                                typeSelect.append('<option value="' + type.id + '">' + type.name + '</option>');
+                            });
+                        },
+                        error: function () {
+                            typeSelect.empty();
+                            typeSelect.append('<option value="">Không tải được loại</option>');
+                        }
+                    });
 
-                    } else {
-                        // Nếu không chọn sport, disable và reset type select
-                        typeSelect.prop('disabled', true).val('');
-                    }
-                });
+                } else {
+                    // Nếu không chọn sport, disable và reset type select
+                    typeSelect.prop('disabled', true).val('');
+                }
+            });
+
+            filters.forEach(id => {
+                $("#" + id).on("change", renderMatches);
+            });
+
+            function renderMatches() {
+                const params = new URLSearchParams();
 
                 filters.forEach(id => {
-                    $("#" + id).on("change", renderMatches);
+                    const value = $("#" + id).val();
+                    if (value) params.append(id === "sportId" ? "fieldTypeId" : id, value);
                 });
+                $.ajax({
+                    url: "/api/v1/challenge-matchs?" + params.toString(),
+                    type: "GET",
+                    dataType: "json",
+                    success: function (json) {
+                        const matches = json.data?.data;
 
-                function renderMatches() {
-                    const params = new URLSearchParams();
+                        container.empty();
 
-                    filters.forEach(id => {
-                        const value = $("#" + id).val();
-                        if (value) params.append(id === "sportId" ? "fieldTypeId" : id, value);
-                    });
-                    $.ajax({
-                        url: "/api/v1/challenge-matchs?" + params.toString(),
-                        type: "GET",
-                        dataType: "json",
-                        success: function (json) {
-                            const matches = json.data?.data;
+                        if (!matches || matches.length === 0) {
+                            container.html("<p>Không tìm thấy trận đấu nào.</p>");
+                            return;
+                        }
 
-                            container.empty();
+                        matches.forEach(m => {
+                            const percent = ((m.currentPlayers * 100) / m.maxPlayers).toFixed(0);
 
-                            if (!matches || matches.length === 0) {
-                                container.html("<p>Không tìm thấy trận đấu nào.</p>");
-                                return;
-                            }
-
-                            matches.forEach(m => {
-                                const percent = ((m.currentPlayers * 100) / m.maxPlayers).toFixed(0);
-
-                                const card = `
+                            const card = `
                         <div class="card">
                             <div class="card-header">
                                 <h2>${m.title}</h2>
                                  <span class="badge ${m.status === "OPEN" ? "badge-pending" :
-                                        m.status === "PENDING" ? "badge-confirmed" :
-                                            m.status === "FULL" ? "badge-full" :
-                                                m.status === "MATCHED" ? "badge-matched" :
-                                                    m.status === "CANCELLED" ? "badge-cancelled" :
-                                                        "badge"
-                                    }">${m.status}</span>
+                                m.status === "PENDING" ? "badge-confirmed" :
+                                    m.status === "FULL" ? "badge-full" :
+                                        m.status === "MATCHED" ? "badge-matched" :
+                                            m.status === "CANCELLED" ? "badge-cancelled" :
+                                                "badge"
+                            }">${m.status}</span>
                             </div>
                             <div class="card-body">
                                 <p><i class="fas fa-map-marker-alt icon"></i> ${m.ward}, ${m.city}</p>
@@ -400,19 +399,19 @@
                         </div>
                     `;
 
-                                container.append(card);
-                            });
-                        },
-                        error: function (xhr) {
-                            console.error("Lỗi khi lọc dữ liệu:", xhr);
-                            container.html("<p>Lỗi khi tải dữ liệu.</p>");
-                        },
-                    });
-                }
-            });
+                            container.append(card);
+                        });
+                    },
+                    error: function (xhr) {
+                        console.error("Lỗi khi lọc dữ liệu:", xhr);
+                        container.html("<p>Lỗi khi tải dữ liệu.</p>");
+                    },
+                });
+            }
+        });
 
-        </script>
-    </section>
+    </script>
+</section>
 </body>
 
 </html>

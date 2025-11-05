@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -106,6 +107,13 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
 
         if (getAcceptedCurrentPlayers(participant.getMatch().getId()).compareTo(participant.getMatch().getChallengeMatchType().getMaxPlayers()) >= 0) {
             throw new InvalidDataException("Số lượng người chơi đã đủ!");
+        }
+
+        BigDecimal fee = participant.getMatch().getParticipationFee();
+
+        if (fee == null || fee.compareTo(BigDecimal.ZERO) == 0) {
+            participant.setPaid(true);
+            participant.setPaidAt(LocalDateTime.now());
         }
 
         participant.setStatus(EParticipantStatus.ACCEPTED);
