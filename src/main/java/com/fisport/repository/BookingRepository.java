@@ -36,11 +36,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     Optional<Booking> findByIdAndUser(Long id, User user);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("SELECT b FROM Booking b WHERE b.subfield.id = :subfieldId AND b.bookingDate = :date " +
-            "AND b.bookingStatus IN ('PENDING','PAID') " +
-            "AND ((:startTime BETWEEN b.startTime AND b.endTime) " +
-            "OR (:endTime BETWEEN b.startTime AND b.endTime) " +
-            "OR (b.startTime BETWEEN :startTime AND :endTime))")
+    @Query("SELECT b FROM Booking b " +
+            "WHERE b.subfield.id = :subfieldId " +
+            "  AND b.bookingDate = :date " +
+            "  AND b.bookingStatus IN ('PENDING','PAID') " +
+            "  AND (:startTime < b.endTime AND :endTime > b.startTime)")
     List<Booking> findOverlappingBookingsForUpdate(@Param("subfieldId") Long subfieldId,
                                                    @Param("date") LocalDate date,
                                                    @Param("startTime") LocalTime startTime,

@@ -170,7 +170,8 @@
                             <h4 class="section-title">Dịch vụ kèm theo</h4>
                             <div class="list-group">
                                 <div class="list-group-item d-flex justify-content-between align-items-center rounded-3 mb-2"
-                                    th:each="item, iter : ${items}">
+                                    th:each="item, iter : ${items}"
+                                    th:data-price="${item.price}">
                                     <div>
                                         <input class="form-check-input me-2 service-checkbox" type="checkbox"
                                             th:id="${'item-' + item.id}" th:value="${item.serviceItemId}" />
@@ -182,7 +183,7 @@
                                     <div class="text-end d-flex align-items-center gap-2">
                                         <input type="number" class="form-control form-control-sm service-qty" min="1"
                                             value="1" style="display:none;">
-                                        <span class="fw-bold service-total" th:attr="data-price=${item.price}"
+                                        <span class="fw-bold service-total" th:data-price="${item.price}"
                                             th:text="${#numbers.formatDecimal(item.price,0,'COMMA',0,'POINT')} + '₫'"></span>
                                     </div>
                                 </div>
@@ -499,6 +500,7 @@
                     let sum = 0;
                     $('.list-group-item').each(function () {
                         const itemEl = $(this);
+                        console.log(itemEl);
                         if (itemEl.find('.service-checkbox').is(':checked')) {
                             let t = parseFloat(itemEl.find('.service-total').data('total')) || 0;
                             sum += t;
@@ -512,7 +514,7 @@
 
                     const servicesTotalVal = calculateServicesTotal();
                     if (servicesTotalVal > 0)
-                        $('#servicesTotal').show().text('💼 Dịch vụ: ' + formatCurrency(servicesTotalVal));
+                        $('#servicesTotal').show().text('Dịch vụ: ' + formatCurrency(servicesTotalVal));
                     else
                         $('#servicesTotal').hide().text('');
 
@@ -528,7 +530,7 @@
 
                     const grandTotal = Math.max(totalBeforeVoucher - discountAmount, 0);
                     if (grandTotal > 0)
-                        $('#grandTotal').show().text('💰 Tổng: ' + formatCurrency(grandTotal));
+                        $('#grandTotal').show().text('Tổng: ' + formatCurrency(grandTotal));
                     else
                         $('#grandTotal').hide().text('');
                 }
@@ -559,10 +561,6 @@
                     updateServiceTotal(itemEl);
                     updateAllTotals();
                 });
-
-                // console.log('checkbox clicked', $(this).val(), 'checked=', $(this).is(':checked'));
-                // console.log('basePrice=', itemEl.data('price'), 'service-total data-base-price=', itemEl.find('.service-total').data('base-price'));
-                // console.log('qty=', itemEl.find('.service-qty').val(), 'unitPrice=', getUnitPrice(itemEl));
 
                 // Khi click vào voucher
                 $(document).on('click', '.voucher-btn', function () {

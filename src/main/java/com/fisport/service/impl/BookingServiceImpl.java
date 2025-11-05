@@ -107,7 +107,7 @@ public class BookingServiceImpl implements BookingService {
         //Check overlap
         List<Booking> bookings = bookingRepository.findOverlappingBookingsForUpdate(request.getSubFieldId(), request.getDate(), request.getStartTime(), request.getEndTime());
         if (!bookings.isEmpty()) {
-            throw new BookingException("Giờ này trong sân đã bị đặt rồi, bạn chọn giờ khác nhé");
+            throw new InvalidDataException("Giờ này trong sân đã bị đặt rồi, bạn chọn giờ khác nhé");
         }
 
         //Valid occupied
