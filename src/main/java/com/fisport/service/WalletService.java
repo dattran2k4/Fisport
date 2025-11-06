@@ -2,6 +2,7 @@ package com.fisport.service;
 
 import com.fisport.dto.response.WalletResponse;
 import com.fisport.model.Transaction;
+import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 

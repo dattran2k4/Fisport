@@ -3,22 +3,25 @@ package com.fisport.service.impl;
 import com.fisport.dto.request.ChangePasswordRequest;
 import com.fisport.dto.request.UpdateProfileRequest;
 import com.fisport.dto.response.UserResponse;
+import com.fisport.exception.InvalidDataException;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.User;
 import com.fisport.repository.UserRepository;
 import com.fisport.service.UserService;
 import com.fisport.common.ERole;
 import com.fisport.common.EUserStatus;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j(topic = "USER-SERVICE")
 public class IUserService implements UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -42,7 +45,7 @@ public class IUserService implements UserService {
 
     @Override
     public void updateUserByUserName(UpdateProfileRequest request, String name) {
-        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
+        User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không thấy user"));
         user.setPhone(request.getPhone());
         user.setEmail(request.getEmail());
         user.setGender(request.getGender());
@@ -51,21 +54,21 @@ public class IUserService implements UserService {
         userRepository.save(user);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void changePasswordByUserName(ChangePasswordRequest request, String name) {
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy user"));
 
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
-            throw new RuntimeException("Mật khẩu hiện tại không đúng");
+            throw new InvalidDataException("Mật khẩu hiện tại không đúng");
         }
 
         if (!request.getNewPassword().equals(request.getConfirmNewPassword())) {
-            throw new RuntimeException("Mật khẩu mới và xác nhận mật khẩu mới không khớp");
+            throw new InvalidDataException("Mật khẩu mới và xác nhận mật khẩu mới không khớp");
         }
 
         if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
-            throw new RuntimeException("Mật khẩu mới trùng với mật khẩu cũ");
+            throw new InvalidDataException("Mật khẩu mới trùng với mật khẩu cũ");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));

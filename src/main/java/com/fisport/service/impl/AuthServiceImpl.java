@@ -16,9 +16,9 @@ import com.fisport.security.CustomUserDetails;
 import com.fisport.service.*;
 import com.fisport.common.ERole;
 import com.fisport.common.EUserStatus;
-import groovy.util.logging.Slf4j;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,16 +27,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
 
 
 @RequiredArgsConstructor
 @Service
-@Slf4j
+@Slf4j(topic = "AUTH-SERVICE")
 public class AuthServiceImpl implements AuthService {
 
-    private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
     @Value("${endpoint.confirmUser}")
     private String endPointConfirmUser;
 
@@ -54,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
     private final SecurityContextService securityContextService;
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) throws MessagingException, UnsupportedEncodingException {
         if (userRepository.findByUsername(registerRequestDTO.getUsername()).isPresent()) {
             throw new InvalidDataException("tài khoản đã tồn tại");
@@ -229,7 +230,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Người dùng không tồn tại"));
 
         if (!request.getPassword().equals(request.getConfirmPassword())) {
-            throw new RuntimeException("Mật khẩu xác nhận không khớp");
+            throw new InvalidDataException("Mật khẩu xác nhận không khớp");
         }
 
         user.setPassword(passwordEncoder.encode(request.getPassword()));

@@ -3,12 +3,14 @@ package com.fisport.service.impl;
 import com.fisport.model.UserSportElo;
 import com.fisport.service.EloService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "ELO-SERVICE")
 public class EloServiceImpl implements EloService {
 
     private final int K = 32;
@@ -48,8 +50,20 @@ public class EloServiceImpl implements EloService {
         int dentaA = (int) (K * (actualA - expectedScoreTeamA));
         int dentaB = (int) (K * (actualB - expectedScoreTeamB));
 
-        teamA.forEach(userSportElo -> {userSportElo.setElo(userSportElo.getElo() + dentaA);});
-        teamB.forEach(userSportElo -> userSportElo.setElo(userSportElo.getElo() + dentaB));
+        teamA.forEach(userSportElo -> {
+            int oldElo = userSportElo.getElo();
+            int newElo = oldElo + dentaA;
+            userSportElo.setElo(newElo);
+            log.info("[TEAM A] UserID={} | Old Elo={} | New Elo={} | dentaA={}",
+                    userSportElo.getUser().getId(), oldElo, newElo, dentaA);
+        });
+        teamB.forEach(userSportElo -> {
+            int oldElo = userSportElo.getElo();
+            int newElo = oldElo + dentaB;
+            userSportElo.setElo(newElo);
+            log.info("[TEAM B] UserID={} | Old Elo={} | New Elo={} | dentaB={}",
+                    userSportElo.getUser().getId(), oldElo, newElo, dentaB);
+        });
     }
 
 }

@@ -1,12 +1,14 @@
 package com.fisport.service.impl;
 
 import com.fisport.config.VnPayConfig;
+import com.fisport.exception.InvalidDataException;
 import com.fisport.model.Booking;
 import com.fisport.model.Payment;
 import com.fisport.service.VnPayService;
 import com.fisport.util.VnPayUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,12 +20,14 @@ import java.util.TreeMap;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j(topic = "VNPAY-SERVICE")
 public class VnPayServiceImpl implements VnPayService {
     private final VnPayConfig vnPayConfig;
 
     @Override
     public String createPaymentUrl(Booking booking, HttpServletRequest httpServletRequest) {
         try {
+            log.info("Creating Payment URL");
             Map<String, String> vnpParams = new HashMap<>();
             vnpParams.put("vnp_Version", "2.1.0");
             vnpParams.put("vnp_Command", "pay");
@@ -62,13 +66,14 @@ public class VnPayServiceImpl implements VnPayService {
             return paymentUrl;
 
         } catch (Exception e) {
-            throw new RuntimeException("Cannot create VNPay URL", e);
+            throw new InvalidDataException("Cannot create VNPay URL", e);
         }
     }
 
     @Override
     public String createWalletPaymentUrl(Payment payment, HttpServletRequest httpServletRequest) {
         try {
+            log.info("Creating Payment URL");
             Map<String, String> vnpParams = new HashMap<>();
             vnpParams.put("vnp_Version", "2.1.0");
             vnpParams.put("vnp_Command", "pay");
@@ -107,7 +112,7 @@ public class VnPayServiceImpl implements VnPayService {
             return paymentUrl;
 
         } catch (Exception e) {
-            throw new RuntimeException("Cannot create VNPay URL", e);
+            throw new InvalidDataException("Cannot create VNPay URL", e);
         }
     }
 
@@ -117,6 +122,7 @@ public class VnPayServiceImpl implements VnPayService {
     @Override
     public boolean validatePayment(Map<String, String> params) {
         try {
+            log.info("Validating Payment URL");
             String vnpSecureHash = params.get("vnp_SecureHash");
             if (vnpSecureHash == null) return false;
 

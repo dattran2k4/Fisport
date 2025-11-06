@@ -25,9 +25,9 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
+@Slf4j(topic = "BOOKING-SERVICE")
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
@@ -149,7 +149,6 @@ public class BookingServiceImpl implements BookingService {
                 booking.getBookingServiceItems().add(bookingServiceItem);
             }
         }
-
 
         //
         BigDecimal totalSlotPrice = fieldHasTimeSlotService.calculateDynamicPrice(slots, request.getStartTime(), request.getEndTime());

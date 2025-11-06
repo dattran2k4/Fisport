@@ -15,7 +15,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-@Slf4j
+@Slf4j(topic = "CHALLENGE-TYPE-SERVICE")
 public class ChallengeMatchTypeServiceImpl implements ChallengeMatchTypeService {
 
     private final ChallengeMatchTypeRepository challengeMatchTypeRepository;

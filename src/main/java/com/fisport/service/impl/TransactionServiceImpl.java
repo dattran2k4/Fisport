@@ -9,6 +9,7 @@ import com.fisport.repository.TransactionRepository;
 import com.fisport.service.TransactionService;
 import com.fisport.service.TransactionSpecification;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "TRANSACTION-SERVICE")
 public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;

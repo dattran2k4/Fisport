@@ -17,9 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
-@Slf4j
 @RequiredArgsConstructor
 @Service
+@Slf4j(topic = "WALLET-SERVICE")
 public class WalletServiceImpl implements WalletService {
 
     private final WalletRepository walletRepository;

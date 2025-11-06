@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "CHALLENGE-RESULT-SERVICE")
 public class ChallengeResultServiceImpl implements ChallengeResultService {
 
     private final ChallengeMatchService challengeMatchService;
@@ -76,7 +76,9 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
 
         //Get list participants in team
         List<ChallengeParticipant> participantsA = challengeParticipantService.getParticipantsByMatchAndTeamAndStatus(matchID, ETeam.TEAM_A, EParticipantStatus.ACCEPTED);
+        log.info("participantsA: {}", participantsA.toString());
         List<ChallengeParticipant> participantsB = challengeParticipantService.getParticipantsByMatchAndTeamAndStatus(matchID, ETeam.TEAM_B, EParticipantStatus.ACCEPTED);
+        log.info("participantsB: {}", participantsB.toString());
 
         if (participantsA.isEmpty() && participantsB.isEmpty()) {
             throw new InvalidDataException("Không thể cập nhật kết quả");
@@ -88,7 +90,9 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
 
         //Get list elo Team
         List<UserSportElo> eloTeamA = userSportEloService.getUserSportEloByUserIds(userIdsTeamA);
+        log.info("eloTeamA: {}", eloTeamA.toString());
         List<UserSportElo> eloTeamB = userSportEloService.getUserSportEloByUserIds(userIdsTeamB);
+        log.info("eloTeamB: {}", eloTeamB.toString());
 
         //Save
         userSportEloService.updateSportElo(eloTeamA, eloTeamB, request.getScortTeamA(), request.getScortTeamB());

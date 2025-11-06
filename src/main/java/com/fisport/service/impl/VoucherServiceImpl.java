@@ -8,6 +8,7 @@ import com.fisport.model.Voucher;
 import com.fisport.repository.VoucherRepository;
 import com.fisport.service.VoucherService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j(topic = "VOUCHER-SERVICE")
 public class VoucherServiceImpl implements VoucherService {
     private final VoucherRepository voucherRepository;
 
@@ -57,6 +59,7 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public boolean isVoucherActive(String code) {
+        log.info("Check Active Voucher");
         LocalDate now = LocalDate.now();
         return voucherRepository.findByCode(code)
                 .map(v -> v.getStatus() == EVoucherStatus.ACTIVE
@@ -67,8 +70,10 @@ public class VoucherServiceImpl implements VoucherService {
 
     @Override
     public BigDecimal applyDiscount(BigDecimal totalPrice, Voucher voucher) {
+        log.info("Apply discount Voucher");
         if (isVoucherActive(voucher.getCode()) && voucher.getDiscount() != null) {
             BigDecimal discountPercent = BigDecimal.valueOf(voucher.getDiscount()); // ví dụ 10, 20
+            log.info("discount percent is {}", discountPercent);
             BigDecimal discountMultiplier = BigDecimal.valueOf(100)
                     .subtract(discountPercent)
                     .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);

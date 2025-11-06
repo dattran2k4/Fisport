@@ -12,6 +12,7 @@ import com.fisport.repository.UserRepository;
 import com.fisport.service.ReviewService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.security.InvalidParameterException;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j(topic = "REVIEW-SERVICE")
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewRepository reviewRepository;
@@ -28,6 +30,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     @Override
     public void addReview(ReviewRequest request, String username, Long bookingId) {
+        log.info("Adding review for booking id {}", bookingId);
         User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new ResourceNotFoundException("Booking not found"));
 
@@ -47,10 +50,12 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
 
         reviewRepository.save(review);
+        log.info("Review has been saved");
     }
 
     @Override
     public List<ReviewResponse> getReviewsByUser(String username) {
+        log.info("Getting reviews for user {}", username);
         User user =  userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         List<Review> reviews = reviewRepository.findByUser(user);

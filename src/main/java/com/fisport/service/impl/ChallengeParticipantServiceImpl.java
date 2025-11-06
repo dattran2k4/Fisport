@@ -34,7 +34,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Service
-@Slf4j
+@Slf4j(topic = "CHALLENGE-PARTICIPANTS-SERVICE")
 public class ChallengeParticipantServiceImpl implements ChallengeParticipantService {
 
     private final UserRepository userRepository;

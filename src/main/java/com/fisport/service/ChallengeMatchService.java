@@ -7,8 +7,6 @@ import com.fisport.dto.request.ChallengeMatchUpdateRequest;
 import com.fisport.dto.response.*;
 import com.fisport.model.ChallengeMatch;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 public interface ChallengeMatchService {

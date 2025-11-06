@@ -5,6 +5,7 @@ import com.fisport.model.Booking;
 import com.fisport.model.Payment;
 import com.fisport.service.PayOSService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import vn.payos.PayOS;
 import vn.payos.model.v2.paymentRequests.CreatePaymentLinkRequest;
@@ -14,6 +15,7 @@ import vn.payos.model.webhooks.WebhookData;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j(topic = "PAYOS-SERVICE")
 public class PayOSServiceImpl implements PayOSService {
 
     private final PayOSConfig payOSConfig;
@@ -21,7 +23,7 @@ public class PayOSServiceImpl implements PayOSService {
 
     @Override
     public String createPaymentLink(Booking booking) {
-
+        log.info("createPaymentLink");
         long timePart = System.currentTimeMillis() / 100;
         long orderCode = timePart * 100000 + booking.getId();
         long amount = booking.getTotalPrice().longValue();
@@ -42,17 +44,19 @@ public class PayOSServiceImpl implements PayOSService {
                 .build();
 
         CreatePaymentLinkResponse data = payOS.paymentRequests().create(paymentData);
-
+        log.info("created link payOS for Booking");
         return data.getCheckoutUrl();
     }
 
     @Override
     public WebhookData verifyWebHook(Object body) {
+        log.info("verifyWebHook");
         return payOS.webhooks().verify(body);
     }
 
     @Override
     public boolean comfirmWebHook(String paymentLink) {
+        log.info("comfirmWebHook");
         try {
             return payOS.webhooks().confirm(paymentLink) != null;
         } catch (Exception e) {
@@ -83,7 +87,7 @@ public class PayOSServiceImpl implements PayOSService {
                 .build();
 
         CreatePaymentLinkResponse data = payOS.paymentRequests().create(paymentData);
-
+        log.info("created link payOS for Wallet");
         return data.getCheckoutUrl();
     }
 

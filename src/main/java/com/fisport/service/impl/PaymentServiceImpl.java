@@ -25,8 +25,8 @@ import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-@Slf4j
 @Service
+@Slf4j(topic = "PAYMENT-SERVICE")
 public class PaymentServiceImpl implements PaymentService {
 
     private final BookingRepository bookingRepository;
@@ -39,6 +39,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional(rollbackFor =  Exception.class)
     public String createPayment(PaymentRequest request, HttpServletRequest httpServletRequest) {
+        log.info("createPayment");
         Booking booking = findByPaymentToken(request.getPaymentToken());
         booking.setPaymentMethod(request.getPaymentMethod());
 
@@ -55,6 +56,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
 
         paymentRepository.save(payment);
+        log.info("Payment created");
 
         Transaction transaction = Transaction.builder()
                 .amount(booking.getTotalPrice())
@@ -65,6 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
 
         transactionRepository.save(transaction);
+        log.info("Transaction created");
         payment.setTransaction(transaction);
         paymentRepository.save(payment);
 
@@ -246,7 +249,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Booking findByOrderCodePayOs(long orderCode) {
         Long bookingId = orderCode % 100000;
-
+        log.info("find bookingId={}, orderCode {}",  bookingId, orderCode);
         return bookingRepository.findById(bookingId).orElseThrow(() -> new RuntimeException("Booking not found"));
     }
 
