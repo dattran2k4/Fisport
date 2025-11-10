@@ -1,6 +1,8 @@
 package com.fisport.service.impl;
 
 import com.fisport.common.ESubFieldStatus;
+import com.fisport.dto.ai.SearchCriteria;
+import com.fisport.dto.ai.SubFieldForAIResponse;
 import com.fisport.dto.request.SubFieldRequest;
 import com.fisport.dto.response.SubFieldResponse;
 import com.fisport.exception.InvalidDataException;
@@ -10,7 +12,9 @@ import com.fisport.model.SubField;
 import com.fisport.repository.FieldRepository;
 import com.fisport.repository.SubFieldRepository;
 import com.fisport.service.SubFieldService;
+import com.fisport.util.SlugUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.AccessDeniedException;
@@ -18,6 +22,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "SUB-FIELD-SERVICE")
 public class SubFieldServiceImpl implements SubFieldService {
     private final FieldRepository fieldRepository;
     private final SubFieldRepository subFieldRepository;
@@ -85,6 +90,30 @@ public class SubFieldServiceImpl implements SubFieldService {
             throw new AccessDeniedException("Bạn không có quyền xóa SubField này");
         }
         subFieldRepository.delete(subField);
+    }
+
+    @Override
+    public List<SubFieldForAIResponse> findAvailableSubFields(SearchCriteria criteria) {
+        log.info("Find Available SubFields by criteria");
+
+        if (!criteria.isReadyForSearch()) {
+            return List.of();
+        }
+
+        String fieldTypeSlug = SlugUtils.slugify(criteria.fieldType());
+        log.info("fieldTypeSlug: {}", fieldTypeSlug);
+
+        String wardSlug = SlugUtils.slugify(criteria.ward().toLowerCase());
+        log.info("wardSlug: {}", wardSlug);
+
+        List<SubField> list = subFieldRepository.findAvailableSubFields(fieldTypeSlug, wardSlug, criteria.date(), criteria.time());
+
+        return list.stream().map(subField -> SubFieldForAIResponse.builder()
+                .id(subField.getId())
+                .name(subField.getName())
+                .fieldName(subField.getField().getName())
+                .address(subField.getField().getAddress())
+                .build()).toList();
     }
 
     private SubField getSubField(Long id) {
