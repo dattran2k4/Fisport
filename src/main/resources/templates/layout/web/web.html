@@ -47,6 +47,8 @@
     <div layout:fragment="content">
         <!-- default content placeholder -->
     </div>
+    <div th:replace="~{fragments/web/chatbot :: booking-modal-component}"></div>
+    <div th:replace="~{fragments/web/chatbot :: chatbot-component}"></div>
 </main>
 
 <!-- JS Lib-->
@@ -57,6 +59,7 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.27/dist/sweetalert2.all.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script th:src="@{/web/js/chatbot.js}"></script>
 
 
 <script>

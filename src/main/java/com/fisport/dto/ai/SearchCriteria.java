@@ -31,12 +31,4 @@ public record SearchCriteria(
                 date != null &&
                 time != null;
     }
-
-    public boolean isGeneralChat() {
-        return (followUpQuestion == null || followUpQuestion.isBlank()) &&
-                fieldType == null &&
-                ward == null &&
-                date == null &&
-                time == null;
-    }
 }

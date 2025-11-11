@@ -43,10 +43,11 @@ public class BookingApiController {
 
     @PostMapping("/create")
     public ApiResponse createBooking(@Valid @RequestBody BookingRequest request, @AuthenticationPrincipal CustomUserDetails principal) {
-        bookingService.createBooking(request, principal.getUser().getId());
+        String token = bookingService.createBooking(request, principal.getUser().getId());
         return ApiResponse.builder()
                 .status(HttpStatus.CREATED.value())
                 .message("booking created")
+                .data(token)
                 .build();
     }
 

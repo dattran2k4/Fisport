@@ -35,7 +35,7 @@ public class Payment extends AbstractEntity {
     @Column(name = "payment_time")
     private LocalDateTime paymentTime;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "booking_id")
     private Booking booking;
 

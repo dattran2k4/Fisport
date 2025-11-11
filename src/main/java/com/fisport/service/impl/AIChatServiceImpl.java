@@ -1,9 +1,17 @@
 package com.fisport.service.impl;
 
-import com.fisport.dto.ai.SearchCriteria;
-import com.fisport.dto.ai.SubFieldForAIResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fisport.common.EIntentType;
+import com.fisport.dto.ai.ActionPayload;
+import com.fisport.dto.ai.AnalyzedIntent;
+import com.fisport.dto.ai.ConversationContext;
+import com.fisport.dto.ai.StreamResponse;
 import com.fisport.service.AIChatService;
+import com.fisport.service.ConversationContextService;
 import com.fisport.service.SubFieldService;
+import com.fisport.service.intent.IntentHandler;
+import com.fisport.service.intent.IntentRouter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -14,120 +22,100 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j(topic = "AI-CHAT-SERVICE")
 public class AIChatServiceImpl implements AIChatService {
 
     private final ChatClient chatClient;
-    private final SubFieldService subFieldService;
 
-    private final Resource extractionPromptResource;
-    private final Resource generationPromptResource;
-    private final Resource generalPromptResource;
+    private final Resource classifyIntentPrompt;
 
-    private final Map<String, SearchCriteria> conversationState = new ConcurrentHashMap<>();
+    private final IntentRouter router;
+
+    private final Map<String, String> chatHistory = new ConcurrentHashMap<>();
+
+    private final ConversationContextService contextService;
+
+    private final ObjectMapper objectMapper;
 
     public AIChatServiceImpl(ChatClient.Builder builder, SubFieldService subFieldService,
-                             @Value("classpath:prompts/extract-criteria.st") Resource extractionPromptResource,
-                             @Value("classpath:prompts/contextual-chat.st") Resource generationPromptResource,
-                             @Value("classpath:prompts/general-chat.st") Resource generalPromptResource) {
+                             @Value("classpath:prompts/classify-intent.st") Resource classifyIntentPrompt,
+                             IntentRouter router,
+                             ConversationContextService contextService,
+                             ObjectMapper objectMapper) {
         this.chatClient = builder.build();
-        this.subFieldService = subFieldService;
-
-        this.extractionPromptResource = extractionPromptResource;
-        this.generationPromptResource = generationPromptResource;
-        this.generalPromptResource = generalPromptResource;
+        this.classifyIntentPrompt = classifyIntentPrompt;
+        this.router = router;
+        this.contextService = contextService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public Flux<String> streamConversationalResponse(String userId, String userMessage) {
-        log.info("Stream conversation");
+        log.info("Stream conversation for userId {}", userId);
 
-        // --- BƯỚC 1: TRÍCH XUẤT THÔNG TIN (BLOCKING CALL) ---
-        SearchCriteria history = conversationState.getOrDefault(userId,
-                new SearchCriteria(null, null, null, null, null));
+        Optional<ConversationContext> contextOpt = contextService.getConversationContext(userId);
+        EIntentType intent;
 
-        log.info("[USER: {}] Loaded history state: {}", userId, history);
-
-        var outputConverter = new BeanOutputConverter<>(SearchCriteria.class);
-
-        PromptTemplate extractionTpl = new PromptTemplate(extractionPromptResource);
-        Prompt extractionPrompt = extractionTpl.create(Map.of(
-                "user_message", userMessage,
-                "history", history.toString(),
-                "current_date", LocalDate.now().toString(),
-                "format", outputConverter.getFormat()
-        ));
-
-        // Gọi AI lần 1 (blocking) để lấy SearchCriteria
-        log.info("[USER: {}] Calling AI for criteria extraction...", userId);
-        String rawOutput = chatClient.prompt(extractionPrompt).call().content();
-        log.info("[USER: {}] AI Raw Output (Extraction): {}", userId, rawOutput);
-
-        SearchCriteria newCriteria = outputConverter.convert(rawOutput);
-        log.info("[USER: {}] AI Parsed Criteria: {}", userId, newCriteria);
-
-        // --- BƯỚC 2: PHÂN LOẠI VÀ HÀNH ĐỘNG ---
-
-        if (newCriteria.isGeneralChat()) {
-            // Trường hợp 1: Nói chuyện phiếm
-            log.info("[USER: {}] CLASSIFICATION: General Chat. Removing state.", userId);
-            conversationState.remove(userId);
-            return callStreamingGeneration(generalPromptResource, Map.of("user_message", userMessage));
-
-        } else if (newCriteria.isReadyForSearch()) {
-            // Trường hợp 2: Đủ thông tin, tìm sân và trả lời (streaming)
-            log.info("[USER: {}] CLASSIFICATION: Ready for Search. Removing state.", userId);
-            conversationState.remove(userId);
-
-            List<SubFieldForAIResponse> subFields = subFieldService.findAvailableSubFields(newCriteria);
-            log.info("[USER: {}] Found {} available subfields.", userId, subFields.size());
-
-            String context = formatSubFieldsAsContext(subFields);
-
-            log.info("[USER: {}] Calling AI for streaming generation (with context)...", userId);
-            return callStreamingGeneration(generationPromptResource, Map.of(
-                    "context", context,
-                    "question", userMessage
-            ));
-
+        if (contextOpt.isPresent()) {
+            intent = contextOpt.get().getCurrentTopic();
+            log.info("User [{}]: Continuing conversation with topic [{}]", userId, intent);
 
         } else {
-            // Trường hợp 3: Thiếu thông tin, hỏi lại
-            log.info("[USER: {}] CLASSIFICATION: Needs Follow-up. Saving state.", userId);
-            conversationState.put(userId, newCriteria);
+            var outputConverter = new BeanOutputConverter<>(AnalyzedIntent.class);
+            String history = chatHistory.getOrDefault(userId, "");
 
-            String followUp = newCriteria.followUpQuestion();
-            log.info("[USER: {}] Returning follow-up question: \"{}\"", userId, followUp);
+            PromptTemplate classifyTempt = new PromptTemplate(classifyIntentPrompt);
+            Prompt classifyPrompt = classifyTempt.create(Map.of(
+                    "user_message", userMessage,
+                    "history", history.toString(),
+                    "format", outputConverter.getFormat()
+            ));
 
-            return Flux.just(newCriteria.followUpQuestion());
+            log.debug("User [{}]: Calling classification AI...", userId);
+
+//            String response = chatClient.prompt(classifyPrompt).call().content();
+//            AnalyzedIntent analyzedIntent = outputConverter.convert(response);
+
+            AnalyzedIntent analyzedIntent = chatClient.prompt(classifyPrompt).call().entity(AnalyzedIntent.class);
+
+            intent = analyzedIntent.intent();
+
+            log.info("User [{}]: Classified intent as [{}]", userId, intent);
+
+            chatHistory.put(userId, history + "\nUser: " + userMessage);
+
         }
+
+        IntentHandler handler = router.getHandler(intent);
+        log.info("User [{}]: Routing to handler [{}]", userId, handler.getClass().getSimpleName());
+
+        Flux<StreamResponse> responseStream =  handler.handle(userId, userMessage, contextOpt);
+
+        ActionPayload endTurnAction = new ActionPayload("END_TURN", null);
+        StreamResponse endTurnResponse = new StreamResponse("ACTION", null, endTurnAction);
+
+        return responseStream
+                .concatWith(Flux.just(endTurnResponse))
+                .map(this::serializeResponse)
+                .doOnError(e -> log.error("Error serializing StreamResponse", e));
     }
 
-    private Flux<String> callStreamingGeneration(Resource promptResource, Map<String, Object> variables) {
-        PromptTemplate promptTemplate = new PromptTemplate(promptResource);
-        Prompt prompt = promptTemplate.create(variables);
-
-        return chatClient.prompt(prompt)
-                .stream()
-                .content();
-    }
-
-    private String formatSubFieldsAsContext(List<SubFieldForAIResponse> subFields) {
-        if (subFields == null || subFields.isEmpty()) {
-            return "Rất tiếc, không tìm thấy sân con nào trống theo yêu cầu.";
+    private String serializeResponse(StreamResponse response) {
+        try {
+            // Biến Object thành chuỗi JSON
+            log.info("Serializing StreamResponse [{}]", response);
+            return objectMapper.writeValueAsString(response);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize response: {}", response, e);
+            // Trả về lỗi dưới dạng JSON
+            return "{\"type\": \"ERROR\", \"textChunk\": \"Lỗi xử lý máy chủ\"}";
         }
-
-        // Giới hạn 7 sân để tránh context quá dài (tiết kiệm token)
-        return subFields.stream()
-                .limit(2)
-                .map(SubFieldForAIResponse::toString)
-                .collect(Collectors.joining("\n"));
     }
 }
+
+

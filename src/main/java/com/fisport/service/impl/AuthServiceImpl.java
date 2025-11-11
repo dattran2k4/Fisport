@@ -63,6 +63,14 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidDataException("email đã tồn tại");
         }
 
+        if (!registerRequestDTO.getPassword().equals(registerRequestDTO.getConfirmPassword())) {
+            throw new InvalidDataException("Mật khẩu không trùng với mật khẩu xác nhận");
+        }
+
+        if (userRepository.findByPhone(registerRequestDTO.getPhone()).isPresent()) {
+            throw new InvalidDataException("Số điện thoại đã tồn tại");
+        }
+
         Role role = roleRepository.findByName(ERole.USER)
                 .orElseThrow(() -> new ResourceNotFoundException("Default role 'USER' not found"));
 

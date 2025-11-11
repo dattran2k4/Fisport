@@ -9,8 +9,7 @@ QUY TẮC:
 
 CÁC Ý ĐỊNH:
 - `FIND_VENUE`: Người dùng muốn tìm sân, hỏi sân trống,
-  hoặc cung cấp thông tin (cầu lông, Sơn Trà, 5h chiều).
-- `GENERAL_CHAT`: Người dùng chào hỏi, cảm ơn, hỏi vu vơ.
+  hoặc cung cấp thông tin (môn thể thao, quận/phường, ngày, giờ, tìm kiếm).
 
 LỊCH SỬ HỘI THOẠI (tham khảo):
 {history}

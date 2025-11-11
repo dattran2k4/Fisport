@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div id="booking-modal-overlay" class="chatbot-modal-overlay">
+        <div class="chatbot-modal-content">
+            <h3>Xác nhận Đặt sân</h3>
+            <p>Vui lòng xác nhận thông tin:</p>
+
+            <form id="chatbot-booking-form">
+                <div class="chatbot-form-group">
+                    <label>Ngày chơi:</label>
+                    <input type="text" id="chatbot-modal-date" disabled>
+                </div>
+                <div class="chatbot-form-group">
+                    <label>Giờ bắt đầu:</label>
+                    <input type="text" id="chatbot-modal-time" disabled>
+                </div>
+                <div class="chatbot-form-group">
+                    <label for="chatbot-modal-subfield">Chọn sân con:</label>
+                    <select id="chatbot-modal-subfield" required></select>
+                </div>
+                <div class="chatbot-form-group">
+                    <label for="chatbot-modal-duration">Thời lượng (phút):</label>
+                    <select id="chatbot-modal-duration" required>
+                        <option value="60">60 phút</option>
+                        <option value="90">90 phút</option>
+                        <option value="120">120 phút</option>
+                    </select>
+                </div>
+                <div class="chatbot-modal-buttons">
+                    <button type="button" id="chatbot-cancel-booking-btn" class="btn-secondary">Hủy</button>
+                    <button type="submit" id="chatbot-confirm-booking-btn" class="btn-primary">Xác nhận</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .chatbot-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .chatbot-modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 400px;
+            z-index: 10001;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .chatbot-form-group {
+            margin-bottom: 15px;
+        }
+
+        .chatbot-form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .chatbot-form-group input,
+        .chatbot-form-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .chatbot-modal-buttons {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .chatbot-modal-buttons .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .chatbot-modal-buttons .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+    </style>
+    </div>
+
+
+
+    <div id="chatbot-toggle-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
+            <path
+                d="M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9.06 9.06 0 0 0 8 15z" />
+        </svg>
+    </div>
+
+    <div class="chat-popup-window" id="chatbot-popup" th:data-api-chat-stream="@{/api/ai/chat}"
+        th:data-api-bookings="@{/api/v1/bookings/create}">
+        <div class="chat-header">
+            <h3>Chatbot Đặt Sân (SanSan)</h3>
+            <button id="chatbot-close-btn">&times;</button>
+        </div>
+        <div class="chat-log" id="chatbot-log">
+            <div class="message bot">
+                <p>Chào bạn, em là SanSan. Bạn muốn tìm sân gì ạ?</p>
+            </div>
+        </div>
+        <div class="chat-form-container">
+            <form id="chatbot-form">
+                <input type="text" id="chatbot-input" placeholder="Nhập tin nhắn..." autocomplete="off">
+                <button type="submit" id="chatbot-send-btn">Gửi</button>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        #chatbot-toggle-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            z-index: 9998;
+        }
+
+        .chat-popup-window {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            right: 25px;
+            width: 370px;
+            height: 500px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            z-index: 9999;
+        }
+
+        .chat-popup-window .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-popup-window .chat-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        #chatbot-close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .chat-popup-window .chat-log {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message p {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            margin: 0;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            align-items: flex-end;
+        }
+
+        .message.user p {
+            background-color: #007bff;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot {
+            align-items: flex-start;
+        }
+
+        .message.bot p {
+            background-color: #e9e9eb;
+            color: #333;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.error p {
+            background-color: #ffebee;
+            color: #d32f2f;
+            border: 1px solid #d32f2f;
+        }
+
+        .chat-popup-window .chat-form-container {
+            padding: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        #chatbot-form {
+            display: flex;
+        }
+
+        #chatbot-input {
+            flex-grow: 1;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            padding: 10px 15px;
+            font-size: 14px;
+        }
+
+        #chatbot-send-btn {
+            margin-left: 10px;
+            padding: 10px 15px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        #chatbot-send-btn:disabled {
+            background-color: #a0a0a0;
+        }
+    </style>
+
+</body>
+
+</html>

@@ -7,6 +7,7 @@ import com.fisport.security.CustomUserDetails;
 import com.fisport.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
+@Slf4j(topic = "BOOKING-CONTROLLER")
 public class BookingController {
 
     private final FieldService fieldService;
@@ -72,6 +74,7 @@ public class BookingController {
             token = bookingService.createBooking(request, customUserDetails.getUser().getId());
         } catch (Exception e) {
             model.addAttribute("error", e.getMessage());
+            return "web/booking";
         }
         return "redirect:/thanh-toan?token=" + token;
     }
