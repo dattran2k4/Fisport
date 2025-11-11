@@ -80,7 +80,6 @@ public class LoginController {
 
         String role = authService.getRoleByUserName(twoFARequest.getUsername());
 
-
         if (role.equals("ADMIN")) {
             return "redirect:/admin";
         }  else if (role.equals("OWNER")) {
