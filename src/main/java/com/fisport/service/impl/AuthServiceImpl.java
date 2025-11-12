@@ -55,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) throws MessagingException, UnsupportedEncodingException {
+    public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) {
         if (userRepository.findByUsername(registerRequestDTO.getUsername()).isPresent()) {
             throw new InvalidDataException("tài khoản đã tồn tại");
         }

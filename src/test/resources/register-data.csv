@@ -1,0 +1,8 @@
+username,password,confirmPassword,email,phone,birthday,gender,expectedResult,expectedMessage
+,,123,test@a.com,0987654321,2000-01-01,MALE,error_validation,Tài khoản không được để trống
+testuser1,123,123,test@a.com,0987654321,2000-01-01,MALE,error_validation,Mật khẩu
+testuser2,Password123,Password456,test@a.com,0987654321,2000-01-01,MALE,error_validation,Xác nhận mật khẩu
+testuser3,Password123,Password123,bad-email,0987654321,2000-01-01,MALE,error_validation,Định dạng email
+testuser4,Password123,Password123,test@a.com,123,2000-01-01,MALE,error_validation,Định dạng số điện thoại
+testuser5,Password123,Password123,test@a.com,0987654321,2030-01-01,MALE,error_validation,Ngày sinh phải trước hôm nay
+johndoe,Password123,Password123,new@a.com,0987654321,2000-01-01,MALE,error_global,tài khoản đã tồn tại

@@ -30,7 +30,7 @@
                                 <label class="form-label fw-semibold">
                                     <i class="bi bi-person-circle"></i> Tài khoản
                                 </label>
-                                <input type="text" th:field="*{username}" class="form-control"
+                                <input id="username" type="text" th:field="*{username}" class="form-control"
                                        placeholder="Nhập tài khoản">
                                 <div class="text-danger small" th:if="${#fields.hasErrors('username')}"
                                      th:errors="*{username}"></div>
@@ -41,7 +41,7 @@
                                 <label class="form-label fw-semibold">
                                     <i class="bi bi-lock"></i> Mật khẩu
                                 </label>
-                                <input type="password" th:field="*{password}" class="form-control"
+                                <input id="password" type="password" th:field="*{password}" class="form-control"
                                        placeholder="Nhập mật khẩu">
                                 <div class="text-danger small" th:if="${#fields.hasErrors('password')}"
                                      th:errors="*{password}"></div>
@@ -52,7 +52,7 @@
                                 <label class="form-label fw-semibold">
                                     <i class="bi bi-shield-lock"></i> Xác nhận mật khẩu
                                 </label>
-                                <input type="password" th:field="*{confirmPassword}" class="form-control"
+                                <input id="confirmPassword" type="password" th:field="*{confirmPassword}" class="form-control"
                                        placeholder="Nhập lại mật khẩu">
                                 <div class="text-danger small" th:if="${#fields.hasErrors('confirmPassword')}"
                                      th:errors="*{confirmPassword}"></div>
@@ -63,7 +63,7 @@
                                 <label class="form-label fw-semibold">
                                     <i class="bi bi-envelope"></i> Email
                                 </label>
-                                <input type="email" th:field="*{email}" class="form-control"
+                                <input id="email" type="email" th:field="*{email}" class="form-control"
                                        placeholder="Nhập email của bạn">
                                 <div class="text-danger small" th:if="${#fields.hasErrors('email')}"
                                      th:errors="*{email}"></div>
@@ -74,7 +74,7 @@
                                 <label class="form-label fw-semibold">
                                     <i class="bi bi-telephone"></i> Số điện thoại
                                 </label>
-                                <input type="text" th:field="*{phone}" class="form-control"
+                                <input id="phone" type="text" th:field="*{phone}" class="form-control"
                                        placeholder="Nhập số điện thoại">
                                 <div class="text-danger small" th:if="${#fields.hasErrors('phone')}"
                                      th:errors="*{phone}"></div>
@@ -85,7 +85,7 @@
                                 <label class="form-label fw-semibold">
                                     <i class="bi bi-calendar-date"></i> Ngày sinh
                                 </label>
-                                <input type="date" th:field="*{birthday}" class="form-control">
+                                <input id="birthday" type="date" th:field="*{birthday}" class="form-control">
                                 <div class="text-danger small" th:if="${#fields.hasErrors('birthday')}"
                                      th:errors="*{birthday}"></div>
                             </div>
@@ -97,14 +97,14 @@
                                 </label>
                                 <div class="d-flex gap-4 mt-2">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" th:field="*{gender}"
-                                               value="MALE" id="male">
-                                        <label class="form-check-label" for="male">Nam</label>
+                                        <input id="male-gender" class="form-check-input" type="radio" th:field="*{gender}"
+                                               value="MALE" >
+                                        <label class="form-check-label">Nam</label>
                                     </div>
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" th:field="*{gender}"
-                                               value="FEMALE" id="female">
-                                        <label class="form-check-label" for="female">Nữ</label>
+                                        <input id="female-gender" class="form-check-input" type="radio" th:field="*{gender}"
+                                               value="FEMALE">
+                                        <label class="form-check-label">Nữ</label>
                                     </div>
                                 </div>
                                 <div class="text-danger small" th:if="${#fields.hasErrors('gender')}"
@@ -113,7 +113,7 @@
 
                             <!-- Submit -->
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary rounded-pill">
+                                <button id="register-btn" type="submit" class="btn btn-primary rounded-pill">
                                     <i class="bi bi-check-circle"></i> Đăng ký
                                 </button>
                             </div>

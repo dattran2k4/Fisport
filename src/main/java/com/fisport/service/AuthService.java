@@ -11,7 +11,7 @@ import jakarta.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
 
 public interface AuthService {
-    RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) throws MessagingException, UnsupportedEncodingException;
+    RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO);
 
     LoginResponse login(LoginRequestDTO request);
 
