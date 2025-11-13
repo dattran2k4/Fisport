@@ -21,11 +21,11 @@ public class BookingTest extends  BaseTest {
     static LoginPage loginPage;
     static BookingPage bookingPage;
     static HomePage homePage;
-    static FieldDetailPage  fieldDetailPage;
+    static FieldDetailPage fieldDetailPage;
 
-    private static final String FIELD_NAME_TO_CLICK = "Sân bóng đá 2"; // Tên trên trang chủ
-    private static final String SUBFIELD_ID_TO_BOOK = "3"; // ID của Sân con 1
-    private static final String START_TIME = "09:00";
+    private static final String FIELD_NAME_TO_CLICK = "Sân bóng đá 2";
+    private static final String SUBFIELD_ID_TO_BOOK = "3";
+    private static final String START_TIME = "19:00";
     private static final String DURATION_MINUTES = "60";
 
     // Luôn đặt cho 1 ngày trong tương lai (ví dụ: 3 ngày tới)
@@ -42,23 +42,19 @@ public class BookingTest extends  BaseTest {
         fieldDetailPage = new FieldDetailPage(driver);
 
         // 2. ĐĂNG NHẬP
-        System.out.println("Bắt đầu @BeforeAll: Đăng nhập...");
         loginPage.navigate();
-        loginPage.login("johndoe", "123456"); // (Sửa tài khoản nếu cần)
-        homePage.waitForPageLoad(); // Đợi trang chủ load
-        System.out.println("Đăng nhập thành công.");
+        loginPage.login("johndoe", "123456");
+        homePage.waitForPageLoad();
 
-        System.out.println("Điều hướng đến trang đặt sân...");
         homePage.clickFieldLink(FIELD_NAME_TO_CLICK);
 
         try {
-            fieldDetailPage.waitForPageLoad(); // Đợi trang chi tiết load
-            fieldDetailPage.clickGoToBookingButton(); // Click "Đặt sân"
+            fieldDetailPage.waitForPageLoad();
+            fieldDetailPage.clickGoToBookingButton();
 
             wait.until(ExpectedConditions.visibilityOfElementLocated(
                     By.cssSelector("#bookingForm button[type='submit']")
             ));
-            System.out.println("Đã đến trang đặt sân (Form). @BeforeAll hoàn tất.");
         } catch (Exception e) {
             assertTrue(false, "Không thể đến trang đặt sân (Form) từ trang chi tiết.");
         }
@@ -68,31 +64,61 @@ public class BookingTest extends  BaseTest {
     @Order(1)
     @DisplayName("Should book a slot successfully (Lần 1)")
     void testBookingSuccess() {
-        // (Chúng ta đã ở trang đặt sân từ @BeforeAll)
 
         System.out.println("Chạy Test 1: Đặt thành công...");
         System.out.println("Dữ liệu: Ngày=" + BOOKING_DATE + ", Sân=" + SUBFIELD_ID_TO_BOOK + ", Giờ=" + START_TIME);
 
-        // --- ĐIỀN FORM (Theo luồng JS) ---
-        bookingPage.selectDay(BOOKING_DATE);       // Bước 1
-        bookingPage.selectSubField(SUBFIELD_ID_TO_BOOK); // Bước 2
-        bookingPage.selectHour(START_TIME);        // Bước 3 (Đợi JS)
-        bookingPage.selectDuration(DURATION_MINUTES); // Bước 4 (Đợi JS)
+        bookingPage.selectDay(BOOKING_DATE);
+        bookingPage.selectSubField(SUBFIELD_ID_TO_BOOK);
+        bookingPage.selectHour(START_TIME);
+        bookingPage.selectDuration(DURATION_MINUTES);
 
-        bookingPage.clickBookButton();             // Bước 5
+        bookingPage.clickBookButton();
 
-        // --- KIỂM TRA (ASSERT) ---
-        // Giả định: Đặt thành công sẽ redirect về trang Lịch sử (/booking/history)
         try {
             wait.until(ExpectedConditions.urlContains("/thanh-toan"));
             assertTrue(driver.getCurrentUrl().contains("/thanh-toan"),
-                    "Không redirect đến trang lịch sử sau khi đặt thành công.");
-            System.out.println("Test 1: THÀNH CÔNG.");
+                    "Redirect to payment page");
 
         } catch (Exception e) {
-            System.out.println("DEBUG (Booking Success): Test failed. Current URL is: " + driver.getCurrentUrl());
             e.printStackTrace();
             assertTrue(false, "Booking was expected to SUCCEED but it FAILED.");
+        }
+    }
+
+    @Test
+    @Order(2)
+    @DisplayName("Should verify the booked slot is disabled")
+    void testUI_SlotIsDisabledAfterBooking() {
+
+
+        bookingPage.selectDay(BOOKING_DATE);
+        bookingPage.selectSubField(SUBFIELD_ID_TO_BOOK);
+
+        try {
+            assertTrue(bookingPage.isHourDisabled(START_TIME),
+                    "Khung giờ " + START_TIME + " đáng lẽ phải bị disable sau khi đã book.");
+
+        } catch (Exception e) {
+            assertTrue(false, "Test FAILED: Khung giờ đã book nhưng nút vẫn enabled.");
+        }
+    }
+
+    @Test
+    @Order(3)
+    @DisplayName("Should verify the booked slot is disabled")
+    void testUI_DurationIsDisplayedAfterBooking() {
+
+        bookingPage.selectDay("17/11");
+        bookingPage.selectSubField(SUBFIELD_ID_TO_BOOK);
+        bookingPage.selectHour("17:30");
+
+        try {
+            assertTrue(bookingPage.isDuartionNoShowed("60"),
+                    "Duration 60 minutes đáng lẽ phải bị ẩn sau khi đã book.");
+
+        } catch (Exception e) {
+            assertTrue(false, "Test FAILED: Khung giờ đã book nhưng nút vẫn hiện duration.");
         }
     }
 }

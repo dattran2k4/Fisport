@@ -24,7 +24,9 @@ public class LoginPage extends BasePage {
 
     public void login(String username, String password) {
         type(usernameField, username);
+        sleep(500);
         type(passwordField, password);
+        sleep(500);
         click(loginButton);
     }
 

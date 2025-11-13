@@ -19,6 +19,14 @@ public class BasePage {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
+    public WebElement waitForElementPresent(By locator) {
+        return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+    }
+
+    public WebElement waitForElementClickable(By locator) {
+        return wait.until(ExpectedConditions.elementToBeClickable(locator));
+    }
+
     // Click safely
     protected void click(By locator) {
         waitForVisibility(locator).click();
@@ -61,4 +69,32 @@ public class BasePage {
             click(locator);
         }
     }
+
+    public void scrollToElement(By locator) {
+        WebElement element = driver.findElement(locator);
+        ((JavascriptExecutor) driver)
+                .executeScript("arguments[0].scrollIntoView({block: 'center', behavior: 'smooth'});", element);
+        sleep(300);
+    }
+
+    public void scrollDown(int pixels) {
+        ((JavascriptExecutor) driver).executeScript("window.scrollBy(0, arguments[0]);", pixels);
+    }
+
+    protected void sleep(long millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    protected boolean isElementHiddenOrAbsent(By locator) {
+        try {
+            return wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        } catch (TimeoutException e) {
+            return false;
+        }
+    }
+
 }
