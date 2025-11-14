@@ -107,8 +107,8 @@ public class AIChatServiceImpl implements AIChatService {
 
     private String serializeResponse(StreamResponse response) {
         try {
+            log.info("Serializing StreamResponse");
             // Biến Object thành chuỗi JSON
-            log.info("Serializing StreamResponse [{}]", response);
             return objectMapper.writeValueAsString(response);
         } catch (JsonProcessingException e) {
             log.error("Failed to serialize response: {}", response, e);

@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class BookingTest extends  BaseTest {
+public class BookingServiceTest extends  BaseTest {
 
     static WebDriverWait wait;
     static LoginPage loginPage;
