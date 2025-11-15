@@ -46,9 +46,9 @@
             <h4 class="mt-2">Đăng nhập</h4>
         </div>
         <form th:action="@{/login}" th:object="${login}" method="POST" novalidate>
-            <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
-            <div th:if="${errorCode}" class="alert alert-danger" th:text="${errorCode}"></div>
-            <div th:if="${TwoFASuccess}" class="alert alert-danger" th:text="${TwoFASuccess}"></div>
+            <div th:if="${error}" class="alert alert-danger error-message" th:text="${error}"></div>
+<!--            <div th:if="${errorCode}" class="alert alert-danger" th:text="${errorCode}"></div>-->
+<!--            <div th:if="${TwoFASuccess}" class="alert alert-danger" th:text="${TwoFASuccess}"></div>-->
             <div class="mb-3">
                 <div class="input-group">
                     <span class="input-group-text"><i class="bi bi-person"></i></span>

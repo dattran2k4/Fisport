@@ -9,6 +9,7 @@ import com.fisport.util.QRCodeUtil;
 import jakarta.mail.MessagingException;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -22,6 +23,7 @@ import java.io.UnsupportedEncodingException;
 @RequiredArgsConstructor
 @RequestMapping
 @Controller
+@Slf4j(topic = "REGISTER-CONTROLLER")
 public class RegisterController {
     private final AuthService authService;
     private final SessionService sessionService;
@@ -38,15 +40,23 @@ public class RegisterController {
                              BindingResult result,
                              Model model,
                              RedirectAttributes redirectAttributes) throws MessagingException, UnsupportedEncodingException {
+        log.info("Regisger request");
+
         if (result.hasErrors()) {
             model.addAttribute("error", result.getAllErrors().get(0).getDefaultMessage());
             return "/register";
         }
 
-        RegisterResponseDTO response = authService.register(request);
-        redirectAttributes.addFlashAttribute("success",
-                "Đăng ký tài khoản thành công! Vui lòng xác thực email để xác thực tài khoản.");
-        sessionService.set("username", response.getUsername());
+        try {
+            RegisterResponseDTO response = authService.register(request);
+            redirectAttributes.addFlashAttribute("success",
+                    "Đăng ký tài khoản thành công! Vui lòng xác thực email để xác thực tài khoản.");
+            sessionService.set("username", response.getUsername());
+        } catch (Exception e) {
+            model.addAttribute("error", e.getMessage());
+            log.info("Error register {}", e.getMessage());
+            return "/register";
+        }
         return "redirect:/register";
     }
 

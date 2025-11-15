@@ -1,6 +1,8 @@
 package com.fisport.dto.request;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +18,7 @@ public class BookingRequest {
 
     @NotNull(message = "Chọn ngày chơi")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @FutureOrPresent(message = "Ngày đặt phải trong hôm nay hoặc tương lai")
     private LocalDate date;
 
     @NotNull(message = "Chọn sân chơi")

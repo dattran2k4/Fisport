@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.context.Context;
@@ -28,7 +29,6 @@ public class MailService {
 
     private final JavaMailSender mailSender;
     private final SpringTemplateEngine templateEngine;
-    private final CaffeineTokenService tokenService;
 
     @Value("${spring.mail.from}")
     private String emailFrom;
@@ -59,26 +59,30 @@ public class MailService {
         return "Sent";
     }
 
-    public void sendConfirmLink(String emailTo, String template, String endPointConfirmUser, String verifyCode) throws MessagingException, UnsupportedEncodingException {
+    @Async
+    public void sendConfirmLink(String emailTo, String template, String endPointConfirmUser, String verifyCode) {
 
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED, StandardCharsets.UTF_8.name());
-        Context context =  new Context();
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED, StandardCharsets.UTF_8.name());
+            Context context =  new Context();
 
+            String confirmLink = String.format("%s?verifyCode=%s", endPointConfirmUser, URLEncoder.encode(verifyCode, StandardCharsets.UTF_8));
 
-        String confirmLink = String.format("%s?verifyCode=%s", endPointConfirmUser, URLEncoder.encode(verifyCode, StandardCharsets.UTF_8));
+            Map<String, Object> properties = new HashMap<>();
+            properties.put("confirmLink", confirmLink);
+            properties.put("verifyCode", verifyCode);
+            context.setVariables(properties);
 
-        Map<String, Object> properties = new HashMap<>();
-        properties.put("confirmLink", confirmLink);
-        properties.put("verifyCode", verifyCode);
-        context.setVariables(properties);
+            helper.setFrom(emailFrom, "Đạt Trần");
+            helper.setTo(emailTo);
+            helper.setSubject("Xác nhận tài khoản");
+            String html = templateEngine.process(template, context);
+            helper.setText(html, true);
 
-        helper.setFrom(emailFrom, "Đạt Trần");
-        helper.setTo(emailTo);
-        helper.setSubject("Xác nhận tài khoản");
-        String html = templateEngine.process(template, context);
-        helper.setText(html, true);
-
-        mailSender.send(message);
+            mailSender.send(message);
+        } catch (Exception e) {
+            log.error("Failed to send confirm link email to {}: {}", emailTo, e.getMessage(), e);
+        }
     }
 }

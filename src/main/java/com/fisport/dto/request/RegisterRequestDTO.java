@@ -38,13 +38,13 @@ public class RegisterRequestDTO implements Serializable {
     )
     private String phone;
 
-    @NotNull(message = "Ngày bạn đẻ đừng để trống mà!")
+    @NotNull(message = "Ngày sinh không để trống!")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     @Past(message = "Ngày sinh phải trước hôm nay")
 //    @JsonFormat(pattern = "dd/MM/yyyy")
     private LocalDate birthday;
 
-    @NotNull(message = "Vui lòng chọn giới tính (chỉ có 2)")
+    @NotNull(message = "Vui lòng chọn giới tính")
     @EnumValue(name = "gender", enumClass = EGender.class)
     private EGender gender;
 }

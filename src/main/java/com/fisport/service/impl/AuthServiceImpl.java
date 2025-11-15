@@ -55,12 +55,20 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) throws MessagingException, UnsupportedEncodingException {
+    public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) {
         if (userRepository.findByUsername(registerRequestDTO.getUsername()).isPresent()) {
             throw new InvalidDataException("tài khoản đã tồn tại");
         }
         if (userRepository.findByEmail(registerRequestDTO.getEmail()).isPresent()) {
             throw new InvalidDataException("email đã tồn tại");
+        }
+
+        if (!registerRequestDTO.getPassword().equals(registerRequestDTO.getConfirmPassword())) {
+            throw new InvalidDataException("Mật khẩu không trùng với mật khẩu xác nhận");
+        }
+
+        if (userRepository.findByPhone(registerRequestDTO.getPhone()).isPresent()) {
+            throw new InvalidDataException("Số điện thoại đã tồn tại");
         }
 
         Role role = roleRepository.findByName(ERole.USER)

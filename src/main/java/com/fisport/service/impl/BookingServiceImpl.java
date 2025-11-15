@@ -64,35 +64,35 @@ public class BookingServiceImpl implements BookingService {
         SubField subField = subFieldRepository.findById(request.getSubFieldId()).orElseThrow(() -> new ResourceNotFoundException("SubField not found"));
 
         if (!subField.getStatus().equals(ESubFieldStatus.AVAILABLE)) {
-            throw new BookingException("Subfield not available");
+            throw new InvalidDataException("Subfield not available");
         }
 
         //Valid date
         if (request.getDate().isBefore(LocalDate.now())) {
-            throw new BookingException("Date must be after now");
+            throw new InvalidDataException("Date must be after now");
         }
 
         //Valid time
         LocalDateTime startDateTime = LocalDateTime.of(request.getDate(), request.getStartTime());
         if (startDateTime.isBefore(LocalDateTime.now())) {
-            throw new BookingException("Invalid start time");
+            throw new InvalidDataException("Thời gian bắt đầu chơi không hợp lệ");
         }
 
         if (request.getStartTime().isAfter(request.getEndTime())) {
-            throw new BookingException("Start time must be before end time");
+            throw new InvalidDataException("Thời gian bắt đầu chơi phải trước thời gian kết thúc");
         }
 
         if (request.getStartTime().isBefore(subField.getField().getOpenTime())) {
-            throw new BookingException("Start time must be after open time");
+            throw new InvalidDataException("Thời gian bắt đầu chơi không được trước giờ mở cửa");
         }
 
         if (request.getEndTime().isAfter(subField.getField().getCloseTime())) {
-            throw new BookingException("End time must be before close time");
+            throw new InvalidDataException("Thời gian kết thúc không được sau giờ đóng cửa");
         }
 
         //Valid duration must be in field type
         if (request.getDuration() != java.time.Duration.between(request.getStartTime(), request.getEndTime()).toMinutes()) {
-            throw new BookingException("Duration not valid");
+            throw new InvalidDataException("Thời gian chơi không hợp lệ");
         }
 
         Set<FieldTypeBookDuration> durations = subField.getField().getFieldType().getFieldTypeBookDuration();
@@ -132,11 +132,11 @@ public class BookingServiceImpl implements BookingService {
 
                 //quantity check
                 if (requestItem.getQuantity() < 0 || requestItem.getQuantity() > fsi.getQuantity()) {
-                    throw new BookingException("Quantity not valid");
+                    throw new BookingException("Số lượng không hợp lệ");
                 }
 
                 if (!fsi.getStatus().equals(EFieldServiceItem.ACTIVE)) {
-                    throw new BookingException("Service Item is Inactive");
+                    throw new BookingException("Dịch vụ tạm ngưng");
                 }
 
                 BookingServiceItem bookingServiceItem = BookingServiceItem.builder()
@@ -244,7 +244,7 @@ public class BookingServiceImpl implements BookingService {
                 .fieldName(b.getSubfield().getField().getName())
                 .startTime(b.getStartTime())
                 .endTime(b.getEndTime())
-                .paymentMethod(b.getPaymentMethod().name())
+                .paymentMethod(b.getPaymentMethod() != null ? b.getPaymentMethod().name() : null)
                 .status(String.valueOf(b.getBookingStatus()))
                 .cancel(b.getBookingStatus() == EBookingStatus.PENDING || b.getBookingStatus() == EBookingStatus.PAID)
                 .canReview(b.getBookingStatus() == EBookingStatus.COMPLETED && (b.getReview() == null || b.getReview().getRating() == null))
