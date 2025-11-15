@@ -19,6 +19,11 @@ $(document).ready(function () {
     const chatApiUrl = $chatPopup.data('api-chat-stream');
     const bookingsApiUrl = $chatPopup.data('api-bookings');
 
+    const $voucherCodeInput = $('#chatbot-modal-voucher-code');
+    const $voucherIdInput = $('#chatbot-modal-voucher-id');
+    const $voucherListContainer = $('#chatbot-voucher-list');
+    const $voucherDiscountInput = $('#chatbot-modal-voucher-discount');
+
     let eventSource = null;
     let modalDataStore = null;
     let isStreamFinished = false;
@@ -75,13 +80,6 @@ $(document).ready(function () {
         };
     });
 
-    // (Các hàm handleStreamResponse, handleAction, addMessageToLog...
-    // giữ nguyên y hệt như ví dụ trước)
-
-    // ... (Hàm handleStreamResponse) ...
-    // ... (Hàm handleAction) ...
-
-    // Logic Xử lý Form Modal
     $cancelBookingBtn.on('click', function () {
         $modalOverlay.hide();
         modalDataStore = null;
@@ -112,6 +110,7 @@ $(document).ready(function () {
         const durationVal = $('#chatbot-modal-duration').val();
         const durationMinutes = parseInt(durationVal, 10);
         const startTime = $('#chatbot-modal-time').val();
+        const discountPercent = parseInt($voucherDiscountInput.val() || '0', 10);
 
         if (!fieldId || !durationMinutes || !startTime) {
             $priceDisplay.html('--').removeClass('loading');
@@ -133,11 +132,28 @@ $(document).ready(function () {
             },
             success: function (apiResponse) {
                 if (apiResponse.status === 200 && apiResponse.data !== null) {
-                    const formattedPrice = apiResponse.data.toLocaleString('vi-VN', {
+
+
+                    const basePrice = parseFloat(apiResponse.data);
+
+                    let finalPrice = basePrice;
+                    if (discountPercent > 0) {
+                        finalPrice = basePrice * (1 - (discountPercent / 100));
+                    }
+
+                    const formattedPrice = finalPrice.toLocaleString('vi-VN', {
                         style: 'currency',
                         currency: 'VND'
                     });
                     $priceDisplay.html(formattedPrice);
+
+                    if (discountPercent > 0) {
+                        const formattedBasePrice = basePrice.toLocaleString('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND'
+                        });
+                        $priceDisplay.append(` <s class="price-original">${formattedBasePrice}</s>`);
+                    }
                 } else {
                     $priceDisplay.html('Lỗi');
                 }
@@ -154,6 +170,22 @@ $(document).ready(function () {
         });
     }
 
+    $voucherListContainer.on('click', '.voucher-btn', function () {
+        const $this = $(this);
+
+        const voucherCode = $this.data('code');
+        const voucherId = $this.data('id');
+
+        $voucherListContainer.find('.voucher-btn').removeClass('active');
+        $this.addClass('active');
+
+        $voucherCodeInput.val($this.data('code'));
+        $voucherIdInput.val($this.data('id'));
+        $voucherDiscountInput.val($this.data('discount'));
+
+        updatePrice();
+    });
+
 
 
     $bookingForm.on('submit', function (e) {
@@ -164,6 +196,7 @@ $(document).ready(function () {
         const startTime = $('#chatbot-modal-time').val();
         const subFieldIdVal = $('#chatbot-modal-subfield').val();
         const durationVal = $('#chatbot-modal-duration').val();
+        const voucherIdVal = $('#chatbot-modal-voucher-id').val();
 
         const durationMinutes = parseInt(durationVal, 10);
         const endTime = calculateEndTime(startTime, durationMinutes);
@@ -178,7 +211,8 @@ $(document).ready(function () {
             subFieldId: parseInt(subFieldIdVal, 10), // Chuyển sang số (Long)
             startTime: startTime,
             endTime: endTime,                 // "HH:mm" (String)
-            duration: durationMinutes     // Chuyển sang số (Integer)
+            duration: durationMinutes,     // Chuyển sang số (Integer)
+            voucherId: voucherIdVal
         };
 
         addMessageToLog('bot', "Đang xử lý đặt sân, vui lòng đợi...");
@@ -310,6 +344,36 @@ $(document).ready(function () {
         });
     }
 
+    function fetchAndPopulateVouchers() {
+        $.ajax({
+            url: '/api/v1/vouchers/list',
+            type: 'GET',
+            success: function (response) {
+                $voucherListContainer.empty();
+                if (response.status === 200 && response.data && response.data.length > 0) {
+                    response.data.forEach(voucher => {
+                        // Tạo button cho mỗi voucher
+                        const voucherBtn = $(`
+                        <button type="button" class="voucher-btn" 
+                            data-code="${voucher.code}" 
+                            data-id="${voucher.id}"
+                            data-discount="${voucher.discount}">
+                        <strong>${voucher.code}</strong>
+                        <span>${voucher.description} (Giảm ${voucher.discount}%)</span>
+                    </button>
+                    `);
+                        $voucherListContainer.append(voucherBtn);
+                    });
+                } else {
+                    $voucherListContainer.html('<span>Không có voucher nào.</span>');
+                }
+            },
+            error: function () {
+                $voucherListContainer.html('<span style="color: red;">Lỗi tải voucher.</span>');
+            }
+        });
+    }
+
     function handleAction(action) {
         if (action.actionName === 'OPEN_BOOKING_MODAL') {
 
@@ -345,6 +409,12 @@ $(document).ready(function () {
                 const initialSubfieldId = fields[0].id;
                 const initialFieldId = fields[0].fieldId;
                 $('#chatbot-modal-field-id').val(initialFieldId);
+                $('#chatbot-modal-price').html('--');
+                $voucherCodeInput.val('');
+                $voucherIdInput.val('');
+                $voucherDiscountInput.val('0');
+
+                fetchAndPopulateVouchers();
                 fetchAndPopulateDurations(initialSubfieldId, criteria.date, criteria.time);
 
             } else {
@@ -357,6 +427,8 @@ $(document).ready(function () {
             $modalOverlay.css('display', 'flex');
         }
     }
+
+
 
     function addMessageToLog(sender, message) {
         // (Code y hệt ví dụ trước)
