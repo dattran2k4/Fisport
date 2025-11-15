@@ -45,7 +45,7 @@ public class GeneralIntentHandler implements IntentHandler{
                         .param("user_message", userMessage))
                 .stream()
                 .content()
-                .map(chunk -> StreamResponse.text(chunk));
+                .map(StreamResponse::text);
     }
 
     @Override

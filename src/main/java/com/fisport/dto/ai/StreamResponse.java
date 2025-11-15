@@ -3,7 +3,6 @@ package com.fisport.dto.ai;
 import lombok.*;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
 public class StreamResponse {

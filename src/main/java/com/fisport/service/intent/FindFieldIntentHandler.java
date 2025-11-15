@@ -91,7 +91,7 @@ public class FindFieldIntentHandler implements IntentHandler {
                     .content();
 
             Flux<StreamResponse> textResponseStream = textStream
-                    .map(chunk -> StreamResponse.text(chunk));
+                    .map(StreamResponse::text);
 
             ActionPayload action = new ActionPayload("OPEN_BOOKING_MODAL",
                     Map.of("foundFields", subFieldForAIResponses,

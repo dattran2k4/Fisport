@@ -42,7 +42,7 @@ public class AIChatServiceImpl implements AIChatService {
 
     private final ObjectMapper objectMapper;
 
-    public AIChatServiceImpl(ChatClient.Builder builder, SubFieldService subFieldService,
+    public AIChatServiceImpl(ChatClient.Builder builder,
                              @Value("classpath:prompts/classify-intent.st") Resource classifyIntentPrompt,
                              IntentRouter router,
                              ConversationContextService contextService,
@@ -78,8 +78,8 @@ public class AIChatServiceImpl implements AIChatService {
 
             log.debug("User [{}]: Calling classification AI...", userId);
 
-//            String response = chatClient.prompt(classifyPrompt).call().content();
-//            AnalyzedIntent analyzedIntent = outputConverter.convert(response);
+            //String response = chatClient.prompt(classifyPrompt).call().content();
+            //AnalyzedIntent analyzedIntent = outputConverter.convert(response);
 
             AnalyzedIntent analyzedIntent = chatClient.prompt(classifyPrompt).call().entity(AnalyzedIntent.class);
 
