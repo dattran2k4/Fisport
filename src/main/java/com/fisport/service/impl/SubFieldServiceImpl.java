@@ -113,6 +113,7 @@ public class SubFieldServiceImpl implements SubFieldService {
                 .name(subField.getName())
                 .fieldName(subField.getField().getName())
                 .address(subField.getField().getAddress())
+                .fieldId(subField.getField().getId())
                 .build()).toList();
     }
 

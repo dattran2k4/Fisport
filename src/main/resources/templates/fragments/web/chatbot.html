@@ -19,6 +19,7 @@
                     <label>Giờ bắt đầu:</label>
                     <input type="text" id="chatbot-modal-time" disabled>
                 </div>
+                <input type="hidden" id="chatbot-modal-field-id">
                 <div class="chatbot-form-group">
                     <label for="chatbot-modal-subfield">Chọn sân con:</label>
                     <select id="chatbot-modal-subfield" required></select>
@@ -28,6 +29,20 @@
                     <select id="chatbot-modal-duration" required>
                     </select>
                 </div>
+
+                <!-- <div class="chatbot-form-group chatbot-voucher-group">
+                    <label for="chatbot-modal-voucher">Mã giảm giá:</label>
+                    <div class="voucher-input-wrapper">
+                        <input type="text" id="chatbot-modal-voucher" placeholder="Nhập mã voucher...">
+                        <button type="button" id="chatbot-apply-voucher-btn">Áp dụng</button>
+                    </div>
+                </div> -->
+
+                <div class="chatbot-price-summary">
+                    <span>Giá dự kiến:</span>
+                    <strong id="chatbot-modal-price">--</strong>
+                </div>
+
                 <div class="chatbot-modal-buttons">
                     <button type="button" id="chatbot-cancel-booking-btn" class="btn-secondary">Hủy</button>
                     <button type="submit" id="chatbot-confirm-booking-btn" class="btn-primary">Xác nhận</button>
@@ -70,6 +85,32 @@
 
         .chatbot-modal-buttons .btn-secondary { background-color: #6c757d; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; margin-right: 10px;}
 
+        .chatbot-price-summary {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 16px;
+        background-color: var(--background-light);
+        border-radius: 10px;
+        margin-top: 24px; /* Tách biệt khỏi form */
+        margin-bottom: 10px; /* Tách biệt khỏi nút bấm */
+        }
+        .chatbot-price-summary span {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .chatbot-price-summary strong {
+            font-size: 1.4rem; /* Làm giá tiền nổi bật */
+            font-weight: 700;
+            color: var(--primary-color); /* Màu nhấn thương hiệu */
+        }
+
+        /* Lớp loading cho giá */
+        .chatbot-price-summary strong.loading {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
 </style>
 </div>
 

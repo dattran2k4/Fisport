@@ -12,6 +12,7 @@ $(document).ready(function () {
     // Lấy các phần tử Modal
     const $modalOverlay = $('#booking-modal-overlay');
     const $bookingForm = $('#chatbot-booking-form');
+    const $priceDisplay = $('#chatbot-modal-price');
     const $cancelBookingBtn = $('#chatbot-cancel-booking-btn');
 
     // *** THAY ĐỔI: Lấy URL từ data-attributes ***
@@ -87,6 +88,74 @@ $(document).ready(function () {
         addMessageToLog('bot', "Đã hủy đặt sân. Bạn cần em giúp gì nữa không?");
     });
 
+    function calculateEndTime(startTime, durationMinutes) {
+        // Tách giờ và phút
+        const [hours, minutes] = startTime.split(':').map(Number);
+
+        // Tạo đối tượng Date (chỉ dùng để tính toán)
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0); // Đặt giờ bắt đầu
+
+        // Thêm số phút thời lượng
+        date.setMinutes(date.getMinutes() + durationMinutes);
+
+        // Lấy giờ và phút kết thúc
+        const endHours = String(date.getHours()).padStart(2, '0');
+        const endMinutes = String(date.getMinutes()).padStart(2, '0');
+
+        return `${endHours}:${endMinutes}`;
+    }
+
+    function updatePrice() {
+        const fieldId = $('#chatbot-modal-field-id').val();
+        console.log(fieldId);
+        const durationVal = $('#chatbot-modal-duration').val();
+        const durationMinutes = parseInt(durationVal, 10);
+        const startTime = $('#chatbot-modal-time').val();
+
+        if (!fieldId || !durationMinutes || !startTime) {
+            $priceDisplay.html('--').removeClass('loading');
+            return;
+        }
+
+        const endTime = calculateEndTime(startTime, parseInt(durationMinutes, 10));
+        console.log(endTime)
+
+        $priceDisplay.html('Đang tính...').addClass('loading');
+
+        $.ajax({
+            url: '/api/v1/bookings/preview-timingPrice',
+            type: 'GET',
+            data: {
+                fieldId: fieldId,
+                startTime: startTime,
+                endTime: endTime
+            },
+            success: function (apiResponse) {
+                if (apiResponse.status === 200 && apiResponse.data !== null) {
+                    const formattedPrice = apiResponse.data.toLocaleString('vi-VN', {
+                        style: 'currency',
+                        currency: 'VND'
+                    });
+                    $priceDisplay.html(formattedPrice);
+                } else {
+                    $priceDisplay.html('Lỗi');
+                }
+            },
+            error: function (xhr, status, error) {
+                // Tương đương với 'catch' block
+                console.error('Lỗi cập nhật giá:', error);
+                $priceDisplay.html('Không thể tính');
+            },
+            complete: function () {
+                // Tương đương với 'finally' block
+                $priceDisplay.removeClass('loading');
+            }
+        });
+    }
+
+
+
     $bookingForm.on('submit', function (e) {
         e.preventDefault();
 
@@ -96,28 +165,8 @@ $(document).ready(function () {
         const subFieldIdVal = $('#chatbot-modal-subfield').val();
         const durationVal = $('#chatbot-modal-duration').val();
 
-        let endTime = null;
-        try {
-            const duration = parseInt(durationVal, 10);
-            const parts = startTime.split(':');
-
-            // Tạo một đối tượng Date tạm thời
-            const tempDate = new Date();
-            tempDate.setHours(parseInt(parts[0], 10));
-            tempDate.setMinutes(parseInt(parts[1], 10));
-            tempDate.setSeconds(0);
-
-            // Thêm số phút (duration)
-            tempDate.setMinutes(tempDate.getMinutes() + duration);
-
-            // Định dạng lại thành "HH:mm"
-            const endHours = String(tempDate.getHours()).padStart(2, '0');
-            const endMinutes = String(tempDate.getMinutes()).padStart(2, '0');
-            endTime = `${endHours}:${endMinutes}`;
-
-        } catch (err) {
-            console.error("Lỗi khi tính endTime ở client:", err);
-        }
+        const durationMinutes = parseInt(durationVal, 10);
+        const endTime = calculateEndTime(startTime, durationMinutes);
 
         if (!subFieldIdVal || !durationVal) {
             addMessageToLog('error', 'Lỗi: Vui lòng chọn sân con và thời lượng.');
@@ -129,9 +178,7 @@ $(document).ready(function () {
             subFieldId: parseInt(subFieldIdVal, 10), // Chuyển sang số (Long)
             startTime: startTime,
             endTime: endTime,                 // "HH:mm" (String)
-            duration: parseInt(durationVal, 10)     // Chuyển sang số (Integer)
-            // endTime không cần gửi, vì DTO của bạn không yêu cầu (@NotNull)
-            // và backend có thể tự tính toán
+            duration: durationMinutes     // Chuyển sang số (Integer)
         };
 
         addMessageToLog('bot', "Đang xử lý đặt sân, vui lòng đợi...");
@@ -197,17 +244,31 @@ $(document).ready(function () {
     }
 
     $('#chatbot-modal-subfield').on('change', function () {
-        const selectSubFieldId = $this.val();
+        const $selectedOption = $(this).find('option:selected');
+
+        const selectedSubfieldId = $selectedOption.val();
+        const associatedFieldId = $selectedOption.data('field-id');
+        $('#chatbot-modal-field-id').val(associatedFieldId);
+        console.log(associatedFieldId);
         const date = $('#chatbot-modal-date').val();
         const time = $('#chatbot-modal-time').val();
 
+        $('#chatbot-modal-price').html('--');
+
         if (selectedSubfieldId) {
             fetchAndPopulateDurations(selectedSubfieldId, date, time);
+            updatePrice();
         } else {
             // Xử lý nếu không có ID (ví dụ: chọn "Không có sân con")
             $('#chatbot-modal-duration').empty().prop('disabled', true);
         }
     });
+
+    $('#chatbot-modal-duration').on('change', function () {
+        updatePrice();
+    });
+
+
 
     /**
  * Gọi API để lấy thời lượng khả dụng và cập nhật dropdown
@@ -264,6 +325,7 @@ $(document).ready(function () {
 
             $('#chatbot-modal-date').val(criteria.date);
             $('#chatbot-modal-time').val(criteria.time);
+            $('#chatbot-modal-field-id').val(fields.fieldId);
 
             const $subfieldSelect = $('#chatbot-modal-subfield');
             const $durationSelect = $('#chatbot-modal-duration');
@@ -274,14 +336,16 @@ $(document).ready(function () {
             if (fields && fields.length > 0) {
                 fields.forEach(field => {
                     const optionText = `${field.fieldName} - ${field.name}`;
-                    $subfieldSelect.append($('<option>').val(field.id).text(optionText));
+                    $subfieldSelect.append($('<option>').val(field.id)
+                        .text(optionText)
+                        .data('field-id', field.fieldId));
                 });
 
-                // *** THÊM PHẦN NÀY ***
                 // Tự động gọi API cho sân con đầu tiên trong danh sách
                 const initialSubfieldId = fields[0].id;
+                const initialFieldId = fields[0].fieldId;
+                $('#chatbot-modal-field-id').val(initialFieldId);
                 fetchAndPopulateDurations(initialSubfieldId, criteria.date, criteria.time);
-                // *** HẾT PHẦN THÊM ***
 
             } else {
                 // Không tìm thấy sân nào

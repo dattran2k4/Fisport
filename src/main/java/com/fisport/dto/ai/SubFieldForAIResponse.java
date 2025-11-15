@@ -11,4 +11,5 @@ public class SubFieldForAIResponse {
     private String name;
     private String address;
     private String fieldName;
+    private Long fieldId;
 }
