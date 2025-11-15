@@ -25,7 +25,7 @@ public class BookingTest extends BaseTest {
 
     private static final String FIELD_NAME_TO_CLICK = "Sân bóng đá 2";
     private static final String SUBFIELD_ID_TO_BOOK = "3";
-    private static final String START_TIME = "19:00";
+    private static final String START_TIME = "13:00";
     private static final String DURATION_MINUTES = "60";
 
     // Luôn đặt cho 1 ngày trong tương lai (ví dụ: 3 ngày tới)
@@ -68,7 +68,7 @@ public class BookingTest extends BaseTest {
         System.out.println("Chạy Test 1: Đặt thành công...");
         System.out.println("Dữ liệu: Ngày=" + BOOKING_DATE + ", Sân=" + SUBFIELD_ID_TO_BOOK + ", Giờ=" + START_TIME);
 
-        bookingPage.selectDay(BOOKING_DATE);
+        bookingPage.selectDay("17/11");
         bookingPage.selectSubField(SUBFIELD_ID_TO_BOOK);
         bookingPage.selectHour(START_TIME);
         bookingPage.selectDuration(DURATION_MINUTES);
@@ -92,7 +92,7 @@ public class BookingTest extends BaseTest {
     void testUI_SlotIsDisabledAfterBooking() {
 
 
-        bookingPage.selectDay(BOOKING_DATE);
+        bookingPage.selectDay("17/11");
         bookingPage.selectSubField(SUBFIELD_ID_TO_BOOK);
 
         try {
@@ -111,7 +111,7 @@ public class BookingTest extends BaseTest {
 
         bookingPage.selectDay("17/11");
         bookingPage.selectSubField(SUBFIELD_ID_TO_BOOK);
-        bookingPage.selectHour("17:30");
+        bookingPage.selectHour("12:30");
 
         try {
             assertTrue(bookingPage.isDuartionNoShowed("60"),

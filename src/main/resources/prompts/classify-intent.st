@@ -10,6 +10,7 @@ QUY TẮC:
 CÁC Ý ĐỊNH:
 - `FIND_VENUE`: Người dùng muốn tìm sân, hỏi sân trống,
   hoặc cung cấp thông tin (môn thể thao, quận/phường, ngày, giờ, tìm kiếm).
+- `GENERAL_CHAT`: Người dùng chỉ nói chuyện chung chung, không liên quan đến website
 
 LỊCH SỬ HỘI THOẠI (tham khảo):
 {history}

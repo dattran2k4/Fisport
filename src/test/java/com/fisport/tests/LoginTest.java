@@ -63,7 +63,7 @@ public class LoginTest extends BaseTest {
 
         loginPage.login(username, password);
         if ("success".equals(expected)) {
-            // --- LOGIC KIỂM TRA THÀNH CÔNG ---
+
             try {
                 // Đợi nút dropdown (biểu tượng user) xuất hiện
                 WebElement dropdownToggle = wait.until(ExpectedConditions.visibilityOfElementLocated(USER_DROPDOWN_TOGGLE));
