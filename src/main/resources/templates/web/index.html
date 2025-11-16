@@ -268,11 +268,9 @@
             >
                 <h2 class="h5 mb-0">Tất cả sân thể thao</h2>
                 <div class="d-flex align-items-center gap-2">
-                    <div
-                            class="btn-group btn-group-sm"
-                            role="group"
-                            id="topFieldTypeFilters"
-                    >
+                    <div class="btn-group btn-group-sm"
+                         role="group"
+                         id="topFieldTypeFilters">
                         <!-- Nút Tất cả -->
                         <button
                                 type="button"
@@ -282,13 +280,11 @@
                             <i class="fas fa-th-large me-1"></i> Tất cả
                         </button>
 
-                        <button
-                                type="button"
+                        <button type="button"
                                 class="btn btn-outline-primary"
                                 th:each="type : ${fieldTypes}"
                                 th:data-type="${type.slug}"
-                                th:data-id="${type.id}"
-                        >
+                                th:data-id="${type.id}">
                             <i
                                     th:class="'me-1 ' + (
                                     ${type.slug} == 'bong-da'     ? 'fa-solid fa-futbol' : (
@@ -326,9 +322,8 @@
 <section layout:fragment="scripts">
     <script>
         $(document).ready(function () {
-            // đảm bảo jQuery đã load
 
-            // 1️⃣ Init Swiper
+            // Init Swiper
             var heroSwiper = new Swiper(".hero-swiper", {
                 loop: true,
                 autoplay: {delay: 3500, disableOnInteraction: false},
@@ -358,7 +353,7 @@
                 },
             });
 
-            // 2️⃣ Load wards khi thay đổi city
+            // Load wards khi thay đổi city
             $("#citySelect").on("change", function () {
                 const cityId = $(this).val();
                 const $ward = $("#wardSelect");
@@ -386,7 +381,6 @@
                     });
             });
 
-            // 3️⃣ Enable search button khi đủ điều kiện
             function toggleSearchState() {
                 var hasCity = $("#citySelect").val();
                 var hasType = $("#fieldTypeSelect").val();
@@ -396,7 +390,6 @@
             $("#citySelect, #fieldTypeSelect").on("change", toggleSearchState);
             toggleSearchState();
 
-            // 4️⃣ Quick search form
             $("#quickSearchForm").on("submit", function (e) {
                 e.preventDefault();
                 const slug = $("#fieldTypeSelect option:selected").data("slug");
@@ -411,31 +404,36 @@
                 $("#topFieldTypeFilters button").removeClass("active");
                 $(this).addClass("active");
 
-                const typeId = $(this).data("id") || null; // null = tất cả
-                loadFields(typeId);
+                let typeSlug = $(this).data("type")
+                if (typeSlug === "") {
+                    typeSlug = null;
+                }
+                loadFields(typeSlug);
             });
 
             // ===============================
             // Hàm gọi API
             // ===============================
-            function loadFields(typeId = null) {
+            function loadFields(typeSlug) {
+                console.log(typeSlug);
+                const apiData = { status: "active" };
+                if (typeSlug) {
+                    apiData.fieldTypeSlug = typeSlug;
+                }
                 $.ajax({
-                    url: "/api/v1/fields", // 🔹 Địa chỉ API backend cung cấp danh sách các sân
-                    type: "GET", // 🔹 Phương thức HTTP: GET (lấy dữ liệu)
-                    data: {status: "active", typeId: typeId}, // 🔹 Tham số gửi kèm request
-                    //   - status: chỉ lấy sân đang active
-                    //   - fieldTypeId: nếu có thì filter theo loại sân
+                    url: "/api/v1/fields", //
+                    type: "GET", //
+                    data: apiData,
                     success: function (res) {
-                        // 🔹 Callback khi request thành công
-                        const fields = res.data || []; // 🔹 Lấy mảng sân từ response (trường hợp res.data undefined thì dùng mảng rỗng)
-                        renderFields(fields, typeId); // 🔹 Gọi hàm renderFields() để hiển thị dữ liệu ra Swiper
+                        if (res && res.data) {
+                            const fields = res.data.data || [];
+                            renderFields(fields);
+                        }
                     },
                     error: function () {
-                        // 🔹 Callback khi request lỗi
                         $("#topFieldsWrapper").html(
                             '<div class="text-center text-danger">Lỗi khi tải sân.</div>'
                         );
-                        // 🔹 Hiển thị thông báo lỗi trong phần Swiper
                     },
                 });
             }
@@ -444,26 +442,17 @@
             // Hàm render danh sách fields
             // ===============================
 
-            function renderFields(fields, typeId = null) {
+            function renderFields(fields) {
                 const $wrapper = $("#topFieldsWrapper");
-
-                // Lọc theo typeId nếu có
-                let filteredFields = fields;
-                if (typeId) {
-                    filteredFields = fields.filter(
-                        (f) =>
-                            f.fieldTypeResponse.id && f.fieldTypeResponse.id == typeId
-                    );
-                }
 
                 $wrapper.empty();
 
-                if (filteredFields.length === 0) {
+                if (fields.length === 0) {
                     $wrapper.append(
                         '<div class="text-center w-100">Không có sân phù hợp</div>'
                     );
                 } else {
-                    filteredFields.forEach((field) => {
+                    fields.forEach((field) => {
                         const banner =
                             field.banner || "/web/img/field/default-field.jpg";
                         const wardName = field.wardResponse

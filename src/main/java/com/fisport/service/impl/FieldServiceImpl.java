@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j(topic = "FIELD-SERVICE")
 public class FieldServiceImpl implements FieldService {
+
     private final FieldRepository fieldRepository;
     private final WardRepository wardRepository;
     private final UserRepository userRepository;
@@ -59,9 +60,14 @@ public class FieldServiceImpl implements FieldService {
             wardId = ward.getId();
         }
 
-        FieldType fieldType = fieldTypeRepository.findBySlug(fieldTypeSlug);
+        Long fieldTypeId = null;
 
-        Specification<Field> specification = FieldSpecification.filterFields(wardId, fieldType.getId(), status, keyword, featureIds);
+        if (fieldTypeSlug != null) {
+            FieldType fieldType = fieldTypeRepository.findBySlug(fieldTypeSlug);
+            fieldTypeId = fieldType.getId();
+        }
+
+        Specification<Field> specification = FieldSpecification.filterFields(wardId, fieldTypeId, status, keyword, featureIds);
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id"));
 
@@ -110,7 +116,6 @@ public class FieldServiceImpl implements FieldService {
     @Override
     public void updateFieldByOwnerId(FieldRequest fieldRequest, Long ownerId, Long fieldId) {
         Field field = getFieldByid(fieldId);
-        User user = userRepository.findById(ownerId).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
         Ward ward = wardRepository.findById(fieldRequest.getWardId()).orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
         FieldType fieldType = fieldRepository.findById(fieldRequest.getFieldTypeId()).orElseThrow(() -> new ResourceNotFoundException("Field type not found")).getFieldType();
         field.setName(fieldRequest.getName());

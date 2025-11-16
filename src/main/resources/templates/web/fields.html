@@ -4,6 +4,19 @@
       layout:decorate="~{layout/web/web}">
 <head>
     <title>Danh sách sân</title>
+    <style>
+        .field-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 80vh; /* Chiều cao tối thiểu cho toàn bộ khu vực */
+        }
+
+        #fieldsGrid {
+            flex-grow: 1;
+
+            align-items: start;
+        }
+    </style>
 </head>
 <body>
     <div layout:fragment="content">
@@ -64,16 +77,17 @@
                     </div>
                 </div>
 
-                <!-- Danh sách sân -->
-                <div class="row g-3" id="fieldsGrid">
+                <div class="field-container">
 
-                </div>
+                    <div class="row g-3" id="fieldsGrid">
+                    </div>
 
-                <!-- Pagination -->
-                <div class="d-flex justify-content-center mt-4">
-                    <nav aria-label="pagination">
-                        <ul class="pagination pagination-sm" id="pager"></ul>
-                    </nav>
+                    <div class="d-flex justify-content-center mt-4">
+                        <nav aria-label="pagination">
+                            <ul class="pagination pagination-sm" id="pager"></ul>
+                        </nav>
+                    </div>
+
                 </div>
             </div>
         </section>
