@@ -240,6 +240,7 @@ public class BookingServiceImpl implements BookingService {
 
         return bookings.stream().map(b -> BookingForUserResponse.builder()
                 .id(b.getId())
+                .paymentToken(b.getPaymentToken())
                 .date(b.getBookingDate())
                 .fieldName(b.getSubfield().getField().getName())
                 .startTime(b.getStartTime())

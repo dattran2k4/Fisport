@@ -15,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -30,7 +31,7 @@ public class BookingController {
 
     @PreAuthorize("hasAnyRole('USER', 'OWNER', 'ADMIN')")
     @GetMapping("/san/{fieldTypeSlug}/{fieldNameSlug}/dat-san")
-    public String showBookingPage(Model model, @PathVariable String fieldTypeSlug, @PathVariable String fieldNameSlug, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public String showBookingPage(Model model, @PathVariable String fieldTypeSlug, @PathVariable String fieldNameSlug, Principal principal) {
 
         FieldDetailResponse field = fieldService.findBySlug(fieldNameSlug);
         model.addAttribute("field", field);
@@ -45,7 +46,7 @@ public class BookingController {
             model.addAttribute("booking", new BookingRequest());
         }
 
-        model.addAttribute("vouchers", voucherService.getVouchersByUserId(customUserDetails.getUser().getId()));
+        model.addAttribute("vouchers", voucherService.getVouchersByUserId(principal.getName()));
 
         return "web/booking";
     }

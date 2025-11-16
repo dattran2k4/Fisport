@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface VoucherService {
 
-    List<VoucherResponse> getVouchersByUserId(Long userId);
+    List<VoucherResponse> getVouchersByUserId(String username);
 
     List<VoucherResponse> findAllByActive();
 

@@ -32,10 +32,11 @@ public class UserDashboardServiceImpl implements UserDashboardService {
     public UserDashboardResponse getData(String username) {
         User user = userRepository.findByUsername(username).orElse(null);
 
-        List<Voucher> vouchers = voucherRepository.findByUsersId(user.getId());
+        List<Voucher> vouchers = voucherRepository.findByUsersUsername(username);
         int vouchersCount = (int) vouchers.stream().filter(voucher -> voucher.getStatus().equals(EVoucherStatus.ACTIVE)).count();
 
-        List<Booking> bookings = bookingRepository.findByUserId(user.getId());
+        List<Booking> bookings = bookingRepository.findByUserUsername(username);
+
         int pendingCount = (int) bookings.stream().filter(booking -> booking.getBookingStatus().equals(EBookingStatus.PENDING)).count();
         int completedCount = (int) bookings.stream().filter(booking -> booking.getBookingStatus().equals(EBookingStatus.COMPLETED)).count();
 

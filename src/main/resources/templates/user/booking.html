@@ -41,7 +41,10 @@
               <td th:text="${#numbers.formatDecimal(booking.totalPrice, 0, 'COMMA', 0, 'POINT')}">
                 $0.00
               </td>
-              <td th:text="${booking.paymentMethod}">Credit Card</td>
+                <td>
+                    <span th:if="${booking.paymentMethod != null}" th:text="${booking.paymentMethod}"></span>
+                    <a th:if="${booking.paymentMethod == null && booking.status == 'PENDING'}" th:href="@{/thanh-toan(token=${booking.paymentToken})}">Tiếp tục thanh toán</a>
+                </td>
 
               <!-- Booking status badge -->
               <td>

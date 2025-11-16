@@ -82,8 +82,8 @@ public class UserApiController {
     }
 
     @GetMapping("/vouchers")
-    public ApiResponse getVouchersForBooking(@AuthenticationPrincipal CustomUserDetails principal) {
-        List<VoucherResponse> response = voucherService.getVouchersByUserId(principal.getUser().getId());
+    public ApiResponse getVouchersForBooking(Principal principal) {
+        List<VoucherResponse> response = voucherService.getVouchersByUserId(principal.getName());
 
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())

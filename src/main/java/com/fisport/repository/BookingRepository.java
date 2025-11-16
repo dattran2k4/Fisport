@@ -57,4 +57,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                              @Param("now") LocalDateTime now);
 
     List<Booking> findBySubfieldAndBookingDate(SubField subField, LocalDate date);
+
+    List<Booking> findByUserUsername(String username);
 }

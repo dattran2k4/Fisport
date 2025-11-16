@@ -24,8 +24,8 @@ public class VoucherServiceImpl implements VoucherService {
 
 
     @Override
-    public List<VoucherResponse> getVouchersByUserId(Long userId) {
-        List<Voucher> vouchers = voucherRepository.findByUsersId(userId);
+    public List<VoucherResponse> getVouchersByUserId(String username) {
+        List<Voucher> vouchers = voucherRepository.findByUsersUsername(username);
 
         return vouchers.stream().map(v -> VoucherResponse.builder()
                 .id(v.getId())

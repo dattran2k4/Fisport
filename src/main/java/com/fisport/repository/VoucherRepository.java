@@ -26,4 +26,6 @@ public interface VoucherRepository extends JpaRepository<Voucher, Long> {
     List<Voucher> findByStatus(EVoucherStatus status);
 
     Optional<Voucher> findByCode(String code);
+
+    List<Voucher> findByUsersUsername(String username);
 }

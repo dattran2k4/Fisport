@@ -11,6 +11,7 @@ import java.util.List;
 @Builder
 public class BookingForUserResponse {
     private Long id;
+    private String paymentToken;
     private LocalTime startTime;
     private LocalTime endTime;
     private LocalDate date;
