@@ -3,6 +3,7 @@ package com.fisport.config;
 import com.fisport.security.CustomAccessDeniedHandler;
 import com.fisport.security.CustomAuthenticationEntryPoint;
 import com.fisport.security.CustomUserDetailsService;
+import com.fisport.security.OAuth2SuccessHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +29,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     public static final List<String> WHITE_LIST = List.of( "/common/**", "/web/**", "/web/css/**", "/web/img/**", "/favicon.ico",
             "/san/**", "/login/**", "/2fa/**", "/", "/web/js/**", "/forgot-password", "/register**", "/error/**", "/confirm/**", "2fa-register", "/thach-dau/**"); //test
@@ -63,6 +65,12 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form.disable())
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/")
+                        .failureUrl("/login?error=true")
+                        .successHandler(oAuth2SuccessHandler)
+                )
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                         .accessDeniedPage("/access-denied")

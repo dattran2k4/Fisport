@@ -23,16 +23,16 @@ public class User extends AbstractEntity {
     @Column(unique = true, nullable = false, length = 30)
     private String username;
 
-    @Column(nullable = false, length = 255)
+    @Column(length = 255)
     private String password;
 
     @Column(unique = true, nullable = false, length = 255)
     private String email;
 
-    @Column(unique = true, nullable = false, length = 20)
+    @Column(unique = true, length = 20)
     private String phone;
 
-    @Column(nullable = false, name = "birth_day")
+    @Column(name = "birth_day")
     private LocalDate birthday;
 
     @Enumerated(EnumType.STRING)

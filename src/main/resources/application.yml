@@ -1,0 +1,111 @@
+app:
+  base-url: http://localhost:8080
+  token:
+    expiry-minutes: 10
+
+spring:
+  application:
+    name: Fisport
+  datasource:
+    url: jdbc:mysql://localhost:3306/fisport?useSSL=false&serverTimezone=UTC
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 600000
+      connection-timeout: 30000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+  # EMAIL SENDER
+  mail:
+    from: dattqde181019@fpt.edu.vn
+    host: smtp.gmail.com
+    port: 587
+    username: dattqde181019@fpt.edu.vn
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  #Thymeleaf
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    cache: false
+    mode: HTML
+
+  #static resources
+  web:
+    resources:
+      static-locations: classpath:/static/
+
+  #OPENAI
+  ai:
+    openai:
+      api-key: ${GEMINI_API_KEY}
+      chat:
+        base-url: https://generativelanguage.googleapis.com
+        completions-path: /v1beta/openai/chat/completions
+        options:
+          model: gemini-2.0-flash
+
+  #Google
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: openid,profile,email
+
+
+endpoint:
+  confirmUser: ${app.base-url}/confirm
+  endPointResetPassword: ${app.base-url}/api/auth/reset-password
+
+logging:
+  level:
+    org:
+      thymeleaf:
+      springframework:
+        ai:
+          client:
+            processor: TRACE
+          retry: TRACE
+    nz:
+      net:
+        ultraq:
+          thymeleaf:
+
+vnpay:
+  tmn-code: ${VNP_TMN_CODE}
+  hash-secret: ${VNP_HASH_SECRET}
+  pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: /vnpay-return
+
+#PayOS
+payos:
+  client-id: {PAYOS_CLIENT_ID}
+  api-key: {PAYOS_API_KEY}
+  checksum-key: {PAYOS_CHECKSUM_KEY}
+  return-url: ${app.base-url}/thanh-toan/payos/thanh-cong
+  cancel-url: ${app.base-url}/thanh-toan/payos/that-bai
+  return-payment-wallet-url: ${app.base-url}/user/wallet
+  cancel-payment-wallet-cancel: ${app.base-url}/user/wallet

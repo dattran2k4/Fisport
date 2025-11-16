@@ -8,6 +8,7 @@ import com.fisport.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,6 +28,7 @@ public class BookingController {
     private final FieldServiceItemService fieldServiceItemService;
     private final VoucherService voucherService;
 
+    @PreAuthorize("hasAnyRole('USER', 'OWNER', 'ADMIN')")
     @GetMapping("/san/{fieldTypeSlug}/{fieldNameSlug}/dat-san")
     public String showBookingPage(Model model, @PathVariable String fieldTypeSlug, @PathVariable String fieldNameSlug, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 

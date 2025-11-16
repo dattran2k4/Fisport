@@ -57,7 +57,11 @@
                         <a class="d-flex align-items-center text-decoration-none dropdown-toggle"
                            href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle fs-4 text-primary me-2"></i>
-                            <span sec:authentication="name">User</span>
+                            <span th:text="${#authentication.principal instanceof T(org.springframework.security.oauth2.core.user.OAuth2User)
+                            ? #authentication.principal.attributes['name']
+                            : #authentication.principal.username}">
+                            User
+</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2" aria-labelledby="userDropdown">
                             <li><a class="dropdown-item" th:href="@{/user}"><i class="bi bi-person me-2"></i> Hồ
