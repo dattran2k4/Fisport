@@ -3,6 +3,7 @@ package com.fisport.dto.response;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Builder
@@ -11,5 +12,5 @@ public class PageResponse<T> implements Serializable {
    private int pageSize;
    private Long totalElements;
    private int totalPages;
-   private Object data;
+   private transient List<T> data;
 }

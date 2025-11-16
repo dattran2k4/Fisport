@@ -33,16 +33,18 @@ public class FieldApiController {
     private final FieldHasTimeSlotService fieldHasTimeSlotService;
 
     @GetMapping()
-    public ApiResponse getAllFields(@RequestParam(required = false) Long wardId,
-                                       @RequestParam(required = false) Long typeId,
-                                       @RequestParam(required = false) EFieldStatus status,
-                                       @RequestParam(required = false) String keyword,
-                                       @RequestParam(required = false) Long... featureIds) {
+    public ApiResponse getAllFields(@RequestParam(required = false) String wardSlug,
+                                    @RequestParam(required = false) String fieldTypeSlug,
+                                    @RequestParam(required = false) EFieldStatus status,
+                                    @RequestParam(required = false) String keyword,
+                                    @RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "8") int size,
+                                    @RequestParam(required = false) Long... featureIds) {
 
         return ApiResponse.builder()
-                .status(HttpStatus.FOUND.value())
+                .status(200)
                 .message("fields")
-                .data(fieldService.getAllFields(wardId, typeId, status, keyword, featureIds))
+                .data(fieldService.getAllFields(page, size, wardSlug, fieldTypeSlug, status, keyword, featureIds))
                 .build();
     }
 
@@ -51,7 +53,7 @@ public class FieldApiController {
 
         return ApiResponse.builder()
                 .status(HttpStatus.FOUND.value())
-                .message("fields")
+                .message("field")
                 .data(fieldService.getField(id))
                 .build();
     }

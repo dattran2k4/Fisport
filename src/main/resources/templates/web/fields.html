@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
+<html lang="vn" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/web/web}">
+<head>
+    <title>Danh sách sân</title>
+</head>
 <body>
     <div layout:fragment="content">
-<!--        <input type="hidden" id="fieldTypeId"-->
-<!--        th:if="${#lists.isEmpty(fields) == false}"-->
-<!--        th:value="${fields[0].fieldTypeResponse.id}" />-->
         <section class="py-4">
             <div class="container">
 
@@ -66,25 +66,7 @@
 
                 <!-- Danh sách sân -->
                 <div class="row g-3" id="fieldsGrid">
-                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3" th:each="f : ${fields}">
-                        <a th:href="@{${f.fieldTypeResponse.slug} + '/' + ${f.slug}}" class="card h-100 text-decoration-none text-reset shadow-sm hover-shadow">
-                            <div class="ratio ratio-16x9 bg-light rounded-top"
-                                 th:style="'background:url(' + (${f.banner} != null ? ${f.banner} : '/images/default-field.jpg') + ') center/cover no-repeat'"></div>
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <small class="text-muted">
-                                        <i class="bi bi-clock"></i>
-                                        <span th:text="${f.openTime}">05:00</span> - <span th:text="${f.closeTime}">22:00</span>
-                                    </small>
-                                </div>
-                                <h6 class="card-title mb-1 fw-semibold" th:text="${f.name}">Tên sân</h6>
-                                <small class="text-muted d-block">
-                                    <i class="bi bi-geo-alt"></i>
-                                    <span th:text="${f.wardResponse.name}">Phường/Xã</span>
-                                </small>
-                            </div>
-                        </a>
-                    </div>
+
                 </div>
 
                 <!-- Pagination -->
@@ -104,43 +86,30 @@
                 const params = new URLSearchParams(window.location.search);
                 const wardSlug = params.get("ward");
 
-                // ===============================
-                // Biến global
-                // ===============================
-                let currentPage = 1;       // Trang hiện tại
-                const pageSize = 10;       // Số item trên 1 trang
-                const fieldTypeId = $('#fieldTypeId').val();
+                const pathParts = window.location.pathname.split('/');
+                const fieldTypeSlug = pathParts[2] ? pathParts[2] : null;
 
-                // ===============================
-                // Hàm lấy danh sách featureId đã chọn
-                // ===============================
+                let currentPage = 0;
+                const pageSize = 8;
+
                 function getSelectedFeatures() {
                     return $('.util-check:checked').map(function() { return this.value; }).get();
                 }
 
-                // ===============================
-                // Hàm tạo query params cho API
-                // ===============================
                 function buildQuery() {
                     const qs = {};
-
-                    // Field Type
-                    // if (fieldTypeId) qs.fieldTypeId = fieldTypeId;
-
-                    // Distance & Sort
-                    // const distance = $('#distanceSelect').val();
-                    // const sort = $('#sortSelect').val();
-                    // if (distance) qs.distanceKm = distance;
-                    // if (sort) qs.sort = sort;
 
                     // Utilities
                     const utils = getSelectedFeatures();
                     if (utils.length) qs.featureIds = utils.join(',');
-                    if (wardSlug) qs.wardSlug = wardSlug;
+                    console.log(utils);
 
-                    // Pagination
-                    // qs.page = currentPage;
-                    // qs.size = pageSize;
+                    if (wardSlug) qs.wardSlug = wardSlug;
+                    if (fieldTypeSlug) qs.fieldTypeSlug = fieldTypeSlug;
+
+                    qs.page = currentPage;
+                    qs.size = pageSize;
+
                     return qs;
                 }
 
@@ -170,6 +139,10 @@
                                             </small>
                                         </div>
                                         <h6 class="card-title mb-1 fw-semibold">${f.name}</h6>
+                                        <div class="mb-1 text-warning fw-semibold">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span>${f.rating != null ? f.rating : 4}</span>
+                                </div>
                                         <small class="text-muted d-block">
                                             <i class="bi bi-geo-alt"></i>
                                             ${f.wardResponse.name}
@@ -191,12 +164,13 @@
                     totalPages = Math.max(1, totalPages || 1);
 
                     for (let p = 1; p <= totalPages; p++) {
-                        const $li = $('<li>').addClass('page-item' + (p === currentPage ? ' active' : ''));
+                        const isActive = (p === (currentPage + 1));
+                        const $li = $('<li>').addClass('page-item' + (isActive ? ' active' : ''));
                         const $a = $('<a>').addClass('page-link').attr('href', 'javascript:void(0)').text(p);
 
                         // Khi click vào số trang, cập nhật currentPage và load lại
                         $a.on('click', function() {
-                            currentPage = p;
+                            currentPage = p - 1;
                             loadFields();
                         });
 
@@ -205,26 +179,30 @@
                     }
                 }
 
-                // ===============================
-                // Hàm gọi API và render kết quả
-                // ===============================
                 function loadFields() {
                     const qs = buildQuery();
-
-                    // Hiển thị loading tạm thời
-                    $('#fieldsGrid').html('<p class="text-center w-100">Đang tải...</p>');
+                    console.log("params: ", qs);
 
                     $.ajax({
                         url: '/api/v1/fields',
                         type: 'GET',
                         data: qs,
-                        success: function(data) {
-                            // Hỗ trợ cả array trực tiếp hoặc {content, totalPages}
-                            const fields = Array.isArray(data) ? data : (data.data || []);
-                            const totalPages = Array.isArray(data) ? 1 : (data.totalPages || 1);
+                        success: function(response) {
 
-                            renderFields(fields);
-                            renderPager(totalPages);
+                            if (response && response.data) {
+
+                                const fields = response.data.data || [];
+                                console.log(fields);
+                                const totalPages = response.data.totalPages;
+                                console.log(totalPages)
+                                currentPage = response.data.pageNumber;
+                                console.log(currentPage)
+
+                                renderFields(fields);
+                                renderPager(totalPages);
+                            } else {
+                                renderPager(1);
+                            }
                         },
                         error: function() {
                             $('#fieldsGrid').html('<p class="text-center w-100 text-danger">Lỗi khi tải sân.</p>');
@@ -233,41 +211,12 @@
                     });
                 }
 
-                // ===============================
-                // Event listeners
-                // ===============================
-
-                // Chọn field type
-                // $('#fieldTypeFilterBar').on('click', 'button[data-type]', function() {
-                //     $('#fieldTypeFilterBar button').removeClass('active');
-                //     $(this).addClass('active');
-                //     currentPage = 1;
-                //     loadFields();
-                // });
-
-                // // Thay đổi khoảng cách
-                // $('#distanceSelect').on('change', function() {
-                //     currentPage = 1;
-                //     loadFields();
-                // });
-
-                // // Thay đổi sắp xếp
-                // $('#sortSelect').on('change', function() {
-                //     currentPage = 1;
-                //     loadFields();
-                // });
-
                 // Chọn/uncheck tiện ích
                 $('#collapseUtilities').on('change', '.util-check', function() {
-                    currentPage = 1;
+                    currentPage = 0;
                     loadFields();
                 });
-
-                // ===============================
-                // Load lần đầu
-                // ===============================
-                // loadFields();
-
+                loadFields();
             });
         </script>
     </section>

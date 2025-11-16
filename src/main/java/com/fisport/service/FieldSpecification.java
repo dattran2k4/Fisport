@@ -14,8 +14,7 @@ public class FieldSpecification {
 
     public static Specification<Field> filterFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, Long... featureIds) {
         return (Root<Field> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
-            Join<?, ?> hasFeatureJoin = root.join("fieldHasFeatures");
-            Join<?, ?> featureJoin = hasFeatureJoin.join("feature");
+
 
             Predicate predicate = cb.conjunction();
 
@@ -41,6 +40,9 @@ public class FieldSpecification {
             }
 
             if (featureIds != null && featureIds.length > 0) {
+                Join<?, ?> hasFeatureJoin = root.join("fieldHasFeatures");
+                Join<?, ?> featureJoin = hasFeatureJoin.join("feature");
+
                 predicate = cb.and(predicate, featureJoin.get("id").in((Object[]) featureIds));
 
                 query.groupBy(root.get("id"));

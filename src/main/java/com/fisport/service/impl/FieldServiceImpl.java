@@ -16,8 +16,14 @@ import com.fisport.service.FieldSpecification;
 import com.fisport.util.SlugUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -27,6 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "FIELD-SERVICE")
 public class FieldServiceImpl implements FieldService {
     private final FieldRepository fieldRepository;
     private final WardRepository wardRepository;
@@ -37,12 +44,38 @@ public class FieldServiceImpl implements FieldService {
     private final ServiceItemRepository serviceItemRepository;
     private final SubFieldRepository subFieldRepository;
     private final FieldServiceItemRepository fieldServiceItemRepository;
+    private final FieldTypeRepository fieldTypeRepository;
 
     @Override
-    public List<FieldResponse> getAllFields(Long wardId, Long fieldTypeId, EFieldStatus status, String keyword, Long... featureIds) {
-        Specification<Field> specification = FieldSpecification.filterFields(wardId, fieldTypeId, status, keyword, featureIds);
-        List<Field> fieds = fieldRepository.findAll(specification);
-        return fieds.stream().map(this::toDto).toList();
+    public PageResponse<FieldResponse> getAllFields(int page, int size,
+                                                     String wardSlug, String fieldTypeSlug, EFieldStatus status, String keyword, Long... featureIds) {
+
+        log.info("Get list fields");
+
+        Long wardId = null;
+
+        if (StringUtils.hasLength(wardSlug)) {
+            Ward ward = wardRepository.findBySlug(wardSlug);
+            wardId = ward.getId();
+        }
+
+        FieldType fieldType = fieldTypeRepository.findBySlug(fieldTypeSlug);
+
+        Specification<Field> specification = FieldSpecification.filterFields(wardId, fieldType.getId(), status, keyword, featureIds);
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "id"));
+
+        Page<Field> pageEntity =  fieldRepository.findAll(specification, pageable);
+
+        List<FieldResponse> response = pageEntity.stream().map(this::toDto).toList();
+
+        return PageResponse.<FieldResponse>builder()
+                .pageSize(size)
+                .pageNumber(page)
+                .totalPages(pageEntity.getTotalPages())
+                .totalElements(pageEntity.getTotalElements())
+                .data(response)
+                .build();
     }
 
 
