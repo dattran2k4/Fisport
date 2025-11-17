@@ -8,12 +8,14 @@ import com.fisport.repository.UserSportEloRepository;
 import com.fisport.service.EloService;
 import com.fisport.service.UserSportEloService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j(topic = "USER-SPORT-ELO-SERVICE")
 public class UserSportEloServiceImpl implements UserSportEloService {
 
     private final UserSportEloRepository userSportEloRepository;
@@ -31,6 +33,9 @@ public class UserSportEloServiceImpl implements UserSportEloService {
 
     @Override
     public void updateSportElo(List<UserSportElo> teamA, List<UserSportElo> teamB, int scoreA, int scoreB) {
+        log.info("teamA size: {}", teamA.size());
+        log.info("teamB size: {}", teamB.size());
+
         eloService.updateTeamElo(teamA, teamB, scoreA, scoreB);
 
         teamA.forEach(t -> t.setLevel(ELevel.fromElo(t.getElo())));
@@ -42,8 +47,8 @@ public class UserSportEloServiceImpl implements UserSportEloService {
 
 
     @Override
-    public List<UserSportElo> getUserSportEloByUserIds(List<Long> userIds) {
-        return userSportEloRepository.findByUserIdIn(userIds);
+    public List<UserSportElo> getUserSportEloByUserIds(List<Long> userIds, Long sportId) {
+        return userSportEloRepository.findByUserIdAndSport(userIds, sportId);
     }
 
     @Override

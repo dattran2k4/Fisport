@@ -17,16 +17,12 @@ import com.fisport.service.ChallengeParticipantService;
 import com.fisport.service.ChallengeResultService;
 import com.fisport.service.ChallengeMatchService;
 import com.fisport.service.UserSportEloService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -40,8 +36,10 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
     private final UserSportEloService userSportEloService;
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor =  Exception.class)
     public void updateMatchResult(Long matchID, MatchResultRequest request, String username) {
+
+        log.info("Updating result for matchId {}", matchID);
 
         ChallengeMatch match = challengeMatchRepository.findById(matchID).orElseThrow(() -> new ResourceNotFoundException("Match not found"));
 
@@ -49,7 +47,6 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
             throw new InvalidDataException("Chỉ có chủ trận mới được thực hiện");
         }
 
-        //TO-DO CHECK != NULL AND ROLL-BACK
         if (match.getResult() != null) {
             throw new InvalidDataException("Không thể cập nhật lại kết quả");
         }
@@ -69,16 +66,16 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
             result.setTeamAScort(request.getScortTeamA());
             result.setTeamBScort(request.getScortTeamB());
             challengeResultRepository.save(result);
-            log.info("challengeId updated result {} - {}", match, request.getScortTeamA(), request.getScortTeamB());
+            log.info("MatchId {} updated result {} - {}", matchID, request.getScortTeamA(), request.getScortTeamB());
         } else {
             throw new InvalidDataException("Kết quả trận đấu đã được cập nhật. Không thể chỉnh sửa!");
         }
 
         //Get list participants in team
         List<ChallengeParticipant> participantsA = challengeParticipantService.getParticipantsByMatchAndTeamAndStatus(matchID, ETeam.TEAM_A, EParticipantStatus.ACCEPTED);
-        log.info("participantsA: {}", participantsA.toString());
+        log.info("Get participantsA: {}", participantsA.toString());
         List<ChallengeParticipant> participantsB = challengeParticipantService.getParticipantsByMatchAndTeamAndStatus(matchID, ETeam.TEAM_B, EParticipantStatus.ACCEPTED);
-        log.info("participantsB: {}", participantsB.toString());
+        log.info("Get participantsB: {}", participantsB.toString());
 
         if (participantsA.isEmpty() && participantsB.isEmpty()) {
             throw new InvalidDataException("Không thể cập nhật kết quả");
@@ -89,9 +86,9 @@ public class ChallengeResultServiceImpl implements ChallengeResultService {
         List<Long> userIdsTeamB = participantsB.stream().map(c -> c.getUser().getId()).toList();
 
         //Get list elo Team
-        List<UserSportElo> eloTeamA = userSportEloService.getUserSportEloByUserIds(userIdsTeamA);
+        List<UserSportElo> eloTeamA = userSportEloService.getUserSportEloByUserIds(userIdsTeamA, match.getFieldTypeId());
         log.info("eloTeamA: {}", eloTeamA.toString());
-        List<UserSportElo> eloTeamB = userSportEloService.getUserSportEloByUserIds(userIdsTeamB);
+        List<UserSportElo> eloTeamB = userSportEloService.getUserSportEloByUserIds(userIdsTeamB, match.getFieldTypeId());
         log.info("eloTeamB: {}", eloTeamB.toString());
 
         //Save

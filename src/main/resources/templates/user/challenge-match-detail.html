@@ -135,14 +135,6 @@
                 </div>
             </div>
 
-            <div class="mt-2 text-muted small">
-                <p><strong>Hướng dẫn phản hồi người chơi:</strong></p>
-                <ul class="mb-0">
-                    <li>Chấp nhận hoặc Từ chối: chọn trực tiếp nút tương ứng và gửi thông điệp</li>
-                    <li>Đánh dấu Không tham gia: chỉ được đánh dấu sau khi trận đấu đã hoàn thành.</li>
-                </ul>
-            </div>
-
             <!-- Participants Table -->
             <div class="card p-3">
                 <h5 class="mb-3"><i class="bi bi-person-lines-fill me-2"></i>Danh sách người tham gia</h5>
@@ -178,21 +170,36 @@
                                 <td th:text="${p.status.value}">PENDING</td>
                                 <td th:text="${p.message}">Demo message</td>
                                 <td>
-                                    <!-- Duyệt action list -->
                                     <span th:each="act : ${p.actions}">
                                         <button class="btn btn-sm me-1"
                                             th:classappend="${act== 'Chấp nhận'} ? 'btn-success' : (act == 'Từ chối' ? 'btn-danger' : 'btn-secondary')"
                                             th:title="${act=='Chấp nhận'} ? 'Accept' : (act=='Từ chối' ? 'Reject' : 'Not join')"
                                             th:data-id="${p.id}" th:data-action="${act}">
-                                            <i th:if="${act=='Chấp nhận'}" class="bi bi-check-lg"></i>
-                                            <i th:if="${act=='Từ chối'}" class="bi bi-x-lg"></i>
-                                            <i th:if="${act=='Không tham gia'}" class="bi bi-slash-circle"></i>
+
+                                            <th:block th:switch="${act}">
+                                                <i th:case="'Chấp nhận'" class="bi bi-check-lg"></i>
+                                                <i th:case="'Từ chối'" class="bi bi-x-lg"></i>
+                                                <i th:case="'Không tham gia'" class="bi bi-slash-circle"></i>
+                                            </th:block>
+
                                         </button>
                                     </span>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-3 text-muted small fst-italic">
+                    <strong><i class="bi bi-info-circle me-1"></i>Ghi chú:</strong>
+                    <ul class="list-unstyled mb-0 mt-1" style="padding-left: 1.25rem;">
+                        <li><i class="bi bi-check-lg text-success me-1"></i> <strong>Chấp nhận:</strong> Đồng ý cho
+                            người chơi tham gia trận đấu kèm tin nhắn (nên thêm số điện thoại).</li>
+                        <li><i class="bi bi-x-lg text-danger me-1"></i> <strong>Từ chối:</strong> Từ chối yêu cầu tham
+                            gia của người chơi kèm lý do.</li>
+                        <li><i class="bi bi-slash-circle text-secondary me-1"></i> <strong>Không tham gia:</strong> Hủy
+                            tư cách tham gia của người chơi (dùng khi người chơi đã được duyệt nhưng không có mặt tại
+                            trận đấu).</li>
+                    </ul>
                 </div>
             </div>
 
@@ -225,7 +232,7 @@
             let selectedId = '';
 
             $('button[data-id]').click(function () {
-                selectedAction = $(this).data('action'); 
+                selectedAction = $(this).data('action');
                 selectedId = $(this).data('id');
 
                 if (selectedAction === 'Chấp nhận' || selectedAction === 'Từ chối') {

@@ -80,7 +80,7 @@ public class RegisterController {
     }
 
     @PostMapping("/2fa-register")
-    public String TwoFARegister(@ModelAttribute("request") TwoFARequest request, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+    public String handleTwoFARegister(@ModelAttribute("request") TwoFARequest request, BindingResult result, Model model, RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
             model.addAttribute("error", result.getAllErrors().get(0).getDefaultMessage());
             return "/confirm";

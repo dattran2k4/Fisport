@@ -70,7 +70,7 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
             throw new InvalidDataException("Bạn đã tham gia rồi");
         }
 
-        if (getAcceptedCurrentPlayers(matchId) == challengeMatchTypeService.maxPlayer(challengeMatch.getChallengeMatchType().getId())) {
+        if (getAcceptedCurrentPlayers(matchId).compareTo(challengeMatchTypeService.maxPlayer(challengeMatch.getChallengeMatchType().getId())) >= 0) {
             throw new InvalidDataException("Số lượng người tham gia hiện tại đã đủ");
         }
 
@@ -210,9 +210,8 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
             case ACCEPTED:
                 actions.add("Không tham gia");
                 break;
-            case NOSHOW:
-            case REJECTED:
-            case CANCELLED:
+            default:
+                break;
         }
 
         return actions;
@@ -237,7 +236,7 @@ public class ChallengeParticipantServiceImpl implements ChallengeParticipantServ
                 .isPaid(p.isPaid())
                 .status(p.getStatus())
                 .messageRequest(p.getRequestMessage())
-                .messageResponse(p.getRequestMessage())
+                .messageResponse(p.getResponseMessage())
                 .matchType(p.getMatch().getChallengeMatchType().getName())
                 .canPay(p.getStatus().equals(EParticipantStatus.ACCEPTED) && !p.isPaid())
                 .build()).toList();

@@ -6,6 +6,7 @@ import com.fisport.common.ETeam;
 import com.fisport.model.ChallengeMatch;
 import com.fisport.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,13 +14,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/thach-dau")
+@Slf4j(topic = "CHALLENGE-MATCH-CONTROLLER")
 public class ChallengeMatchController {
 
     private final ChallengeMatchService challengeMatchService;
@@ -30,7 +30,7 @@ public class ChallengeMatchController {
     private final FieldTypeService fieldTypeService;
 
     @GetMapping
-    public String challengeMatch(Model model, @RequestParam(required = false) EChallengeStatus status,
+    public String showChallengeMatchsPage(Model model, @RequestParam(required = false) EChallengeStatus status,
                                  @RequestParam(required = false) ELevel level,
                                  @RequestParam(required = false) Long typeId,
                                  @RequestParam(required = false) Long cityId,
@@ -49,7 +49,7 @@ public class ChallengeMatchController {
     }
 
     @GetMapping("/{id}/chi-tiet")
-    public String challengeMatchDetail(@PathVariable Long id, Model model) {
+    public String showChallengeMatchDetailPage(@PathVariable Long id, Model model) {
         ChallengeMatch match = challengeMatchService.findChallengeMatch(id);
 
         int maxPlayersPerTeam = match.getChallengeMatchType().getMaxPlayers() / 2;

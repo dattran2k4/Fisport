@@ -13,7 +13,7 @@ public interface UserSportEloService {
 
     void updateSportElo(List<UserSportElo> teamA, List<UserSportElo> teamB, int scoreA, int scoreB);
 
-    List<UserSportElo> getUserSportEloByUserIds(List<Long> ids);
+    List<UserSportElo> getUserSportEloByUserIds(List<Long> ids, Long sportId);
 
     UserSportEloResponse getUserSportEloResponse(Long userId, Long sportId);
 }

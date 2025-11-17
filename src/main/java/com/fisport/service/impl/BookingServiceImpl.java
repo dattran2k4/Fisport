@@ -41,7 +41,7 @@ public class BookingServiceImpl implements BookingService {
     private final VoucherService voucherService;
     private final ChallengeMatchService challengeMatchService;
     private final ChallengeMatchTypeService challengeMatchTypeService;
-    private final int SLOT_INTERVAL = 30;
+    private static final int SLOT_INTERVAL = 30;
 
     @Override
     public List<BookingTimeResponse> getOccupiedSlots(Long subFieldId, LocalDate date) {
@@ -231,6 +231,8 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingForUserResponse> getBookingsForUser(String name) {
+        log.info("Getting booking for user {}", name);
+
         User user = userRepository.findByUsername(name).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         List<Booking> bookings = bookingRepository.findByUserId(user.getId())

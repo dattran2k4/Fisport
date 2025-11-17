@@ -7,6 +7,7 @@ import com.fisport.service.ReviewService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,6 +19,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @Controller
 @RequestMapping("/user/bookings")
+@Slf4j(topic = "USER-BOOKING-CONTROLLER")
 public class UserBookingController {
 
     private final BookingService bookingService;
@@ -25,7 +27,7 @@ public class UserBookingController {
 
 
     @GetMapping()
-    public String bookings(Model model, Principal principal) {
+    public String showBookingsHistoryPage(Model model, Principal principal) {
         model.addAttribute("bookings", bookingService.getBookingsForUser(principal.getName()));
         model.addAttribute("levels", ELevel.values());
         return "user/booking";
@@ -41,8 +43,7 @@ public class UserBookingController {
     @PostMapping("/review/{id}")
     public String submitFormReview(@Min(1) @PathVariable("id") Long id,
                                    @Valid @ModelAttribute("review") ReviewRequest request,
-                                   Principal principal, RedirectAttributes redirectAttributes, BindingResult result,
-                                   Model model) {
+                                   Principal principal, RedirectAttributes redirectAttributes, BindingResult result) {
         if (result.hasErrors()) {
             redirectAttributes.addFlashAttribute("errorMessage", result.getAllErrors().get(0).getDefaultMessage());
             return "redirect:/user/bookings/review/" + id;

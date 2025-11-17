@@ -273,6 +273,9 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
     @Override
     public List<ChallengeMatchManagementResponse> getListMatchForManagement(String username) {
+
+        log.info("Get list match for management by user {}", username);
+
         User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         List<ChallengeMatch> matches = challengeMatchRepository.findByCreatorId(user.getId());
@@ -338,9 +341,8 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
             case CANCELLED:
                 break;
             case MATCHED:
-                if (m.getResult() != null) {
-                    actions.add("View Result");
-                }
+                actions.add("View Result");
+                actions.add("View");
                 break;
             default:
                 break;

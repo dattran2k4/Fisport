@@ -37,6 +37,7 @@ public class EloServiceImpl implements EloService {
 
     @Override
     public void updateTeamElo(List<UserSportElo> teamA, List<UserSportElo> teamB, int scoreA, int scoreB) {
+        log.info("Updating elo sport for 2 teams");
 
         int avgEloTeamA =  averageTeamElo(teamA);
         int avgEloTeamB = averageTeamElo(teamB);

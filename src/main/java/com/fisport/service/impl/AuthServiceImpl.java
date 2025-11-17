@@ -10,8 +10,10 @@ import com.fisport.exception.InvalidDataException;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.Role;
 import com.fisport.model.User;
+import com.fisport.model.Wallet;
 import com.fisport.repository.RoleRepository;
 import com.fisport.repository.UserRepository;
+import com.fisport.repository.WalletRepository;
 import com.fisport.security.CustomUserDetails;
 import com.fisport.service.*;
 import com.fisport.common.ERole;
@@ -52,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
     private final TwoFAService twoFAService;
     private final SessionService sessionService;
     private final SecurityContextService securityContextService;
+    private final WalletRepository walletRepository;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -85,7 +88,17 @@ public class AuthServiceImpl implements AuthService {
                 .role(role)
                 .build();
 
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
+
+        //add wallet
+        Wallet wallet = new Wallet();
+        wallet.setUser(savedUser);
+
+        Wallet savedWallet = walletRepository.save(wallet);
+
+        savedUser.setWallet(savedWallet);
+
+        userRepository.save(savedUser);
 
         log.info("User id {} registered",  user.getId());
 

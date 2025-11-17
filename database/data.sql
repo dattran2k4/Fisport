@@ -556,7 +556,7 @@ VALUES
 (1, 1, 6,  'Bạn có dám?', 'TRUNGBINH', 50000,   'Giao hữu vui vẻ, không phân biệt trình độ.', 'MATCHED', 1, NOW(), NOW()),
 
 -- BK:2: COMPLETE, US 2
-(2, 2, 6,  'Lâu ngày không gặp', 'KHA', 80000,  'Ưu tiên các bạn đá cánh nhanh nhẹn.', 'MATCHED', 2, NOW(), NOW()),
+(2, 5, 6,  'Lâu ngày không gặp', 'KHA', 80000,  'Ưu tiên các bạn đá cánh nhanh nhẹn.', 'MATCHED', 2, NOW(), NOW()),
 
 -- BK: 3: PAID, US 3
 (3, 5, 6,  'Kiếm tí mồ hôi', 'TRUNGBINH_KHA', 0,   'Không có gì', 'OPEN', 3, NOW(), NOW()),

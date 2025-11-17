@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class ForgotPasswordController {
 
     @GetMapping("/forgot-password")
-    public String forgotPassword() {
+    public String showforgotPasswordPage() {
         return "forgot-password";
     }
 
     @GetMapping("/reset-password")
-    public String resetPassword(@RequestParam("verifyCode") String verifyCode,
+    public String showresetPasswordPage(@RequestParam("verifyCode") String verifyCode,
                                 Model model) {
         model.addAttribute("verifyCode", verifyCode);
         return "reset-password";

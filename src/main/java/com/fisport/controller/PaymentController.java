@@ -24,7 +24,7 @@ public class PaymentController {
     private final WalletService walletService;
 
     @GetMapping("/thanh-toan")
-    public String showMethodPayment(@RequestParam("token") String paymentToken, Model model, Principal principal) {
+    public String showMethodPaymentPage(@RequestParam("token") String paymentToken, Model model, Principal principal) {
         model.addAttribute("paymentToken", paymentToken);
         model.addAttribute("methods", EPaymentMethod.values());
         model.addAttribute("wallet", walletService.getWalletByUser(principal.getName()));
@@ -32,7 +32,7 @@ public class PaymentController {
     }
 
     @GetMapping("/vnpay-return")
-    public String showPaymentStatus(@RequestParam Map<String, String> params, Model model) {
+    public String showPaymentStatusPage(@RequestParam Map<String, String> params, Model model) {
         PaymentResponse response = paymentService.handleVnpayReturn(params);
         model.addAttribute("response", response);
         if (response.getStatus().equals(EPaymentStatus.FAILED)) {
@@ -42,14 +42,14 @@ public class PaymentController {
     }
 
     @GetMapping("/thanh-toan/payos/thanh-cong")
-    public String showPaymentPayOSSucces(@RequestParam("orderCode") long orderCode, @RequestParam("status") String status, Model model) {
+    public String showPaymentPayOSSuccesPage(@RequestParam("orderCode") long orderCode, @RequestParam("status") String status, Model model) {
         PaymentResponse response = paymentService.checkPaymentPayOSView(orderCode, status);
         model.addAttribute("response", response);
         return "payment-success";
     }
 
     @GetMapping("/thanh-toan/payos/that-bai")
-    public String showPaymentPayOSFail(@RequestParam("orderCode") long orderCode, @RequestParam("status") String status, Model model) {
+    public String showPaymentPayOSFailPage(@RequestParam("orderCode") long orderCode, @RequestParam("status") String status, Model model) {
         PaymentResponse response = paymentService.checkPaymentPayOSView(orderCode, status);
         model.addAttribute("response", response);
         return "payment-fail";

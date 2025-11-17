@@ -34,7 +34,7 @@ public class FieldController {
     }
 
     @GetMapping("/{fieldNameSlug}")
-    public String getField(@PathVariable String slug, @PathVariable String fieldNameSlug, Model model) {
+    public String showFieldDetailPage(@PathVariable String slug, @PathVariable String fieldNameSlug, Model model) {
         FieldDetailResponse fieldResponse = fieldService.findBySlug(fieldNameSlug);
         model.addAttribute("field", fieldResponse);
         return "web/field-detail";
