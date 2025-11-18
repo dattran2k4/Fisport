@@ -1,9 +1,11 @@
 package com.fisport.controller.user;
 
+import com.fisport.common.ELevel;
 import com.fisport.dto.response.ChallengeResultResponse;
 import com.fisport.service.ChallengeMatchService;
 import com.fisport.service.ChallengeParticipantService;
 import com.fisport.service.ChallengeResultService;
+import com.fisport.service.UserSportEloService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,10 +23,15 @@ public class UserChallengeMatchController {
     private final ChallengeMatchService challengeMatchService;
     private final ChallengeParticipantService challengeParticipantService;
     private final ChallengeResultService challengeResultService;
+    private final UserSportEloService userSportEloService;
 
     @GetMapping
     public String showChallengeMatchManagement(Model model, Principal principal) {
         model.addAttribute("matches", challengeMatchService.getListMatchForManagement(principal.getName()));
+
+        model.addAttribute("userSportElos", userSportEloService.getUserSportEloResponseByUser(principal.getName()));
+
+        model.addAttribute("allLevels", ELevel.values());
 
         return "user/challenge-matches";
     }

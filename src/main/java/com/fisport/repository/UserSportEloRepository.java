@@ -16,4 +16,6 @@ public interface UserSportEloRepository extends JpaRepository<UserSportElo, Long
 
     @Query("SELECT u FROM UserSportElo u WHERE u.user.id IN :userIds AND u.fieldType.id = :sportId")
     List<UserSportElo> findByUserIdAndSport(@Param("userIds") List<Long> userIds, @Param("sportId") Long fieldTypeId);
+
+    List<UserSportElo> findByUserUsername(String name);
 }

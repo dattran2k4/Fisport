@@ -6,6 +6,65 @@
     <meta charset="UTF-8">
     <title>Challenge Matches</title>
     <style>
+        .elo-card {
+            border-radius: 0.75rem;
+            /* Bo góc mềm mại */
+            transition: transform 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
+        }
+
+        .elo-card:hover {
+            transform: translateY(-8px);
+            /* Nâng card lên 1 chút */
+            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Điểm ELO (số) */
+        .elo-score {
+            color: #343a40;
+            /* Màu text đậm */
+        }
+
+        /* Badge (level) chung */
+        .elo-level-badge {
+            padding: 0.5em 1.2em;
+            font-weight: 600;
+            color: #fff;
+            /* Chữ luôn màu trắng */
+            letter-spacing: 0.5px;
+        }
+
+        .level-yeu,
+        .level-trungbinh_yeu {
+            background-color: #198754;
+            /* Màu xanh lá */
+        }
+
+        /* Trung bình */
+        .level-trungbinh {
+            background-color: #0d6efd;
+            /* Màu xanh dương */
+        }
+
+        /* Trung bình khá -> Khá */
+        .level-trungbinh_kha,
+        .level-kha {
+            background-color: #fd7e14;
+            /* Màu cam */
+        }
+
+        /* Chuyên nghiệp */
+        .level-chuyen_nghiep {
+            background-color: #dc3545;
+            /* Màu đỏ */
+        }
+
+        .elo-level-badge:not([class*='level-']) {
+            background-color: #6c757d;
+            /* Màu xám */
+        }
+
+        /* Match */
+
         .card {
             border: none;
             border-radius: 15px;
@@ -43,17 +102,6 @@
             font-weight: 600;
         }
 
-        .progress {
-            background-color: #e8edf5;
-            border-radius: 10px;
-        }
-
-        .progress-bar {
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.85rem;
-        }
-
         .btn-group .btn {
             border-radius: 8px !important;
             font-size: 0.85rem;
@@ -88,11 +136,6 @@
 
         .action-btn:hover {
             color: #0a58ca;
-        }
-
-        .header-title {
-            font-weight: 600;
-            font-size: 1.4rem;
         }
 
         .status-badge {
@@ -204,7 +247,91 @@
 
 <body>
     <div layout:fragment="content">
-        <div class="container py-5">
+        <div class="container">
+
+        </div>
+        <div class="card mb-4 shadow-sm border-0">
+            <div class="card-header bg-light border-0 pt-3 pb-0">
+                <h4 class="fw-bold text-dark mb-0">
+                    <i class="bi bi-award-fill me-2 text-primary"></i>
+                    Bảng Phân Loại Cấp Độ
+                </h4>
+                <small class="text-muted">Xem cách cấp độ của bạn được phân loại dựa trên điểm Elo.</small>
+            </div>
+            <div class="card-body pt-3">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" style="width: 40%;">Cấp độ</th>
+                                <th scope="col">Điểm Elo Yêu Cầu</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="level : ${allLevels}">
+
+                                <td>
+                                    <span class="badge rounded-pill fs-6 elo-level-badge" th:text="${level.value}"
+                                        th:classappend="'level-' + ${level.name().toLowerCase()}">
+                                    </span>
+                                </td>
+
+                                <td class="fw-medium">
+                                    <span th:if="${level.maxElo == T(java.lang.Integer).MAX_VALUE}"
+                                        th:text="${level.minElo} + '+'">
+                                        1800+
+                                    </span>
+
+                                    <span th:unless="${level.maxElo == T(java.lang.Integer).MAX_VALUE}"
+                                        th:text="${level.minElo} + ' - ' + ${level.maxElo}">
+                                        800 - 999
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Sport Elo Detail -->
+        <h3 class="mb-4 fw-bold text-primary">
+            <i class="bi bi-bar-chart-line-fill me-2"></i>
+            Tổng quan Kỹ năng
+        </h3>
+
+        <div th:if="${#lists.isEmpty(userSportElos)}" class="card card-body text-center text-muted mb-4 shadow-sm">
+            <i class="bi bi-shield-slash fs-2 mb-2"></i>
+            <span class="fw-medium">Bạn chưa có thông tin Elo.</span>
+            <small>Hãy tham gia trận đấu đầu tiên để cập nhật kỹ năng!</small>
+        </div>
+
+        <div th:unless="${#lists.isEmpty(userSportElos)}" class="row g-4 mb-4">
+
+            <div class="col-xl-3 col-lg-4 col-md-6" th:each="elo : ${userSportElos}">
+
+                <div class="card h-100 shadow-sm border-0 elo-card">
+                    <div class="card-body text-center d-flex flex-column justify-content-center p-4">
+
+                        <h5 class="card-title fw-bold text-dark mb-2" th:text="${elo.sportName}">
+                            Cầu Lông
+                        </h5>
+
+                        <div class="elo-score my-2">
+                            <i class="bi bi-trophy-fill text-warning me-1"></i>
+                            <span class="fs-2 fw-bolder" th:text="${elo.elo}">1200</span>
+                        </div>
+
+                        <div>
+                            <span class="badge rounded-pill fs-6 elo-level-badge" th:text="${elo.level.value}"
+                                th:classappend="'level-' + ${elo.level.name().toLowerCase()}">
+                                Intermediate
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Match Table -->
             <div class="card">
                 <div class="card-body">
@@ -290,7 +417,7 @@
                                             <!-- Lặp qua các hành động View, Edit -->
                                             <a th:each="act : ${m.actions}" th:if="${act == 'View' or act == 'Edit'}"
                                                 th:href="${act == 'View' ? '/user/challenge-matches/' + m.id 
-                    : '/user/challenge-matches/' + m.id + '/view/'}" class="action-btn"
+                                                    : '/user/challenge-matches/' + m.id + '/view/'}" class="action-btn"
                                                 th:classappend="${act == 'View' ? ' view-btn' : ' edit-btn'}"
                                                 th:title="${act}">
                                                 <i th:if="${act == 'View'}" class="bi bi-eye-fill"></i>
@@ -324,7 +451,8 @@
             <div class="modal-dialog modal-lg modal-dialog-centered">
                 <div class="modal-content border-0 shadow-lg rounded-4">
                     <div class="modal-header bg-primary text-white rounded-top-4">
-                        <h5 class="modal-title" id="editMatchLabel"><i class="bi bi-pencil-square"></i> Edit Match</h5>
+                        <h5 class="modal-title" id="editMatchLabel"><i class="bi bi-pencil-square"></i> Edit Match
+                        </h5>
                         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
                             aria-label="Close"></button>
                     </div>
@@ -381,13 +509,13 @@
                             <input type="hidden" id="matchId">
 
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Điểm Team A</label>
+                                <label for="scoreTeamA" class="form-label fw-bold">Điểm Team A</label>
                                 <input type="number" id="scoreTeamA" class="form-control text-center fs-5 fw-bold"
                                     min="0" required>
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Điểm Team B</label>
+                                <label for="scoreTeamB" class="form-label fw-bold">Điểm Team B</label>
                                 <input type="number" id="scoreTeamB" class="form-control text-center fs-5 fw-bold"
                                     min="0" required>
                             </div>
@@ -406,6 +534,7 @@
         </div>
 
 
+    </div>
     </div>
     <section layout:fragment="scripts">
         <script th:inline="javascript">

@@ -161,7 +161,10 @@ public class ChallengeMatchServiceImpl implements ChallengeMatchService {
 
         Page<ChallengeMatch> matchPage = challengeMatchRepository.findAll(spec, pageable);
 
-        List<ChallengeMatchSummaryResponse> response = matchPage.stream().map(m -> ChallengeMatchSummaryResponse.builder()
+        List<ChallengeMatchSummaryResponse> response = matchPage.stream()
+                .filter(m -> !m.getStatus().equals(EChallengeStatus.CANCELLED)
+                && !m.getStatus().equals(EChallengeStatus.MATCHED))
+                .map(m -> ChallengeMatchSummaryResponse.builder()
                 .id(m.getId())
                 .title(m.getTitle())
                 .status(m.getStatus())

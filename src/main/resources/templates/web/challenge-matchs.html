@@ -374,13 +374,11 @@
                         <div class="card">
                             <div class="card-header">
                                 <h2>${m.title}</h2>
-                                 <span class="badge ${m.status === "OPEN" ? "badge-pending" :
-                                m.status === "PENDING" ? "badge-confirmed" :
-                                    m.status === "FULL" ? "badge-full" :
-                                        m.status === "MATCHED" ? "badge-matched" :
-                                            m.status === "CANCELLED" ? "badge-cancelled" :
-                                                "badge"
-                            }">${m.status}</span>
+                                 <span class="badge ${m.status.name === "OPEN" ? "badge-pending" :
+                                m.status.name === "PENDING" ? "badge-confirmed" :
+                                    m.status.name === "FULL" ? "badge-full" :
+                                        m.status.name === "MATCHED" ? "badge-matched" :
+                                            m.status.name === "CANCELLED" ? "badge-cancelled" : "badge"}">${m.status.value}</span>
                             </div>
                             <div class="card-body">
                                 <p><i class="fas fa-map-marker-alt icon"></i> ${m.ward}, ${m.city}</p>
@@ -398,6 +396,8 @@
                             </div>
                         </div>
                     `;
+                            console.log(m.status);
+                            console.log(m.status.name);
 
                             container.append(card);
                         });

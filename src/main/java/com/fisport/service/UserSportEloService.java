@@ -1,6 +1,7 @@
 package com.fisport.service;
 
 import com.fisport.common.ELevel;
+import com.fisport.dto.response.UserSportEloDetailResponse;
 import com.fisport.dto.response.UserSportEloResponse;
 import com.fisport.model.UserSportElo;
 
@@ -16,4 +17,6 @@ public interface UserSportEloService {
     List<UserSportElo> getUserSportEloByUserIds(List<Long> ids, Long sportId);
 
     UserSportEloResponse getUserSportEloResponse(Long userId, Long sportId);
+
+    List<UserSportEloDetailResponse> getUserSportEloResponseByUser(String name);
 }

@@ -1,6 +1,7 @@
 package com.fisport.service.impl;
 
 import com.fisport.common.ELevel;
+import com.fisport.dto.response.UserSportEloDetailResponse;
 import com.fisport.dto.response.UserSportEloResponse;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.UserSportElo;
@@ -55,6 +56,19 @@ public class UserSportEloServiceImpl implements UserSportEloService {
     public UserSportEloResponse getUserSportEloResponse(Long userId, Long sportId) {
         UserSportElo userSportElo = getUserSportElo(userId, sportId);
         return UserSportEloResponse.builder().elo(userSportElo.getElo()).level(userSportElo.getLevel()).build();
+    }
+
+    @Override
+    public List<UserSportEloDetailResponse> getUserSportEloResponseByUser(String name) {
+        log.info("Get sport, elo for user: {}", name);
+
+        List<UserSportElo> list = userSportEloRepository.findByUserUsername(name);
+
+        return list.stream().map(use -> UserSportEloDetailResponse.builder()
+                .sportName(use.getFieldType().getName())
+                .elo(use.getElo())
+                .level(use.getLevel())
+                .build()).toList();
     }
 
     private UserSportElo getUserSportElo(Long userId, Long sportId) {

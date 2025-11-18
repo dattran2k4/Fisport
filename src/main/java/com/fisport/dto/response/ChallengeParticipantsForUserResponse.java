@@ -1,5 +1,6 @@
 package com.fisport.dto.response;
 
+import com.fisport.common.EChallengeStatus;
 import com.fisport.common.EParticipantStatus;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,6 +25,6 @@ public class ChallengeParticipantsForUserResponse {
     private boolean isPaid;
     private String messageRequest;
     private String messageResponse;
-
+    private EChallengeStatus challengeStatus;
     private ChallengeResultResponse result;
 }
