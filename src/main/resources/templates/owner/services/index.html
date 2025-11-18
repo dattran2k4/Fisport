@@ -1,0 +1,92 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content" class="px-6 py-4 font-inter">
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Quản lý Dịch vụ</h1>
+        <p class="text-gray-600 text-sm">Chọn sân để quản lý dịch vụ và sản phẩm</p>
+    </div>
+
+    <!-- Alert messages -->
+    <div th:if="${successMessage}" class="mb-4 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg flex items-start">
+        <i class="ri-checkbox-circle-fill text-green-500 text-xl mr-3 mt-0.5"></i>
+        <span class="text-green-800" th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg flex items-start">
+        <i class="ri-error-warning-fill text-red-500 text-xl mr-3 mt-0.5"></i>
+        <span class="text-red-800" th:text="${errorMessage}"></span>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${fields == null || fields.isEmpty()}" class="bg-white rounded-2xl shadow-md border border-gray-100 p-12 text-center">
+        <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="ri-map-pin-line text-4xl text-blue-500"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Chưa có sân nào</h3>
+        <p class="text-gray-600 mb-6 max-w-md mx-auto">Bạn cần tạo sân trước khi quản lý dịch vụ. Hãy tạo sân đầu tiên của bạn.</p>
+        <a th:href="@{/owner/fields/create}" 
+           class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg">
+            <i class="ri-add-line mr-2 text-lg"></i>
+            Tạo sân đầu tiên
+        </a>
+    </div>
+
+    <!-- Fields Grid -->
+    <div th:if="${fields != null && !fields.isEmpty()}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-all cursor-pointer overflow-hidden group"
+             th:each="field : ${fields}"
+             th:onclick="'window.location.href=\'/owner/services/' + ${field.id} + '/items\''">
+            <!-- Field Image -->
+            <div class="relative h-48 overflow-hidden">
+                <img th:src="${field.banner}" 
+                     th:alt="${field.name}"
+                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                <div class="absolute top-4 right-4">
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold"
+                          th:classappend="${field.status == T(com.fisport.common.EFieldStatus).ACTIVE ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}"
+                          th:text="${field.status}">ACTIVE</span>
+                </div>
+            </div>
+
+            <!-- Field Details -->
+            <div class="p-6">
+                <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors"
+                    th:text="${field.name + (field.fieldTypeResponse != null ? ' - ' + field.fieldTypeResponse.name : '')}">
+                    Tên sân
+                </h3>
+                
+                <p class="text-gray-600 text-sm mb-4 flex items-center gap-2">
+                    <i class="ri-map-pin-line text-blue-500"></i>
+                    <span th:text="${field.address + (field.wardResponse != null ? ', ' + field.wardResponse.name : '')}">Địa chỉ</span>
+                </p>
+
+                <!-- Stats -->
+                <div class="grid grid-cols-3 gap-4 mb-4 pb-4 border-b border-gray-100">
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 mb-1">Rating</p>
+                        <p class="text-sm font-semibold text-gray-900" 
+                           th:text="${field.rating != null ? field.rating + '★' : 'N/A'}">N/A</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 mb-1">Mở cửa</p>
+                        <p class="text-sm font-semibold text-gray-900" th:text="${field.openTime}">08:00</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 mb-1">Đóng cửa</p>
+                        <p class="text-sm font-semibold text-gray-900" th:text="${field.closeTime}">22:00</p>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <button class="w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                        onclick="event.stopPropagation()"
+                        th:onclick="'window.location.href=\'/owner/services/' + ${field.id} + '/items\''">
+                    <i class="ri-settings-3-line"></i>
+                    <span>Quản lý Dịch vụ</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
