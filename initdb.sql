@@ -1,4 +1,903 @@
 
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `booking`
+--
+SET NAMES utf8mb4;
+
+DROP TABLE IF EXISTS `booking`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `booking` (
+                           `booking_date` date DEFAULT NULL,
+                           `duration` int NOT NULL,
+                           `end_time` time(6) NOT NULL,
+                           `start_time` time(6) NOT NULL,
+                           `total_price` decimal(38,2) NOT NULL,
+                           `created_at` datetime(6) DEFAULT NULL,
+                           `expired_at` datetime(6) DEFAULT NULL,
+                           `id` bigint NOT NULL AUTO_INCREMENT,
+                           `subfield_id` bigint DEFAULT NULL,
+                           `updated_at` datetime(6) DEFAULT NULL,
+                           `user_id` bigint DEFAULT NULL,
+                           `payment_token` varchar(255) DEFAULT NULL,
+                           `payment_method` enum('BANK_TRANSFER','MOMO','PAYOS','VNPAY','WALLET','ZALOPAY') DEFAULT NULL,
+                           `status` enum('CANCELLED','COMPLETED','FAILED','PAID','PENDING') NOT NULL,
+                           PRIMARY KEY (`id`),
+                           KEY `FK2aqogf67irx4n7a3t1omakrwn` (`subfield_id`),
+                           KEY `FKkgseyy7t56x7lkjgu3wah5s3t` (`user_id`),
+                           CONSTRAINT `FK2aqogf67irx4n7a3t1omakrwn` FOREIGN KEY (`subfield_id`) REFERENCES `sub_field` (`id`),
+                           CONSTRAINT `FKkgseyy7t56x7lkjgu3wah5s3t` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `booking`
+--
+
+LOCK TABLES `booking` WRITE;
+/*!40000 ALTER TABLE `booking` DISABLE KEYS */;
+/*!40000 ALTER TABLE `booking` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `booking_service_item`
+--
+
+DROP TABLE IF EXISTS `booking_service_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `booking_service_item` (
+                                        `quantity` int NOT NULL,
+                                        `subtotal` decimal(38,2) DEFAULT NULL,
+                                        `booking_id` bigint DEFAULT NULL,
+                                        `field_service_item_id` bigint DEFAULT NULL,
+                                        `id` bigint NOT NULL AUTO_INCREMENT,
+                                        PRIMARY KEY (`id`),
+                                        KEY `FKt8kqb37ggu9gvo06jon71a44y` (`booking_id`),
+                                        KEY `FKe6bemvwh68ok15tj9qrx1yuwo` (`field_service_item_id`),
+                                        CONSTRAINT `FKe6bemvwh68ok15tj9qrx1yuwo` FOREIGN KEY (`field_service_item_id`) REFERENCES `field_service_item` (`id`),
+                                        CONSTRAINT `FKt8kqb37ggu9gvo06jon71a44y` FOREIGN KEY (`booking_id`) REFERENCES `booking` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `booking_service_item`
+--
+
+LOCK TABLES `booking_service_item` WRITE;
+/*!40000 ALTER TABLE `booking_service_item` DISABLE KEYS */;
+/*!40000 ALTER TABLE `booking_service_item` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `challenge_match`
+--
+
+DROP TABLE IF EXISTS `challenge_match`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `challenge_match` (
+                                   `fee` decimal(38,2) DEFAULT NULL,
+                                   `booking_id` bigint NOT NULL,
+                                   `challenge_match_type_id` bigint DEFAULT NULL,
+                                   `created_at` datetime(6) DEFAULT NULL,
+                                   `creator_id` bigint NOT NULL,
+                                   `field_type_id` bigint DEFAULT NULL,
+                                   `id` bigint NOT NULL AUTO_INCREMENT,
+                                   `updated_at` datetime(6) DEFAULT NULL,
+                                   `title` varchar(100) DEFAULT NULL,
+                                   `note` varchar(500) DEFAULT NULL,
+                                   `status` enum('CANCELLED','FULL','MATCHED','OPEN','PENDING') DEFAULT NULL,
+                                   `suggested_level` enum('CHUYEN_NGHIEP','KHA','TRUNGBINH','TRUNGBINH_KHA','TRUNGBINH_YEU','YEU') DEFAULT NULL,
+                                   PRIMARY KEY (`id`),
+                                   UNIQUE KEY `UKlphtr07bisihtsgmflgpnns9k` (`booking_id`),
+                                   KEY `FK9irqfre1wt0snbrtvk1ujk2di` (`challenge_match_type_id`),
+                                   KEY `FKebxpdypgrvo9iacdjj71vpgvc` (`creator_id`),
+                                   CONSTRAINT `FK9irqfre1wt0snbrtvk1ujk2di` FOREIGN KEY (`challenge_match_type_id`) REFERENCES `challenge_match_type` (`id`),
+                                   CONSTRAINT `FKanbxr070d3d5xhufr3j7yw7ve` FOREIGN KEY (`booking_id`) REFERENCES `booking` (`id`),
+                                   CONSTRAINT `FKebxpdypgrvo9iacdjj71vpgvc` FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `challenge_match`
+--
+
+LOCK TABLES `challenge_match` WRITE;
+/*!40000 ALTER TABLE `challenge_match` DISABLE KEYS */;
+/*!40000 ALTER TABLE `challenge_match` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `challenge_match_type`
+--
+
+DROP TABLE IF EXISTS `challenge_match_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `challenge_match_type` (
+                                        `max_players` int DEFAULT NULL,
+                                        `field_type_id` bigint DEFAULT NULL,
+                                        `id` bigint NOT NULL AUTO_INCREMENT,
+                                        `name` varchar(255) DEFAULT NULL,
+                                        PRIMARY KEY (`id`),
+                                        KEY `FKoqeyd0hs8hkgsdfos9sk6oxpv` (`field_type_id`),
+                                        CONSTRAINT `FKoqeyd0hs8hkgsdfos9sk6oxpv` FOREIGN KEY (`field_type_id`) REFERENCES `field_type` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `challenge_match_type`
+--
+
+LOCK TABLES `challenge_match_type` WRITE;
+/*!40000 ALTER TABLE `challenge_match_type` DISABLE KEYS */;
+/*!40000 ALTER TABLE `challenge_match_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `challenge_participant`
+--
+
+DROP TABLE IF EXISTS `challenge_participant`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `challenge_participant` (
+                                         `paid` bit(1) DEFAULT NULL,
+                                         `cancelled_at` datetime(6) DEFAULT NULL,
+                                         `created_at` datetime(6) DEFAULT NULL,
+                                         `id` bigint NOT NULL AUTO_INCREMENT,
+                                         `match_id` bigint NOT NULL,
+                                         `paid_at` datetime(6) DEFAULT NULL,
+                                         `updated_at` datetime(6) DEFAULT NULL,
+                                         `user_id` bigint NOT NULL,
+                                         `request_message` varchar(200) DEFAULT NULL,
+                                         `response_message` varchar(200) DEFAULT NULL,
+                                         `status` enum('ACCEPTED','CANCELLED','NOSHOW','PENDING','REJECTED') DEFAULT NULL,
+                                         `team` enum('TEAM_A','TEAM_B') DEFAULT NULL,
+                                         PRIMARY KEY (`id`),
+                                         KEY `FKnj4ifv9m86nw9c7uvmkoo932y` (`match_id`),
+                                         KEY `FK8mluajlc6urhowb7nclemis8d` (`user_id`),
+                                         CONSTRAINT `FK8mluajlc6urhowb7nclemis8d` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+                                         CONSTRAINT `FKnj4ifv9m86nw9c7uvmkoo932y` FOREIGN KEY (`match_id`) REFERENCES `challenge_match` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `challenge_participant`
+--
+
+LOCK TABLES `challenge_participant` WRITE;
+/*!40000 ALTER TABLE `challenge_participant` DISABLE KEYS */;
+/*!40000 ALTER TABLE `challenge_participant` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `challenge_result`
+--
+
+DROP TABLE IF EXISTS `challenge_result`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `challenge_result` (
+                                    `team_a_scort` int DEFAULT NULL,
+                                    `team_b_scort` int DEFAULT NULL,
+                                    `created_at` datetime(6) DEFAULT NULL,
+                                    `id` bigint NOT NULL AUTO_INCREMENT,
+                                    `match_id` bigint NOT NULL,
+                                    PRIMARY KEY (`id`),
+                                    UNIQUE KEY `UKcxvm74fyidg5khmbanxkthes0` (`match_id`),
+                                    CONSTRAINT `FKdqj2bghij31brd6l7lvf0641c` FOREIGN KEY (`match_id`) REFERENCES `challenge_match` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `challenge_result`
+--
+
+LOCK TABLES `challenge_result` WRITE;
+/*!40000 ALTER TABLE `challenge_result` DISABLE KEYS */;
+/*!40000 ALTER TABLE `challenge_result` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `city`
+--
+
+DROP TABLE IF EXISTS `city`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `city` (
+                        `id` bigint NOT NULL AUTO_INCREMENT,
+                        `name` varchar(255) NOT NULL,
+                        `slug` varchar(255) NOT NULL,
+                        PRIMARY KEY (`id`),
+                        UNIQUE KEY `UKqsstlki7ni5ovaariyy9u8y79` (`name`),
+                        UNIQUE KEY `UK3kywok3ge37e90c6nc8iuyo6l` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `city`
+--
+
+LOCK TABLES `city` WRITE;
+/*!40000 ALTER TABLE `city` DISABLE KEYS */;
+/*!40000 ALTER TABLE `city` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `duration`
+--
+
+DROP TABLE IF EXISTS `duration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `duration` (
+                            `minutes` int NOT NULL,
+                            `id` bigint NOT NULL AUTO_INCREMENT,
+                            PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `duration`
+--
+
+LOCK TABLES `duration` WRITE;
+/*!40000 ALTER TABLE `duration` DISABLE KEYS */;
+/*!40000 ALTER TABLE `duration` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `feature`
+--
+
+DROP TABLE IF EXISTS `feature`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `feature` (
+                           `id` bigint NOT NULL AUTO_INCREMENT,
+                           `name` varchar(255) NOT NULL,
+                           `slug` varchar(255) NOT NULL,
+                           PRIMARY KEY (`id`),
+                           UNIQUE KEY `UKjhueeftkn8ve8th8m8a2878dr` (`name`),
+                           UNIQUE KEY `UKo6age7guoqxetmfa5bmb7pgus` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `feature`
+--
+
+LOCK TABLES `feature` WRITE;
+/*!40000 ALTER TABLE `feature` DISABLE KEYS */;
+/*!40000 ALTER TABLE `feature` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `field`
+--
+
+DROP TABLE IF EXISTS `field`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `field` (
+                         `close_time` time(6) NOT NULL,
+                         `latitude` double NOT NULL,
+                         `longitude` double NOT NULL,
+                         `open_time` time(6) NOT NULL,
+                         `created_at` datetime(6) DEFAULT NULL,
+                         `field_type_id` bigint DEFAULT NULL,
+                         `id` bigint NOT NULL AUTO_INCREMENT,
+                         `updated_at` datetime(6) DEFAULT NULL,
+                         `user_id` bigint DEFAULT NULL,
+                         `ward_id` bigint DEFAULT NULL,
+                         `address` varchar(255) NOT NULL,
+                         `banner` varchar(255) NOT NULL,
+                         `description` varchar(255) NOT NULL,
+                         `name` varchar(255) NOT NULL,
+                         `slug` varchar(255) NOT NULL,
+                         `status` enum('ACTIVE','INACTIVE','PENDING') DEFAULT NULL,
+                         PRIMARY KEY (`id`),
+                         UNIQUE KEY `UKhxx23xwp6cxwm1uax4dodi1av` (`name`),
+                         UNIQUE KEY `UKbn39g9jasccxlt1n07axdryof` (`slug`),
+                         KEY `FK1yfodgfhm6x6twopj6wubnis7` (`field_type_id`),
+                         KEY `FKl3t3t2bepmqkf6iyvo6eibjdx` (`user_id`),
+                         KEY `FK8o717ti3cq13pg7t2h2wdx1b` (`ward_id`),
+                         CONSTRAINT `FK1yfodgfhm6x6twopj6wubnis7` FOREIGN KEY (`field_type_id`) REFERENCES `field_type` (`id`),
+                         CONSTRAINT `FK8o717ti3cq13pg7t2h2wdx1b` FOREIGN KEY (`ward_id`) REFERENCES `ward` (`id`),
+                         CONSTRAINT `FKl3t3t2bepmqkf6iyvo6eibjdx` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `field`
+--
+
+LOCK TABLES `field` WRITE;
+/*!40000 ALTER TABLE `field` DISABLE KEYS */;
+/*!40000 ALTER TABLE `field` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `field_feature`
+--
+
+DROP TABLE IF EXISTS `field_feature`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `field_feature` (
+                                 `feature_id` bigint DEFAULT NULL,
+                                 `field_id` bigint DEFAULT NULL,
+                                 `id` bigint NOT NULL AUTO_INCREMENT,
+                                 PRIMARY KEY (`id`),
+                                 KEY `FKm64ejap642t1spd9r74sa7ldf` (`feature_id`),
+                                 KEY `FKjx6g22bleo0nvxim7yoanuy5a` (`field_id`),
+                                 CONSTRAINT `FKjx6g22bleo0nvxim7yoanuy5a` FOREIGN KEY (`field_id`) REFERENCES `field` (`id`),
+                                 CONSTRAINT `FKm64ejap642t1spd9r74sa7ldf` FOREIGN KEY (`feature_id`) REFERENCES `feature` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `field_feature`
+--
+
+LOCK TABLES `field_feature` WRITE;
+/*!40000 ALTER TABLE `field_feature` DISABLE KEYS */;
+/*!40000 ALTER TABLE `field_feature` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `field_service_item`
+--
+
+DROP TABLE IF EXISTS `field_service_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `field_service_item` (
+                                      `price` decimal(38,2) NOT NULL,
+                                      `quantity` int NOT NULL,
+                                      `field_id` bigint DEFAULT NULL,
+                                      `id` bigint NOT NULL AUTO_INCREMENT,
+                                      `service_item_id` bigint DEFAULT NULL,
+                                      `status` enum('ACTIVE','INACTIVE') NOT NULL,
+                                      PRIMARY KEY (`id`),
+                                      KEY `FKs9v1kjx530jd9n31e9guub8e4` (`field_id`),
+                                      KEY `FKkw61vguui7v1roexck0tl0j15` (`service_item_id`),
+                                      CONSTRAINT `FKkw61vguui7v1roexck0tl0j15` FOREIGN KEY (`service_item_id`) REFERENCES `service_item` (`id`),
+                                      CONSTRAINT `FKs9v1kjx530jd9n31e9guub8e4` FOREIGN KEY (`field_id`) REFERENCES `field` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `field_service_item`
+--
+
+LOCK TABLES `field_service_item` WRITE;
+/*!40000 ALTER TABLE `field_service_item` DISABLE KEYS */;
+/*!40000 ALTER TABLE `field_service_item` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `field_time_slot`
+--
+
+DROP TABLE IF EXISTS `field_time_slot`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `field_time_slot` (
+                                   `price` decimal(38,2) NOT NULL,
+                                   `field_id` bigint NOT NULL,
+                                   `id` bigint NOT NULL AUTO_INCREMENT,
+                                   `time_slot_id` bigint NOT NULL,
+                                   PRIMARY KEY (`id`),
+                                   KEY `FKdu57n35luii8mn2q15g3lbxjg` (`field_id`),
+                                   KEY `FKo04tetboko11l3g14kruufuf5` (`time_slot_id`),
+                                   CONSTRAINT `FKdu57n35luii8mn2q15g3lbxjg` FOREIGN KEY (`field_id`) REFERENCES `field` (`id`),
+                                   CONSTRAINT `FKo04tetboko11l3g14kruufuf5` FOREIGN KEY (`time_slot_id`) REFERENCES `time_slot` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `field_time_slot`
+--
+
+LOCK TABLES `field_time_slot` WRITE;
+/*!40000 ALTER TABLE `field_time_slot` DISABLE KEYS */;
+/*!40000 ALTER TABLE `field_time_slot` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `field_type`
+--
+
+DROP TABLE IF EXISTS `field_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `field_type` (
+                              `id` bigint NOT NULL AUTO_INCREMENT,
+                              `name` varchar(255) NOT NULL,
+                              `slug` varchar(255) NOT NULL,
+                              PRIMARY KEY (`id`),
+                              UNIQUE KEY `UKlucec9f5c2kurc3fbqb7uea0k` (`name`),
+                              UNIQUE KEY `UKi871vvrsv7tpa5xb6v23jeyy5` (`slug`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `field_type`
+--
+
+LOCK TABLES `field_type` WRITE;
+/*!40000 ALTER TABLE `field_type` DISABLE KEYS */;
+/*!40000 ALTER TABLE `field_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `field_type_duration`
+--
+
+DROP TABLE IF EXISTS `field_type_duration`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `field_type_duration` (
+                                       `duration_id` bigint DEFAULT NULL,
+                                       `field_type_id` bigint DEFAULT NULL,
+                                       `id` bigint NOT NULL AUTO_INCREMENT,
+                                       PRIMARY KEY (`id`),
+                                       KEY `FK8gf0wh60dwjoq8oiedebph5ib` (`duration_id`),
+                                       KEY `FKjij0syvqpkyk5wym5sxt012iv` (`field_type_id`),
+                                       CONSTRAINT `FK8gf0wh60dwjoq8oiedebph5ib` FOREIGN KEY (`duration_id`) REFERENCES `duration` (`id`),
+                                       CONSTRAINT `FKjij0syvqpkyk5wym5sxt012iv` FOREIGN KEY (`field_type_id`) REFERENCES `field_type` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `field_type_duration`
+--
+
+LOCK TABLES `field_type_duration` WRITE;
+/*!40000 ALTER TABLE `field_type_duration` DISABLE KEYS */;
+/*!40000 ALTER TABLE `field_type_duration` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `payment`
+--
+
+DROP TABLE IF EXISTS `payment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `payment` (
+                           `amount` decimal(38,2) NOT NULL,
+                           `booking_id` bigint DEFAULT NULL,
+                           `created_at` datetime(6) DEFAULT NULL,
+                           `id` bigint NOT NULL AUTO_INCREMENT,
+                           `payment_time` datetime(6) DEFAULT NULL,
+                           `transaction_code` varchar(255) DEFAULT NULL,
+                           `method` enum('BANK_TRANSFER','MOMO','PAYOS','VNPAY','WALLET','ZALOPAY') NOT NULL,
+                           `status` enum('CANCELLED','FAILED','PENDING','REFUNDED','SUCCESS') NOT NULL,
+                           PRIMARY KEY (`id`),
+                           UNIQUE KEY `UKku02qy6369hn9uhy3n7jk9v6e` (`booking_id`),
+                           UNIQUE KEY `UKfwxx8doixmraxcqckmp1lw2oq` (`transaction_code`),
+                           CONSTRAINT `FKqewrl4xrv9eiad6eab3aoja65` FOREIGN KEY (`booking_id`) REFERENCES `booking` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `payment`
+--
+
+LOCK TABLES `payment` WRITE;
+/*!40000 ALTER TABLE `payment` DISABLE KEYS */;
+/*!40000 ALTER TABLE `payment` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `review`
+--
+
+DROP TABLE IF EXISTS `review`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `review` (
+                          `rating` int NOT NULL,
+                          `booking_id` bigint DEFAULT NULL,
+                          `create_at` datetime(6) DEFAULT NULL,
+                          `field_id` bigint DEFAULT NULL,
+                          `id` bigint NOT NULL AUTO_INCREMENT,
+                          `updated_at` datetime(6) DEFAULT NULL,
+                          `user_id` bigint DEFAULT NULL,
+                          `comment` varchar(255) DEFAULT NULL,
+                          PRIMARY KEY (`id`),
+                          UNIQUE KEY `UKm685o801uf70i84jf94qq3d0b` (`booking_id`),
+                          KEY `FK53y3y4gp6gppyj7oeq4stpr2u` (`field_id`),
+                          KEY `FKiyf57dy48lyiftdrf7y87rnxi` (`user_id`),
+                          CONSTRAINT `FK53y3y4gp6gppyj7oeq4stpr2u` FOREIGN KEY (`field_id`) REFERENCES `field` (`id`),
+                          CONSTRAINT `FKiyf57dy48lyiftdrf7y87rnxi` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+                          CONSTRAINT `FKk4xawqohtguy5yx5nnpba6yf3` FOREIGN KEY (`booking_id`) REFERENCES `booking` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `review`
+--
+
+LOCK TABLES `review` WRITE;
+/*!40000 ALTER TABLE `review` DISABLE KEYS */;
+/*!40000 ALTER TABLE `review` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `role`
+--
+
+DROP TABLE IF EXISTS `role`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `role` (
+                        `id` bigint NOT NULL AUTO_INCREMENT,
+                        `name` enum('ADMIN','OWNER','USER') NOT NULL,
+                        PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `role`
+--
+
+LOCK TABLES `role` WRITE;
+/*!40000 ALTER TABLE `role` DISABLE KEYS */;
+/*!40000 ALTER TABLE `role` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `service`
+--
+
+DROP TABLE IF EXISTS `service`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `service` (
+                           `id` bigint NOT NULL AUTO_INCREMENT,
+                           `name` varchar(255) NOT NULL,
+                           PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `service`
+--
+
+LOCK TABLES `service` WRITE;
+/*!40000 ALTER TABLE `service` DISABLE KEYS */;
+/*!40000 ALTER TABLE `service` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `service_item`
+--
+
+DROP TABLE IF EXISTS `service_item`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `service_item` (
+                                `id` bigint NOT NULL AUTO_INCREMENT,
+                                `service_id` bigint DEFAULT NULL,
+                                `name` varchar(255) DEFAULT NULL,
+                                PRIMARY KEY (`id`),
+                                KEY `FK82rintgbc4qe75p45eerua9ix` (`service_id`),
+                                CONSTRAINT `FK82rintgbc4qe75p45eerua9ix` FOREIGN KEY (`service_id`) REFERENCES `service` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `service_item`
+--
+
+LOCK TABLES `service_item` WRITE;
+/*!40000 ALTER TABLE `service_item` DISABLE KEYS */;
+/*!40000 ALTER TABLE `service_item` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `sub_field`
+--
+
+DROP TABLE IF EXISTS `sub_field`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `sub_field` (
+                             `created_at` datetime(6) DEFAULT NULL,
+                             `field_id` bigint DEFAULT NULL,
+                             `id` bigint NOT NULL AUTO_INCREMENT,
+                             `updated_at` datetime(6) DEFAULT NULL,
+                             `name` varchar(255) DEFAULT NULL,
+                             `status` enum('AVAILABLE','INACTIVE','MAINTAIN') DEFAULT NULL,
+                             PRIMARY KEY (`id`),
+                             KEY `FKas0aqg1v1yqhl2wyx0ebm3dht` (`field_id`),
+                             CONSTRAINT `FKas0aqg1v1yqhl2wyx0ebm3dht` FOREIGN KEY (`field_id`) REFERENCES `field` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `sub_field`
+--
+
+LOCK TABLES `sub_field` WRITE;
+/*!40000 ALTER TABLE `sub_field` DISABLE KEYS */;
+/*!40000 ALTER TABLE `sub_field` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `time_slot`
+--
+
+DROP TABLE IF EXISTS `time_slot`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `time_slot` (
+                             `start_time` time(6) NOT NULL,
+                             `id` bigint NOT NULL AUTO_INCREMENT,
+                             PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `time_slot`
+--
+
+LOCK TABLES `time_slot` WRITE;
+/*!40000 ALTER TABLE `time_slot` DISABLE KEYS */;
+/*!40000 ALTER TABLE `time_slot` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transaction`
+--
+
+DROP TABLE IF EXISTS `transaction`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `transaction` (
+                               `amount` decimal(18,2) NOT NULL,
+                               `booking_id` bigint DEFAULT NULL,
+                               `created_at` datetime(6) NOT NULL,
+                               `id` bigint NOT NULL AUTO_INCREMENT,
+                               `payment_id` bigint DEFAULT NULL,
+                               `wallet_id` bigint DEFAULT NULL,
+                               `method` enum('BANK_TRANSFER','MOMO','PAYOS','VNPAY','WALLET','ZALOPAY') DEFAULT NULL,
+                               `status` enum('FAILED','PENDING','SUCCESS') NOT NULL,
+                               `type` enum('PAYMENT','RECEIVED','REFUND','TOUP') NOT NULL,
+                               PRIMARY KEY (`id`),
+                               UNIQUE KEY `UK3d7t68r30gvwq45ekr9hqi6j4` (`payment_id`),
+                               KEY `FKhaefbm92emogmcjh4kuk3esti` (`booking_id`),
+                               KEY `FKtfwlfspv2h4wcgc9rjd1658a6` (`wallet_id`),
+                               CONSTRAINT `FKhaefbm92emogmcjh4kuk3esti` FOREIGN KEY (`booking_id`) REFERENCES `booking` (`id`),
+                               CONSTRAINT `FKq9m7rb5uydysanp8smxcovxlh` FOREIGN KEY (`payment_id`) REFERENCES `payment` (`id`),
+                               CONSTRAINT `FKtfwlfspv2h4wcgc9rjd1658a6` FOREIGN KEY (`wallet_id`) REFERENCES `wallet` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transaction`
+--
+
+LOCK TABLES `transaction` WRITE;
+/*!40000 ALTER TABLE `transaction` DISABLE KEYS */;
+/*!40000 ALTER TABLE `transaction` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user`
+--
+
+DROP TABLE IF EXISTS `user`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user` (
+                        `birth_day` date DEFAULT NULL,
+                        `is_two_factor` bit(1) DEFAULT NULL,
+                        `create_at` datetime(6) DEFAULT NULL,
+                        `id` bigint NOT NULL AUTO_INCREMENT,
+                        `role_id` bigint DEFAULT NULL,
+                        `update_at` datetime(6) DEFAULT NULL,
+                        `phone` varchar(20) DEFAULT NULL,
+                        `username` varchar(30) NOT NULL,
+                        `email` varchar(255) NOT NULL,
+                        `password` varchar(255) DEFAULT NULL,
+                        `two_fa_secret` varchar(255) DEFAULT NULL,
+                        `gender` enum('FEMALE','MALE','OTHER') DEFAULT NULL,
+                        `status` enum('ACTIVE','INACTIVE','NONE') DEFAULT NULL,
+                        PRIMARY KEY (`id`),
+                        UNIQUE KEY `UKsb8bbouer5wak8vyiiy4pf2bx` (`username`),
+                        UNIQUE KEY `UKob8kqyqqgmefl0aco34akdtpe` (`email`),
+                        UNIQUE KEY `UK589idila9li6a4arw1t8ht1gx` (`phone`),
+                        KEY `FKn82ha3ccdebhokx3a8fgdqeyy` (`role_id`),
+                        CONSTRAINT `FKn82ha3ccdebhokx3a8fgdqeyy` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user`
+--
+
+LOCK TABLES `user` WRITE;
+/*!40000 ALTER TABLE `user` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user_sport_elo`
+--
+
+DROP TABLE IF EXISTS `user_sport_elo`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_sport_elo` (
+                                  `elo` int DEFAULT NULL,
+                                  `created_at` datetime(6) DEFAULT NULL,
+                                  `field_type_id` bigint DEFAULT NULL,
+                                  `id` bigint NOT NULL AUTO_INCREMENT,
+                                  `updated_at` datetime(6) DEFAULT NULL,
+                                  `user_id` bigint NOT NULL,
+                                  `level` enum('CHUYEN_NGHIEP','KHA','TRUNGBINH','TRUNGBINH_KHA','TRUNGBINH_YEU','YEU') DEFAULT NULL,
+                                  PRIMARY KEY (`id`),
+                                  KEY `FKss7bige9ht0l55a64uvhvgx88` (`field_type_id`),
+                                  KEY `FKdpyawfyn8vdcdpj9k3k54752u` (`user_id`),
+                                  CONSTRAINT `FKdpyawfyn8vdcdpj9k3k54752u` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+                                  CONSTRAINT `FKss7bige9ht0l55a64uvhvgx88` FOREIGN KEY (`field_type_id`) REFERENCES `field_type` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_sport_elo`
+--
+
+LOCK TABLES `user_sport_elo` WRITE;
+/*!40000 ALTER TABLE `user_sport_elo` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_sport_elo` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `user_voucher`
+--
+
+DROP TABLE IF EXISTS `user_voucher`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `user_voucher` (
+                                `user_id` bigint NOT NULL,
+                                `voucher_id` bigint NOT NULL,
+                                PRIMARY KEY (`user_id`,`voucher_id`),
+                                KEY `FK5llb4x2ixiwa75csgei7hbl5r` (`voucher_id`),
+                                CONSTRAINT `FK5llb4x2ixiwa75csgei7hbl5r` FOREIGN KEY (`voucher_id`) REFERENCES `voucher` (`id`),
+                                CONSTRAINT `FK98wtp768dsh1cjpuiqbnphb7a` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `user_voucher`
+--
+
+LOCK TABLES `user_voucher` WRITE;
+/*!40000 ALTER TABLE `user_voucher` DISABLE KEYS */;
+/*!40000 ALTER TABLE `user_voucher` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `voucher`
+--
+
+DROP TABLE IF EXISTS `voucher`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `voucher` (
+                           `discount` int DEFAULT NULL,
+                           `end_date` date DEFAULT NULL,
+                           `limit_qnt` int DEFAULT NULL,
+                           `start_date` date DEFAULT NULL,
+                           `created_at` datetime(6) DEFAULT NULL,
+                           `id` bigint NOT NULL AUTO_INCREMENT,
+                           `updated_at` datetime(6) DEFAULT NULL,
+                           `code` varchar(255) DEFAULT NULL,
+                           `description` varchar(255) DEFAULT NULL,
+                           `status` enum('ACTIVE','INACTIVE') DEFAULT NULL,
+                           PRIMARY KEY (`id`),
+                           UNIQUE KEY `UKpvh1lqheshnjoekevvwla03xn` (`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `voucher`
+--
+
+LOCK TABLES `voucher` WRITE;
+/*!40000 ALTER TABLE `voucher` DISABLE KEYS */;
+/*!40000 ALTER TABLE `voucher` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `wallet`
+--
+
+DROP TABLE IF EXISTS `wallet`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `wallet` (
+                          `balance` decimal(18,2) NOT NULL,
+                          `created_at` datetime(6) NOT NULL,
+                          `id` bigint NOT NULL AUTO_INCREMENT,
+                          `updated_at` datetime(6) NOT NULL,
+                          `user_id` bigint NOT NULL,
+                          PRIMARY KEY (`id`),
+                          UNIQUE KEY `UKhgee4p1hiwadqinr0avxlq4eb` (`user_id`),
+                          CONSTRAINT `FKbs4ogwiknsup4rpw8d47qw9dx` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `wallet`
+--
+
+LOCK TABLES `wallet` WRITE;
+/*!40000 ALTER TABLE `wallet` DISABLE KEYS */;
+/*!40000 ALTER TABLE `wallet` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ward`
+--
+
+DROP TABLE IF EXISTS `ward`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ward` (
+                        `latitude` double NOT NULL,
+                        `longitude` double NOT NULL,
+                        `city_id` bigint DEFAULT NULL,
+                        `id` bigint NOT NULL AUTO_INCREMENT,
+                        `name` varchar(255) NOT NULL,
+                        `slug` varchar(255) NOT NULL,
+                        PRIMARY KEY (`id`),
+                        UNIQUE KEY `UKoc5jy0b9uro8017qv0o4x2rm` (`name`),
+                        UNIQUE KEY `UK9djlfwpm44d2qycy1spy1nx15` (`slug`),
+                        KEY `FKhbgx4ih9knw5edbhjkw4qwhhv` (`city_id`),
+                        CONSTRAINT `FKhbgx4ih9knw5edbhjkw4qwhhv` FOREIGN KEY (`city_id`) REFERENCES `city` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ward`
+--
+
+LOCK TABLES `ward` WRITE;
+/*!40000 ALTER TABLE `ward` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ward` ENABLE KEYS */;
+UNLOCK TABLES;
+
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
 -- ========================
 -- 1. User & Role
 -- ========================
@@ -521,7 +1420,7 @@ VALUES
 (5, 'Rất chuyên nghiệp và nhiệt tình.', 2, 26, 5, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 6 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL 6 DAY), INTERVAL 1 HOUR)),
 (4, 'Ok, sẽ quay lại lần sau.', 4, 26, 6, DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 1 HOUR), DATE_ADD(DATE_ADD(CURDATE(), INTERVAL -2 DAY), INTERVAL 1 HOUR));
 
-INSERT INTO Wallet (balance, created_at, updated_at, user_id)
+INSERT INTO wallet (balance, created_at, updated_at, user_id)
 VALUES
 (500000, NOW(), NOW(), 1),
 (2000000, NOW(), NOW(), 2),

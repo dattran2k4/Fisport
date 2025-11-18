@@ -15,4 +15,6 @@ target/
 
 ### VS Code ###
 .vscode/
->>>>>>> 6b74763 (inital project)
+### Environment files ###
+.env
+.env.*

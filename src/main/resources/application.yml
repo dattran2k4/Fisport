@@ -7,9 +7,9 @@ spring:
   application:
     name: Fisport
   datasource:
-    url: jdbc:mysql://localhost:3306/fisport?useSSL=false&serverTimezone=UTC
-    username: root
-    password: 123456
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/fisport?useSSL=false&serverTimezone=UTC}
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -19,8 +19,8 @@ spring:
       connection-timeout: 30000
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: false
+      ddl-auto: create
+    show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
@@ -102,9 +102,9 @@ vnpay:
 
 #PayOS
 payos:
-  client-id: {PAYOS_CLIENT_ID}
-  api-key: {PAYOS_API_KEY}
-  checksum-key: {PAYOS_CHECKSUM_KEY}
+  client-id: ${PAYOS_CLIENT_ID}
+  api-key: ${PAYOS_API_KEY}
+  checksum-key: ${PAYOS_CHECKSUM_KEY}
   return-url: ${app.base-url}/thanh-toan/payos/thanh-cong
   cancel-url: ${app.base-url}/thanh-toan/payos/that-bai
   return-payment-wallet-url: ${app.base-url}/user/wallet
