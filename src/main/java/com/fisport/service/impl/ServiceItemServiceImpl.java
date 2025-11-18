@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
-public class ServiceItemServiceImpl implements ServiceItemService {
+public class    ServiceItemServiceImpl implements ServiceItemService {
 
     private final ServiceItemRepository serviceItemRepository;
     private final ServiceRepository serviceRepository;
