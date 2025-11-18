@@ -1,6 +1,5 @@
 package com.fisport.config;
 
-import com.fisport.constant.SecurityWhiteList;
 import com.fisport.security.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.*;
@@ -76,7 +75,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Cho phép các request công khai
                         .requestMatchers(WHITE_LIST.toArray(String[]::new)).permitAll()
-                        .requestMatchers(SecurityWhiteList.WHITE_LIST.toArray(String[]::new)).permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/fields/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/field-types/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/sub-fields/**").permitAll()
