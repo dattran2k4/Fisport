@@ -1,9 +1,6 @@
 package com.fisport.dto.response;
 
-<<<<<<< HEAD:src/main/java/com/Fisport/dto/response/VoucherResponse.java
 import com.fisport.common.EVoucherStatus;
-=======
->>>>>>> 53a0974c0fa4f2d0a8289ecdc996934af2e6fd11:src/main/java/com/fisport/dto/response/VoucherResponse.java
 import lombok.Builder;
 import lombok.Getter;
 
