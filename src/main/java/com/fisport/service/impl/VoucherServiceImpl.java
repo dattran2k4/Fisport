@@ -1,17 +1,20 @@
-package com.Fisport.service.impl;
+package com.fisport.service.impl;
 
-import com.Fisport.common.EVoucherStatus;
-import com.Fisport.dto.request.VoucherRequest;
-import com.Fisport.dto.response.VoucherResponse;
-import com.Fisport.exception.ResourceNotFoundException;
-import com.Fisport.model.Voucher;
-import com.Fisport.repository.VoucherRepository;
-import com.Fisport.service.VoucherService;
+import com.fisport.common.EVoucherStatus;
+import com.fisport.dto.request.VoucherRequest;
+import com.fisport.dto.response.VoucherResponse;
+import com.fisport.exception.ResourceNotFoundException;
+import com.fisport.model.Voucher;
+import com.fisport.repository.VoucherRepository;
+import com.fisport.service.VoucherService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -19,18 +22,59 @@ import java.util.List;
 public class VoucherServiceImpl implements VoucherService {
     private final VoucherRepository voucherRepository;
 
+    @Override
+    public BigDecimal applyDiscount(BigDecimal total, Voucher voucher) {
+        if (total == null || voucher == null) {
+            return total;
+        }
+
+        if (voucher.getStatus() != EVoucherStatus.ACTIVE) {
+            return total;
+        }
+
+        java.time.LocalDate now = java.time.LocalDate.now();
+        if ((voucher.getStartDate() != null && now.isBefore(voucher.getStartDate()))
+                || (voucher.getEndDate() != null && now.isAfter(voucher.getEndDate()))) {
+            return total;
+        }
+
+        Integer discountPercent = voucher.getDiscount();
+        if (discountPercent == null || discountPercent <= 0) {
+            return total;
+        }
+
+        int applied = Math.min(discountPercent, 100);
+        BigDecimal discountMultiplier = BigDecimal.valueOf(100 - applied)
+                .divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP);
+
+        return total.multiply(discountMultiplier).setScale(2, RoundingMode.HALF_UP);
+    }
+
 
     @Override
     public List<VoucherResponse> getVouchersByUserId(Long userId) {
         List<Voucher> vouchers = voucherRepository.findByUsersId(userId);
 
-        return vouchers.stream().map(this::toResponse).toList();
+        // Chuyển đổi từ Voucher sang VoucherResponse
+        List<VoucherResponse> result = new ArrayList<>();
+        for (Voucher voucher : vouchers) {
+            VoucherResponse response = toResponse(voucher);
+            result.add(response);
+        }
+        return result;
     }
 
     @Override
     public List<VoucherResponse> findAllByActive() {
         List<Voucher> vouchers = voucherRepository.findByStatus(EVoucherStatus.ACTIVE);
-        return vouchers.stream().map(this::toResponse).toList();
+
+        // Chuyển đổi từ Voucher sang VoucherResponse
+        List<VoucherResponse> result = new ArrayList<>();
+        for (Voucher voucher : vouchers) {
+            VoucherResponse response = toResponse(voucher);
+            result.add(response);
+        }
+        return result;
     }
 
     @Override
@@ -43,9 +87,16 @@ public class VoucherServiceImpl implements VoucherService {
                 EVoucherStatus.ACTIVE,
                 now
         );
-        
+
         List<Voucher> vouchers = voucherRepository.findAll();
-        return vouchers.stream().map(this::toResponse).toList();
+
+        // Chuyển đổi từ Voucher sang VoucherResponse
+        List<VoucherResponse> result = new ArrayList<>();
+        for (Voucher voucher : vouchers) {
+            VoucherResponse response = toResponse(voucher);
+            result.add(response);
+        }
+        return result;
     }
 
     @Override
@@ -62,8 +113,11 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     @Transactional(readOnly = true)
     public VoucherResponse getVoucherById(Long id) {
-        Voucher voucher = voucherRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy voucher với ID: " + id));
+        java.util.Optional<Voucher> voucherOptional = voucherRepository.findById(id);
+        if (!voucherOptional.isPresent()) {
+            throw new ResourceNotFoundException("Không tìm thấy voucher với ID: " + id);
+        }
+        Voucher voucher = voucherOptional.get();
         return toResponse(voucher);
     }
 
@@ -81,7 +135,7 @@ public class VoucherServiceImpl implements VoucherService {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-        
+
         Voucher savedVoucher = voucherRepository.save(voucher);
         return toResponse(savedVoucher);
     }
@@ -89,9 +143,12 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     @Transactional
     public VoucherResponse updateVoucher(Long id, VoucherRequest request) {
-        Voucher voucher = voucherRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy voucher với ID: " + id));
-        
+        java.util.Optional<Voucher> voucherOptional = voucherRepository.findById(id);
+        if (!voucherOptional.isPresent()) {
+            throw new ResourceNotFoundException("Không tìm thấy voucher với ID: " + id);
+        }
+        Voucher voucher = voucherOptional.get();
+
         voucher.setCode(request.getCode().toUpperCase());
         voucher.setDescription(request.getDescription());
         voucher.setDiscount(request.getDiscount());
@@ -99,7 +156,7 @@ public class VoucherServiceImpl implements VoucherService {
         voucher.setStartDate(request.getStartDate());
         voucher.setEndDate(request.getEndDate());
         voucher.setUpdatedAt(LocalDateTime.now());
-        
+
         Voucher updatedVoucher = voucherRepository.save(voucher);
         return toResponse(updatedVoucher);
     }
@@ -107,12 +164,22 @@ public class VoucherServiceImpl implements VoucherService {
     @Override
     @Transactional
     public void deleteVoucher(Long id) {
-        Voucher voucher = voucherRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Không tìm thấy voucher với ID: " + id));
+        java.util.Optional<Voucher> voucherOptional = voucherRepository.findById(id);
+        if (!voucherOptional.isPresent()) {
+            throw new ResourceNotFoundException("Không tìm thấy voucher với ID: " + id);
+        }
+        Voucher voucher = voucherOptional.get();
         voucherRepository.delete(voucher);
     }
 
     private VoucherResponse toResponse(Voucher voucher) {
+        // Tính số lượng user đã sử dụng voucher
+        int usedCount = 0;
+        if (voucher.getUsers() != null) {
+            usedCount = voucher.getUsers().size();
+        }
+
+        // Tạo VoucherResponse
         return VoucherResponse.builder()
                 .id(voucher.getId())
                 .code(voucher.getCode())
@@ -122,7 +189,7 @@ public class VoucherServiceImpl implements VoucherService {
                 .startDate(voucher.getStartDate())
                 .endDate(voucher.getEndDate())
                 .status(voucher.getStatus())
-                .usedCount(voucher.getUsers() != null ? voucher.getUsers().size() : 0)
+                .usedCount(usedCount)
                 .build();
     }
 }
