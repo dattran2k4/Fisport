@@ -61,18 +61,8 @@
                 <i class="fas fa-cogs"></i>
                 <span>Manage Service</span>
             </a>
-            <a th:href="@{/owner/news}"
-               class="nav-link"
-               th:classappend="${currentUri != null and currentUri.contains('/news') ? 'active' : ''}">
-                <i class="fas fa-newspaper"></i>
-                <span>News</span>
-            </a>
-            <a th:href="@{/owner/tournaments}"
-               class="nav-link"
-               th:classappend="${currentUri != null and currentUri.contains('/tournaments') ? 'active' : ''}">
-                <i class="fas fa-trophy"></i>
-                <span>Tournaments</span>
-            </a>
+
+
         </nav>
 
         <div class="sidebar-footer">
@@ -109,26 +99,26 @@
 
         <!-- Content Area -->
         <div class="content-wrapper" layout:fragment="content">
-            <div th:if="${content.contains('dashboard')}">
+            <div th:if="${content != null and content.contains('dashboard')}">
                 <div th:replace="owner/dashboard :: content"></div>
             </div>
-            <div th:if="${content.contains('fields-list')}">
+            <!-- Services content (check trước fields để tránh conflict) -->
+            <div th:if="${content != null and content.contains('services')}">
+                <div th:replace="~{${content} :: content}"></div>
+            </div>
+            <!-- Fields content (chỉ match chính xác 'fields-list' không có 'services') -->
+            <div th:if="${content != null and content == 'fields-list'}">
                 <div th:replace="owner/fields/list :: content"></div>
             </div>
-            <div th:if="${content.contains('fields-create')}" >
+            <div th:if="${content != null and content.contains('fields-create')}" >
                 <div th:replace="owner/fields/create :: content"></div>
             </div>
-            <div th:if="${content.contains('fields-update')}" >
+            <div th:if="${content != null and content.contains('fields-update')}" >
                 <div th:replace="owner/fields/update :: content"></div>
             </div>
-            <div th:if="${content.contains('vouchers')}">
+            <div th:if="${content != null and content.contains('vouchers')}">
                 <div th:replace="~{${content} :: content}"></div>
             </div>
-            <div th:if="${content.contains('services') and !content.contains('items')}">
-                <div th:replace="~{${content} :: content}"></div>
-            </div>
-            <div th:if="${content.contains('items')}">
-                <div th:replace="~{${content} :: content}"></div>
         </div>
     </main>
 </div>
