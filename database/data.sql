@@ -475,6 +475,9 @@ INSERT INTO field_service_item (field_id, service_item_id, price, quantity, stat
 (34,21,48000,100,'ACTIVE'),(34,22,50000,100,'ACTIVE'),(34,23,28000,100,'ACTIVE'),(34,24,30000,100,'ACTIVE'),
 (35,21,49000,100,'ACTIVE'),(35,22,51000,100,'ACTIVE'),(35,23,29000,100,'ACTIVE'),(35,24,31000,100,'ACTIVE');
 
+-- ========================
+-- 7. Voucher
+-- ========================
 INSERT INTO voucher (code, description, discount, status, limit_qnt, start_date, end_date, created_at, updated_at)
 VALUES
 ('TEST10', 'Voucher giảm 10%', 10, 'ACTIVE', 100, '2025-10-01', '2025-12-31', NOW(), NOW()),
