@@ -1,0 +1,282 @@
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="content" class="px-6 py-4 font-inter">
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+    
+    <!-- Breadcrumb -->
+    <div class="mb-6">
+        <div class="flex items-center gap-2 text-sm text-gray-600 mb-4">
+            <a th:href="@{/owner/services}" class="hover:text-blue-600 transition-colors">Quản lý Dịch vụ</a>
+            <i class="ri-arrow-right-s-line text-xs"></i>
+            <span class="text-gray-900 font-medium" th:text="${field.name}">Tên sân</span>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Quản lý Dịch vụ: <span th:text="${field.name}">Tên sân</span></h1>
+        <p class="text-gray-600 text-sm">Chọn dịch vụ/sản phẩm để thêm hoặc xóa khỏi sân</p>
+    </div>
+
+    <!-- Alert messages -->
+    <div th:if="${successMessage}" class="mb-4 p-4 bg-green-50 border-l-4 border-green-500 rounded-lg flex items-start">
+        <i class="ri-checkbox-circle-fill text-green-500 text-xl mr-3 mt-0.5"></i>
+        <span class="text-green-800" th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="mb-4 p-4 bg-red-50 border-l-4 border-red-500 rounded-lg flex items-start">
+        <i class="ri-error-warning-fill text-red-500 text-xl mr-3 mt-0.5"></i>
+        <span class="text-red-800" th:text="${errorMessage}"></span>
+    </div>
+
+    <!-- Action Button và Filter -->
+    <div class="mb-6 flex justify-between items-center gap-4">
+        <a th:href="@{/owner/services}" 
+           class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-all">
+            <i class="ri-arrow-left-line mr-2"></i>
+            Quay lại
+        </a>
+        
+        <!-- Filter by Service -->
+        <div class="flex items-center gap-3">
+            <label for="serviceFilter" class="text-sm font-semibold text-gray-700 whitespace-nowrap">
+
+                Lọc theo loại dịch vụ:
+            </label>
+            <select id="serviceFilter" 
+                    class="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white min-w-[200px]">
+                <option value="">Tất cả dịch vụ</option>
+                <option th:each="service : ${services}" 
+                        th:value="${service.id}" 
+                        th:text="${service.name}">
+                    Tên dịch vụ
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Service Items List -->
+    <div th:if="${items != null && !items.isEmpty()}" class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tên dịch vụ</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Loại dịch vụ</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Trạng thái</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Giá</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Số lượng</th>
+                        <th class="px-6 py-4 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <tr th:each="item : ${items}" 
+                        th:attr="data-service-id=${item.serviceId}"
+                        class="service-item-row hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900" th:text="${item.serviceItemName}">Tên dịch vụ</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-600" th:text="${item.serviceName}">Loại dịch vụ</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span th:if="${item.isAttached}" 
+                                  class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                                Đã thêm
+                            </span>
+                            <span th:unless="${item.isAttached}" 
+                                  class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                                Chưa thêm
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900" th:if="${item.price != null}">
+                                <span th:text="${#numbers.formatDecimal(item.price, 0, 'COMMA', 0, 'POINT')}">0</span> VNĐ
+                            </div>
+                            <div class="text-sm text-gray-400" th:unless="${item.price != null}">-</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900" th:if="${item.quantity != null}" th:text="${item.quantity}">0</div>
+                            <div class="text-sm text-gray-400" th:unless="${item.quantity != null}">-</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-center">
+                            <form th:if="${item.isAttached}" 
+                                  th:action="@{'/owner/services/' + ${field.id} + '/items/remove/' + ${item.serviceItemId}}" 
+                                  method="post" 
+                                  class="inline-block"
+                                  onsubmit="return confirm('Bạn có chắc muốn xóa dịch vụ này khỏi sân?');">
+                                <button type="submit" 
+                                        class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-all shadow-sm hover:shadow-md">
+                                    <i class="ri-delete-bin-line mr-1"></i>
+                                    Xóa
+                                </button>
+                            </form>
+                            <button th:unless="${item.isAttached}" 
+                                    type="button"
+                                    th:data-service-item-id="${item.serviceItemId}"
+                                    th:data-service-item-name="${item.serviceItemName}"
+                                    onclick="openAddModal(this)"
+                                    class="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow-md">
+                                <i class="ri-add-line mr-1"></i>
+                                Thêm
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${items == null || items.isEmpty()}" class="bg-white rounded-2xl shadow-md border border-gray-100 p-12 text-center">
+        <div class="w-20 h-20 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="ri-service-line text-4xl text-blue-500"></i>
+        </div>
+        <h3 class="text-xl font-bold text-gray-900 mb-2">Chưa có dịch vụ nào</h3>
+        <p class="text-gray-600 mb-6 max-w-md mx-auto">Hiện tại chưa có dịch vụ/sản phẩm nào trong hệ thống. Vui lòng liên hệ Admin để thêm dịch vụ.</p>
+    </div>
+
+    <!-- Modal thêm dịch vụ -->
+    <div id="addServiceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-900">Thêm dịch vụ vào sân</h3>
+                    <button type="button" onclick="closeAddModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="ri-close-line text-2xl"></i>
+                    </button>
+                </div>
+                
+                <form id="addServiceForm" method="post" class="space-y-4" onsubmit="return validateAndSubmitForm(event)">
+                    <input type="hidden" id="modalServiceItemId" name="serviceItemId">
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            Tên dịch vụ
+                        </label>
+                        <input type="text" id="modalServiceItemName" readonly
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl bg-gray-50 text-sm text-gray-600">
+                    </div>
+                    
+                    <div>
+                        <label for="modalPrice" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Giá bán (VNĐ) <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" id="modalPrice" name="price" required min="0" step="1000"
+                               placeholder="Nhập giá bán..."
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                    </div>
+                    
+                    <div>
+                        <label for="modalQuantity" class="block text-sm font-semibold text-gray-700 mb-2">
+                            Số lượng tồn kho <span class="text-red-500">*</span>
+                        </label>
+                        <input type="number" id="modalQuantity" name="quantity" required min="0"
+                               placeholder="Nhập số lượng..."
+                               class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm">
+                    </div>
+                    
+                    <div class="flex items-center justify-end gap-4 pt-4 border-t border-gray-200">
+                        <button type="button" onclick="closeAddModal()"
+                                class="px-6 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium">
+                            Hủy
+                        </button>
+                        <button type="submit"
+                                class="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg hover:shadow-xl text-sm font-medium">
+                            <i class="ri-save-line mr-2"></i>
+                            Thêm dịch vụ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const fieldId = /*[[${field.id}]]*/ 0;
+        
+        function openAddModal(button) {
+            const serviceItemId = button.getAttribute('data-service-item-id');
+            const serviceItemName = button.getAttribute('data-service-item-name');
+            document.getElementById('modalServiceItemId').value = serviceItemId;
+            document.getElementById('modalServiceItemName').value = serviceItemName;
+            const form = document.getElementById('addServiceForm');
+            form.action = '/owner/services/' + fieldId + '/items/add/' + serviceItemId;
+            document.getElementById('addServiceModal').classList.remove('hidden');
+        }
+        
+        function closeAddModal() {
+            document.getElementById('addServiceModal').classList.add('hidden');
+            document.getElementById('addServiceForm').reset();
+        }
+        
+        function validateAndSubmitForm(event) {
+            const price = document.getElementById('modalPrice').value;
+            const quantity = document.getElementById('modalQuantity').value;
+            
+            if (!price || price.trim() === '' || parseFloat(price) < 0) {
+                alert('Vui lòng nhập giá bán hợp lệ!');
+                event.preventDefault();
+                return false;
+            }
+            
+            if (!quantity || quantity.trim() === '' || parseInt(quantity) < 0) {
+                alert('Vui lòng nhập số lượng hợp lệ!');
+                event.preventDefault();
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Filter service items by service
+        function filterByService() {
+            const selectedServiceId = document.getElementById('serviceFilter').value;
+            const rows = document.querySelectorAll('.service-item-row');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                const serviceId = row.getAttribute('data-service-id');
+                if (!selectedServiceId || selectedServiceId === '' || serviceId === selectedServiceId) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Hiển thị thông báo nếu không có kết quả
+            const tableBody = document.querySelector('tbody');
+            const emptyMessage = document.getElementById('emptyFilterMessage');
+            if (visibleCount === 0) {
+                if (!emptyMessage) {
+                    const messageRow = document.createElement('tr');
+                    messageRow.id = 'emptyFilterMessage';
+                    messageRow.innerHTML = `
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                            <i class="ri-search-line text-3xl mb-2 block"></i>
+                            <p class="text-sm">Không tìm thấy dịch vụ nào với bộ lọc đã chọn</p>
+                        </td>
+                    `;
+                    tableBody.appendChild(messageRow);
+                }
+            } else {
+                if (emptyMessage) {
+                    emptyMessage.remove();
+                }
+            }
+        }
+        
+        // Đóng modal khi click outside
+        document.getElementById('addServiceModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddModal();
+            }
+        });
+        
+        // Event listener cho filter
+        document.addEventListener('DOMContentLoaded', function() {
+            const serviceFilter = document.getElementById('serviceFilter');
+            if (serviceFilter) {
+                serviceFilter.addEventListener('change', filterByService);
+            }
+        });
+        /*]]>*/
+    </script>
+</div>
+
