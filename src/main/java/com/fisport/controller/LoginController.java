@@ -36,7 +36,8 @@ public class LoginController {
     @PostMapping("/login")
     public String doLogin(@Valid @ModelAttribute("login") LoginRequestDTO loginRequestDTO,
                           BindingResult result,
-                          Model model) {
+                          Model model,
+                          @RequestParam(required = false) String backLink) {
 
         if (result.hasErrors()) {
             model.addAttribute("error", result.getAllErrors().get(0).getDefaultMessage());
@@ -87,7 +88,8 @@ public class LoginController {
 
     @PostMapping("/2fa/verify")
     public String verify2Fa(@Valid @ModelAttribute("request") TwoFARequest twoFARequest,
-                            BindingResult result, Model model) {
+                            BindingResult result, Model model,
+                            @RequestParam(required = false) String backLink) {
 
         if (result.hasErrors()) {
             model.addAttribute("error", result.getAllErrors().get(0).getDefaultMessage());
