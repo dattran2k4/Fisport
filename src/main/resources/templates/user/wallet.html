@@ -167,6 +167,54 @@
                 font-size: 0.9rem;
             }
         }
+
+        /* ==== Promotion Styles ==== */
+        .promo-box {
+            background-color: #fff8e1; /* Màu vàng nhạt */
+            border: 1px dashed #ffc107;
+            border-radius: 10px;
+        }
+
+        .promo-item {
+            font-size: 0.9rem;
+            color: #856404;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .promo-item i {
+            color: #ffc107;
+            margin-right: 8px;
+        }
+
+        .calculation-box {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid #e9ecef;
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+            color: #6c757d;
+        }
+
+        .calc-total {
+            border-top: 1px solid #dee2e6;
+            padding-top: 10px;
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 700;
+            color: #198754; /* Màu xanh lá */
+            font-size: 1.1rem;
+        }
+
     </style>
 </head>
 
@@ -178,10 +226,7 @@
             <div class="col-md-3">
                 <div class="list-group shadow-sm rounded-3">
                     <a href="#" class="list-group-item list-group-item-action active">
-                        <i class="bi bi-wallet2 me-2"></i> My Wallet
-                    </a>
-                    <a href="#" class="list-group-item list-group-item-action">
-                        <i class="bi bi-clock-history me-2"></i> Transaction History
+                        <i class="bi bi-wallet2 me-2"></i> Ví của tôi
                     </a>
                     <a href="#" class="list-group-item list-group-item-action">
                         <i class="bi bi-gear me-2"></i> Settings
@@ -194,23 +239,31 @@
                 <div class="card shadow-sm rounded-4">
                     <div class="card-body p-4">
 
-                        <h4 class="mb-4"><i class="bi bi-wallet-fill me-2"></i>My Wallet</h4>
+                        <h4 class="mb-4"><i class="bi bi-wallet-fill me-2"></i>Ví của tôi</h4>
 
                         <!-- Wallet summary -->
                         <div class="wallet-card mb-4">
-                            <h5 class="fw-semibold mb-2">Current Balance:</h5>
+                            <h5 class="fw-semibold mb-2">Số dư hiện tại:</h5>
                             <div class="wallet-balance mb-2"
                                  th:text="${#numbers.formatDecimal(wallet.balance, 0, 'COMMA', 0, 'POINT') + 'VND'}">
                                 0 VND
                             </div>
                             <p class="mb-0">
-                                <span th:text="'WALLET USER: ' + ${#authentication.name}">Wallet ID: WALLET001</span><br>
+                                <span th:text="'VÍ USER: ' + ${#authentication.name}">Ví ID: WALLET001</span><br>
                             </p>
                         </div>
 
                         <!-- Top-up form -->
                         <div class="border p-4 rounded-4 mb-4 bg-white topup-form shadow-sm">
-                            <h5 class="fw-semibold mb-3">Top up your wallet</h5>
+                            <h5 class="fw-semibold mb-3">Nạp tiền vào ví</h5>
+
+                            <div class="promo-box p-3 mb-3">
+                                <h6 class="fw-bold text-warning mb-2"><i class="bi bi-gift-fill me-2"></i>Khuyến mãi nạp tiền</h6>
+                                <div class="promo-item"><i class="bi bi-check-circle-fill"></i> Nạp từ 10,000đ tặng thêm 10,000đ</div>
+                                <div class="promo-item"><i class="bi bi-check-circle-fill"></i> Nạp từ 200,000đ tặng thêm 25,000đ</div>
+                                <div class="promo-item"><i class="bi bi-check-circle-fill"></i> Nạp từ 500,000đ tặng thêm 70,000đ</div>
+                            </div>
+
                             <form class="">
                                 <div class="mb-3">
                                     <label for="amount" class="form-label">Amount (VND)</label>

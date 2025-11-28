@@ -97,11 +97,15 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
         log.info("handlePayOSReturn called, transactionId = {}", transaction.getId());
 
         if (data.getCode().equals("00") && data.getDesc().equals("success")) {
+
+
             transaction.setStatus(ETransactionStatus.SUCCESS);
             payment.setStatus(EPaymentStatus.SUCCESS);
             payment.setTransactionCode(data.getReference());
             payment.setPaymentTime(LocalDateTime.now());
             walletService.creditWallet(transaction);
+
+            createAndProcessBonusTransaction(transaction);
         } else {
             payment.setStatus(EPaymentStatus.FAILED);
             transaction.setStatus(ETransactionStatus.FAILED);
@@ -112,6 +116,41 @@ public class WalletPaymentServiceImpl implements WalletPaymentService {
 
         transactionRepository.save(transaction);
         log.info("Transaction update status: " + transaction.getStatus());
+    }
+
+    private void createAndProcessBonusTransaction(Transaction originalTransaction) {
+        BigDecimal amount = originalTransaction.getAmount();
+        BigDecimal bonusAmount = BigDecimal.ZERO;
+
+        if (amount.compareTo(BigDecimal.valueOf(500000)) >= 0) {
+            bonusAmount = BigDecimal.valueOf(70000);
+        } else if (amount.compareTo(BigDecimal.valueOf(200000)) >= 0) {
+            bonusAmount = BigDecimal.valueOf(25000);
+        } else if (amount.compareTo(BigDecimal.valueOf(10000)) >= 0) {
+            bonusAmount = BigDecimal.valueOf(10000);
+        }
+
+        if (bonusAmount.compareTo(BigDecimal.ZERO) > 0) {
+            try {
+
+
+                Transaction bonusTransaction = new Transaction();
+                bonusTransaction.setWallet(originalTransaction.getWallet());
+                bonusTransaction.setAmount(bonusAmount);
+
+                bonusTransaction.setType(ETransactionType.BONUS);
+                bonusTransaction.setStatus(ETransactionStatus.SUCCESS);
+                bonusTransaction.setMethod(originalTransaction.getMethod());
+
+                transactionRepository.save(bonusTransaction);
+
+                walletService.creditWallet(bonusTransaction);
+
+                log.info("Đã cộng thưởng {} VND cho ví ID: {}", bonusAmount, originalTransaction.getWallet().getId());
+            } catch (Exception e) {
+                log.error("Lỗi khi cộng thưởng cho giao dịch {}: ", originalTransaction.getId(), e);
+            }
+        }
     }
 
     @Transactional
