@@ -109,3 +109,8 @@ payos:
   cancel-url: ${app.base-url}/thanh-toan/payos/that-bai
   return-payment-wallet-url: ${app.base-url}/user/wallet
   cancel-payment-wallet-cancel: ${app.base-url}/user/wallet
+
+jwt:
+  access-key: OwOw+8t/PROzQ2jr+ecXe3MGrp5RDjwEN4sj56pd4uo=
+  refresh-key: mvBb/s/xhkDlzsYQbMcutG8W9AB2Noqb8GWJapqs66Y=
+  expiration: 1000000

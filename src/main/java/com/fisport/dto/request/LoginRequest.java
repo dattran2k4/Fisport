@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Getter
 @Setter
-public class LoginRequestDTO implements Serializable {
+public class LoginRequest implements Serializable {
 
     @NotBlank(message = "tên đăng nhập không được để trống")
     private String username;

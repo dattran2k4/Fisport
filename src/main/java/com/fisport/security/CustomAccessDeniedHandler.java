@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component
-public class CustomAccessDeniedHandler implements AccessDeniedHandler {
-
-    @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_FOUND);
-        response.sendRedirect(request.getContextPath() + "/access-denied");
-    }
-}
+//@Component
+//public class CustomAccessDeniedHandler implements AccessDeniedHandler {
+//
+//    @Override
+//    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+//        response.setStatus(HttpServletResponse.SC_FOUND);
+//        response.sendRedirect(request.getContextPath() + "/access-denied");
+//    }
+//}
