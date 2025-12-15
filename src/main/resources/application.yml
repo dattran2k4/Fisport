@@ -1,5 +1,7 @@
+server:
+  port: ${SERVER_PORT:8080}
 app:
-  base-url: http://localhost:8080
+  base-url: ${APP_BASE_URL:http://localhost:${SERVER_PORT:8080}}
   token:
     expiry-minutes: 10
 
@@ -7,9 +9,10 @@ spring:
   application:
     name: Fisport
   datasource:
-    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/fisport?useSSL=false&serverTimezone=UTC}
-    username: ${MYSQL_USER:root}
-    password: ${MYSQL_PASSWORD:123456}
+    url:
+      ${MYSQL_URL:jdbc:mysql://${DATABASE_HOST:localhost}:${DATABASE_PORT:3306}/fisport?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    username: ${DATABASE_USERNAME:root}
+    password: ${DATABASE_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -19,7 +22,7 @@ spring:
       connection-timeout: 30000
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: false
     properties:
       hibernate:
@@ -27,10 +30,10 @@ spring:
 
   # EMAIL SENDER
   mail:
-    from: dattqde181019@fpt.edu.vn
+    from: ${MAIL_USERNAME}
     host: smtp.gmail.com
     port: 587
-    username: dattqde181019@fpt.edu.vn
+    username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}
     properties:
       mail:
@@ -109,3 +112,8 @@ payos:
   cancel-url: ${app.base-url}/thanh-toan/payos/that-bai
   return-payment-wallet-url: ${app.base-url}/user/wallet
   cancel-payment-wallet-cancel: ${app.base-url}/user/wallet
+
+jwt:
+  access-key: ${JWT_ACCESS_KEY}
+  refresh-key: ${JWT_REFRESH_KEY}
+  expiration: ${JWT_EXPIRATION}

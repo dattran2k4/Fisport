@@ -16,5 +16,6 @@ target/
 ### VS Code ###
 .vscode/
 ### Environment files ###
-.env
+.env.properties
 .env.*
+.env

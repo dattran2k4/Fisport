@@ -1,6 +1,6 @@
 package com.fisport.controller;
 
-import com.fisport.dto.request.LoginRequestDTO;
+import com.fisport.dto.request.LoginRequest;
 import com.fisport.dto.request.TwoFARequest;
 import com.fisport.dto.response.LoginResponse;
 import com.fisport.service.AuthService;
@@ -22,12 +22,12 @@ public class LoginController {
 
     @GetMapping("/login")
     public String getLoginPage(Model model) {
-        model.addAttribute("login", new LoginRequestDTO());
+        model.addAttribute("login", new LoginRequest());
         return "login";
     }
 
     @PostMapping("/login")
-    public String doLogin(@Valid @ModelAttribute("login") LoginRequestDTO loginRequestDTO,
+    public String doLogin(@Valid @ModelAttribute("login") LoginRequest loginRequest,
                           BindingResult result,
                           Model model) {
 
@@ -37,7 +37,7 @@ public class LoginController {
         }
 
         try {
-            LoginResponse response = authService.login(loginRequestDTO);
+            LoginResponse response = authService.login(loginRequest);
             if (response.is2FAEnabled()) {
                 return "redirect:/2fa/verify";
             }

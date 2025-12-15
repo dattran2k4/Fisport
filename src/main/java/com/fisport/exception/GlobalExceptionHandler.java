@@ -17,7 +17,7 @@ import java.util.Date;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@RestControllerAdvice(basePackages = "com.fisport.api")
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     /**
@@ -63,9 +63,6 @@ public class GlobalExceptionHandler {
             errorResponse.setError("Invalid Parameter");
             errorResponse.setMessage(message);
         } else if (e instanceof ConstraintViolationException) {
-            errorResponse.setError("Invalid Parameter");
-            errorResponse.setMessage(message.substring(message.indexOf(" ") + 1));
-        } else if (e instanceof UnexpectedTypeException) {
             errorResponse.setError("Invalid Parameter");
             errorResponse.setMessage(message.substring(message.indexOf(" ") + 1));
         } else {

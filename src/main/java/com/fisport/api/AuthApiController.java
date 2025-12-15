@@ -1,7 +1,7 @@
 package com.fisport.api;
 
 import com.fisport.dto.request.ForgotPasswordRequest;
-import com.fisport.dto.request.LoginRequestDTO;
+import com.fisport.dto.request.LoginRequest;
 import com.fisport.dto.request.RegisterRequestDTO;
 import com.fisport.dto.request.ResetPasswordRequest;
 import com.fisport.dto.response.*;
@@ -9,6 +9,7 @@ import com.fisport.service.AuthService;
 import jakarta.mail.MessagingException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +19,14 @@ import java.io.UnsupportedEncodingException;
 @RequiredArgsConstructor
 @RestController
 @Validated
+@Slf4j(topic = "AUTHENTICATION-API-CONTROLLER")
 @RequestMapping("/api/auth")
 public class AuthApiController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ApiResponse login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
-        LoginResponse response = authService.login(loginRequestDTO);
+    public ApiResponse login(@Valid @RequestBody LoginRequest loginRequest) {
+        LoginResponse response = authService.login(loginRequest);
         return ApiResponse.builder()
                 .status(HttpStatus.ACCEPTED.value())
                 .message("Successfully logged in")
@@ -84,4 +86,15 @@ public class AuthApiController {
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
+
+    @PostMapping("/access")
+    public ApiResponse getAccessToken(@RequestBody LoginRequest request) {
+        return ApiResponse.builder()
+                .status(HttpStatus.ACCEPTED.value())
+                .message("Successfully logged in")
+                .data(authService.authenticate(request))
+                .build();
+    }
+
+
 }

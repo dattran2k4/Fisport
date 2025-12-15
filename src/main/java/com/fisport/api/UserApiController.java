@@ -32,6 +32,14 @@ public class UserApiController {
                 .build();
     }
 
+    @GetMapping("/example")
+    public ApiResponse example() {
+        return ApiResponse.builder()
+                .status(HttpStatus.FOUND.value())
+                .message("Get profile successfully")
+                .build();
+    }
+
     @PutMapping("/update")
     public ApiResponse updateProfile(@RequestBody UpdateProfileRequest request, Principal principal) {
         userService.updateUserByUserName(request, principal.getName());

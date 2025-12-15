@@ -1,11 +1,12 @@
 package com.fisport.service.impl;
 
-import com.fisport.dto.request.LoginRequestDTO;
+import com.fisport.dto.request.LoginRequest;
 import com.fisport.dto.request.RegisterRequestDTO;
 import com.fisport.dto.request.ResetPasswordRequest;
 import com.fisport.dto.request.TwoFARequest;
 import com.fisport.dto.response.LoginResponse;
 import com.fisport.dto.response.RegisterResponseDTO;
+import com.fisport.dto.response.TokenResponse;
 import com.fisport.exception.InvalidDataException;
 import com.fisport.exception.ResourceNotFoundException;
 import com.fisport.model.Role;
@@ -21,8 +22,6 @@ import com.fisport.common.EUserStatus;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
     private final SessionService sessionService;
     private final SecurityContextService securityContextService;
     private final WalletRepository walletRepository;
+    private final JwtService jwtService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -113,7 +113,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse login(LoginRequestDTO request) {
+    public LoginResponse login(LoginRequest request) {
 
 
         User user = userRepository.findByUsername(request.getUsername()).orElseThrow();
@@ -264,6 +264,30 @@ public class AuthServiceImpl implements AuthService {
     public String getRoleByUserName(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("Not found"));
         return user.getRole().getName().toString();
+    }
+
+    @Override
+    public TokenResponse authenticate(LoginRequest request) {
+        log.info("---------- authenticate ----------");
+
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                request.getUsername(),
+                request.getPassword()
+                ));
+
+        var userEntity = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new ResourceNotFoundException("User Not found"));
+
+        var userDetails = new CustomUserDetails(userEntity);
+
+        String accessToken = jwtService.generateAccessToken(userDetails);
+
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+        return TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
     }
 
 }

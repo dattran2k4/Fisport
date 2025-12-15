@@ -1,11 +1,12 @@
 package com.fisport.service;
 
-import com.fisport.dto.request.LoginRequestDTO;
+import com.fisport.dto.request.LoginRequest;
 import com.fisport.dto.request.RegisterRequestDTO;
 import com.fisport.dto.request.ResetPasswordRequest;
 import com.fisport.dto.request.TwoFARequest;
 import com.fisport.dto.response.LoginResponse;
 import com.fisport.dto.response.RegisterResponseDTO;
+import com.fisport.dto.response.TokenResponse;
 import jakarta.mail.MessagingException;
 
 import java.io.UnsupportedEncodingException;
@@ -13,7 +14,7 @@ import java.io.UnsupportedEncodingException;
 public interface AuthService {
     RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO);
 
-    LoginResponse login(LoginRequestDTO request);
+    LoginResponse login(LoginRequest request);
 
     boolean verify2FA(TwoFARequest request);
 
@@ -28,5 +29,7 @@ public interface AuthService {
     void resetPassword(ResetPasswordRequest request, String verifyCode);
 
     String getRoleByUserName(String username);
+
+    TokenResponse authenticate(LoginRequest request);
 
 }
