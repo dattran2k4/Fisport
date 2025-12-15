@@ -10,36 +10,50 @@ services:
     image: fisport-image
     # Đặt tên container cho dễ quản lý
     container_name: fisport-app
+    restart: always
     # Ánh xạ cổng: Mở cổng 8080 của máy thật và trỏ vào 8080 của container
-    ports:
-      - "8080:8080"
     env_file:
       - .env
+    ports:
+      - "8081:${SERVER_PORT}"
+    environment:
+      #      C1 (GHI TRỰC TIẾP VÀO DOCKER)
+      #      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B7
+      #      SPRING_DATASOURCE_USERNAME: docker_user
+      #      SPRING_DATASOURCE_PASSWORD: 123456
+      #      C2: GHI ĐÈ APPLICATION YML (CLEAN)
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_USERNAME: docker_user
+      DATABASE_PASSWORD: 1234567
     depends_on:
       mysql:
         condition: service_healthy
-
-  # 2. Dịch vụ Database
+      # 2. Dịch vụ Database
   mysql:
     image: mysql:8.0
     container_name: fisport-db
-    # [!!!] Cấu hình cho Database
+    restart: always
     environment:
-      MYSQL_DATABASE: fisport
-      MYSQL_ROOT_PASSWORD: 123456
-      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      MYSQL_DATABASE: fisport_docker
+      MYSQL_USER: docker_user
+      MYSQL_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: 1234567
     volumes:
       - mysql_data:/var/lib/mysql
       - ./initdb.sql:/docker-entrypoint-initdb.d/initdb.sql
     ports:
       - '3307:3306'
-    # Kiểm tra sức khỏe: Chờ đến khi MySQL sẵn sàng nhận kết nối
     healthcheck:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456" ]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-      start_period: 60s
+      interval: 5s       # Kiểm tra mỗi 5 giây
+      timeout: 5s        # Chờ tối đa 5 giây cho mỗi lần kiểm tra
+      retries: 10        # Thử lại 10 lần trước khi báo lỗi
+      start_period: 10s  # Chờ 10s trước khi bắt đầu kiểm tra lần đầu (để DB kịp khởi tạo)
+    command: --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_unicode_ci
+      --skip-character-set-client-handshake
 
 # Định nghĩa volume (nơi lưu trữ dữ liệu DB)
 volumes:

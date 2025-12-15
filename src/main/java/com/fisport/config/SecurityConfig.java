@@ -36,7 +36,7 @@ public class SecurityConfig {
     private final CustomOidcUserService customOidcUserService;
     private final PreFilter requestFilter;
 
-    public static final List<String> WHITE_LIST = List.of( "/common/**", "/web/**", "/web/css/**", "/web/img/**", "/favicon.ico",
+    public static final List<String> WHITE_LIST = List.of("/common/**", "/web/**", "/web/css/**", "/web/img/**", "/favicon.ico",
             "/san/**", "/login/**", "/2fa/**", "/", "/web/js/**", "/forgot-password", "/register**", "/error/**", "/confirm/**", "2fa-register", "/thach-dau/**"); //test
 
 
@@ -48,12 +48,21 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
 
                 .authorizeHttpRequests(auth -> auth
+<<<<<<< HEAD
                         .requestMatchers( "/api/auth/**").permitAll()
                         .requestMatchers( new RegexRequestMatcher("/san.+/dat-san", null)).authenticated()
+=======
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(new RegexRequestMatcher("/san.+/dat-san", null)).authenticated()
+>>>>>>> 1424a42 (docker for fisport template)
                         .requestMatchers(WHITE_LIST.toArray(String[]::new)).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/owner/**").hasAnyRole("OWNER", "ADMIN")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN", "OWNER")
+<<<<<<< HEAD
+=======
+                        .requestMatchers("/**").permitAll()
+>>>>>>> 1424a42 (docker for fisport template)
                         .anyRequest().authenticated()
                 )
 

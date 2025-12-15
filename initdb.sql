@@ -7,16 +7,16 @@ CREATE TABLE `city` (
                         PRIMARY KEY (`id`),
                         UNIQUE KEY `UKqsstlki7ni5ovaariyy9u8y79` (`name`),
                         UNIQUE KEY `UK3kywok3ge37e90c6nc8iuyo6l` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.duration definition
 
 CREATE TABLE `duration` (
-                            `minutes` int NOT NULL,
                             `id` bigint NOT NULL AUTO_INCREMENT,
+                            `minutes` int NOT NULL,
                             PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.feature definition
@@ -28,7 +28,7 @@ CREATE TABLE `feature` (
                            PRIMARY KEY (`id`),
                            UNIQUE KEY `UKjhueeftkn8ve8th8m8a2878dr` (`name`),
                            UNIQUE KEY `UKo6age7guoqxetmfa5bmb7pgus` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.field_type definition
@@ -40,7 +40,7 @@ CREATE TABLE `field_type` (
                               PRIMARY KEY (`id`),
                               UNIQUE KEY `UKlucec9f5c2kurc3fbqb7uea0k` (`name`),
                               UNIQUE KEY `UKi871vvrsv7tpa5xb6v23jeyy5` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.`role` definition
@@ -49,7 +49,7 @@ CREATE TABLE `role` (
                         `id` bigint NOT NULL AUTO_INCREMENT,
                         `name` enum('ADMIN','OWNER','USER') NOT NULL,
                         PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.service definition
@@ -58,116 +58,116 @@ CREATE TABLE `service` (
                            `id` bigint NOT NULL AUTO_INCREMENT,
                            `name` varchar(255) NOT NULL,
                            PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.time_slot definition
 
 CREATE TABLE `time_slot` (
-                             `start_time` time(6) NOT NULL,
                              `id` bigint NOT NULL AUTO_INCREMENT,
+                             `start_time` time(6) NOT NULL,
                              PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.voucher definition
 
 CREATE TABLE `voucher` (
+                           `id` bigint NOT NULL AUTO_INCREMENT,
+                           `code` varchar(255) DEFAULT NULL,
+                           `created_at` datetime(6) DEFAULT NULL,
+                           `description` varchar(255) DEFAULT NULL,
                            `discount` int DEFAULT NULL,
                            `end_date` date DEFAULT NULL,
                            `limit_qnt` int DEFAULT NULL,
                            `start_date` date DEFAULT NULL,
-                           `created_at` datetime(6) DEFAULT NULL,
-                           `id` bigint NOT NULL AUTO_INCREMENT,
-                           `updated_at` datetime(6) DEFAULT NULL,
-                           `code` varchar(255) DEFAULT NULL,
-                           `description` varchar(255) DEFAULT NULL,
                            `status` enum('ACTIVE','INACTIVE') DEFAULT NULL,
+                           `updated_at` datetime(6) DEFAULT NULL,
                            PRIMARY KEY (`id`),
                            UNIQUE KEY `UKpvh1lqheshnjoekevvwla03xn` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.challenge_match_type definition
 
 CREATE TABLE `challenge_match_type` (
-                                        `max_players` int DEFAULT NULL,
-                                        `field_type_id` bigint DEFAULT NULL,
                                         `id` bigint NOT NULL AUTO_INCREMENT,
+                                        `max_players` int DEFAULT NULL,
                                         `name` varchar(255) DEFAULT NULL,
+                                        `field_type_id` bigint DEFAULT NULL,
                                         PRIMARY KEY (`id`),
                                         KEY `FKoqeyd0hs8hkgsdfos9sk6oxpv` (`field_type_id`),
                                         CONSTRAINT `FKoqeyd0hs8hkgsdfos9sk6oxpv` FOREIGN KEY (`field_type_id`) REFERENCES `field_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.field_type_duration definition
 
 CREATE TABLE `field_type_duration` (
+                                       `id` bigint NOT NULL AUTO_INCREMENT,
                                        `duration_id` bigint DEFAULT NULL,
                                        `field_type_id` bigint DEFAULT NULL,
-                                       `id` bigint NOT NULL AUTO_INCREMENT,
                                        PRIMARY KEY (`id`),
                                        KEY `FK8gf0wh60dwjoq8oiedebph5ib` (`duration_id`),
                                        KEY `FKjij0syvqpkyk5wym5sxt012iv` (`field_type_id`),
                                        CONSTRAINT `FK8gf0wh60dwjoq8oiedebph5ib` FOREIGN KEY (`duration_id`) REFERENCES `duration` (`id`),
                                        CONSTRAINT `FKjij0syvqpkyk5wym5sxt012iv` FOREIGN KEY (`field_type_id`) REFERENCES `field_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.service_item definition
 
 CREATE TABLE `service_item` (
                                 `id` bigint NOT NULL AUTO_INCREMENT,
-                                `service_id` bigint DEFAULT NULL,
                                 `name` varchar(255) DEFAULT NULL,
+                                `service_id` bigint DEFAULT NULL,
                                 PRIMARY KEY (`id`),
                                 KEY `FK82rintgbc4qe75p45eerua9ix` (`service_id`),
                                 CONSTRAINT `FK82rintgbc4qe75p45eerua9ix` FOREIGN KEY (`service_id`) REFERENCES `service` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.`user` definition
 
 CREATE TABLE `user` (
-                        `birth_day` date DEFAULT NULL,
-                        `is_two_factor` bit(1) DEFAULT NULL,
-                        `create_at` datetime(6) DEFAULT NULL,
                         `id` bigint NOT NULL AUTO_INCREMENT,
-                        `role_id` bigint DEFAULT NULL,
-                        `update_at` datetime(6) DEFAULT NULL,
-                        `phone` varchar(20) DEFAULT NULL,
-                        `username` varchar(30) NOT NULL,
+                        `birth_day` date DEFAULT NULL,
+                        `create_at` datetime(6) DEFAULT NULL,
                         `email` varchar(255) NOT NULL,
-                        `password` varchar(255) DEFAULT NULL,
-                        `two_fa_secret` varchar(255) DEFAULT NULL,
                         `gender` enum('FEMALE','MALE','OTHER') DEFAULT NULL,
+                        `password` varchar(255) DEFAULT NULL,
+                        `phone` varchar(20) DEFAULT NULL,
                         `status` enum('ACTIVE','INACTIVE','NONE') DEFAULT NULL,
+                        `is_two_factor` bit(1) DEFAULT NULL,
+                        `two_fa_secret` varchar(255) DEFAULT NULL,
+                        `update_at` datetime(6) DEFAULT NULL,
+                        `username` varchar(30) NOT NULL,
+                        `role_id` bigint DEFAULT NULL,
                         PRIMARY KEY (`id`),
-                        UNIQUE KEY `UKsb8bbouer5wak8vyiiy4pf2bx` (`username`),
                         UNIQUE KEY `UKob8kqyqqgmefl0aco34akdtpe` (`email`),
+                        UNIQUE KEY `UKsb8bbouer5wak8vyiiy4pf2bx` (`username`),
                         UNIQUE KEY `UK589idila9li6a4arw1t8ht1gx` (`phone`),
                         KEY `FKn82ha3ccdebhokx3a8fgdqeyy` (`role_id`),
                         CONSTRAINT `FKn82ha3ccdebhokx3a8fgdqeyy` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.user_sport_elo definition
 
 CREATE TABLE `user_sport_elo` (
-                                  `elo` int DEFAULT NULL,
-                                  `created_at` datetime(6) DEFAULT NULL,
-                                  `field_type_id` bigint DEFAULT NULL,
                                   `id` bigint NOT NULL AUTO_INCREMENT,
-                                  `updated_at` datetime(6) DEFAULT NULL,
-                                  `user_id` bigint NOT NULL,
+                                  `created_at` datetime(6) DEFAULT NULL,
+                                  `elo` int DEFAULT NULL,
                                   `level` enum('CHUYEN_NGHIEP','KHA','TRUNGBINH','TRUNGBINH_KHA','TRUNGBINH_YEU','YEU') DEFAULT NULL,
+                                  `updated_at` datetime(6) DEFAULT NULL,
+                                  `field_type_id` bigint DEFAULT NULL,
+                                  `user_id` bigint NOT NULL,
                                   PRIMARY KEY (`id`),
                                   KEY `FKss7bige9ht0l55a64uvhvgx88` (`field_type_id`),
                                   KEY `FKdpyawfyn8vdcdpj9k3k54752u` (`user_id`),
                                   CONSTRAINT `FKdpyawfyn8vdcdpj9k3k54752u` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
                                   CONSTRAINT `FKss7bige9ht0l55a64uvhvgx88` FOREIGN KEY (`field_type_id`) REFERENCES `field_type` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.user_voucher definition
@@ -185,53 +185,53 @@ CREATE TABLE `user_voucher` (
 -- fisport.wallet definition
 
 CREATE TABLE `wallet` (
+                          `id` bigint NOT NULL AUTO_INCREMENT,
                           `balance` decimal(18,2) NOT NULL,
                           `created_at` datetime(6) NOT NULL,
-                          `id` bigint NOT NULL AUTO_INCREMENT,
                           `updated_at` datetime(6) NOT NULL,
                           `user_id` bigint NOT NULL,
                           PRIMARY KEY (`id`),
                           UNIQUE KEY `UKhgee4p1hiwadqinr0avxlq4eb` (`user_id`),
                           CONSTRAINT `FKbs4ogwiknsup4rpw8d47qw9dx` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.ward definition
 
 CREATE TABLE `ward` (
+                        `id` bigint NOT NULL AUTO_INCREMENT,
                         `latitude` double NOT NULL,
                         `longitude` double NOT NULL,
-                        `city_id` bigint DEFAULT NULL,
-                        `id` bigint NOT NULL AUTO_INCREMENT,
                         `name` varchar(255) NOT NULL,
                         `slug` varchar(255) NOT NULL,
+                        `city_id` bigint DEFAULT NULL,
                         PRIMARY KEY (`id`),
                         UNIQUE KEY `UKoc5jy0b9uro8017qv0o4x2rm` (`name`),
                         UNIQUE KEY `UK9djlfwpm44d2qycy1spy1nx15` (`slug`),
                         KEY `FKhbgx4ih9knw5edbhjkw4qwhhv` (`city_id`),
                         CONSTRAINT `FKhbgx4ih9knw5edbhjkw4qwhhv` FOREIGN KEY (`city_id`) REFERENCES `city` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
 -- fisport.field definition
 
 CREATE TABLE `field` (
-                         `close_time` time(6) NOT NULL,
-                         `latitude` double NOT NULL,
-                         `longitude` double NOT NULL,
-                         `open_time` time(6) NOT NULL,
-                         `created_at` datetime(6) DEFAULT NULL,
-                         `field_type_id` bigint DEFAULT NULL,
                          `id` bigint NOT NULL AUTO_INCREMENT,
-                         `updated_at` datetime(6) DEFAULT NULL,
-                         `user_id` bigint DEFAULT NULL,
-                         `ward_id` bigint DEFAULT NULL,
                          `address` varchar(255) NOT NULL,
                          `banner` varchar(255) NOT NULL,
+                         `close_time` time(6) NOT NULL,
+                         `created_at` datetime(6) DEFAULT NULL,
                          `description` varchar(255) NOT NULL,
-                         `name` varchar(255) NOT NULL,
-                         `slug` varchar(255) NOT NULL,
                          `status` enum('ACTIVE','INACTIVE','PENDING') DEFAULT NULL,
+                         `latitude` double NOT NULL,
+                         `longitude` double NOT NULL,
+                         `name` varchar(255) NOT NULL,
+                         `open_time` time(6) NOT NULL,
+                         `slug` varchar(255) NOT NULL,
+                         `updated_at` datetime(6) DEFAULT NULL,
+                         `field_type_id` bigint DEFAULT NULL,
+                         `user_id` bigint DEFAULT NULL,
+                         `ward_id` bigint DEFAULT NULL,
                          PRIMARY KEY (`id`),
                          UNIQUE KEY `UKhxx23xwp6cxwm1uax4dodi1av` (`name`),
                          UNIQUE KEY `UKbn39g9jasccxlt1n07axdryof` (`slug`),
@@ -241,25 +241,250 @@ CREATE TABLE `field` (
                          CONSTRAINT `FK1yfodgfhm6x6twopj6wubnis7` FOREIGN KEY (`field_type_id`) REFERENCES `field_type` (`id`),
                          CONSTRAINT `FK8o717ti3cq13pg7t2h2wdx1b` FOREIGN KEY (`ward_id`) REFERENCES `ward` (`id`),
                          CONSTRAINT `FKl3t3t2bepmqkf6iyvo6eibjdx` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb3;
-
--- ========================
--- 1. User & Role
--- ========================
-
-INSERT INTO role (name) VALUES
-                            ('ADMIN'),
-                            ('USER'),
-                            ('OWNER');
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
 
 
+-- fisport.field_feature definition
+
+CREATE TABLE `field_feature` (
+                                 `id` bigint NOT NULL AUTO_INCREMENT,
+                                 `feature_id` bigint DEFAULT NULL,
+                                 `field_id` bigint DEFAULT NULL,
+                                 PRIMARY KEY (`id`),
+                                 KEY `FKm64ejap642t1spd9r74sa7ldf` (`feature_id`),
+                                 KEY `FKjx6g22bleo0nvxim7yoanuy5a` (`field_id`),
+                                 CONSTRAINT `FKjx6g22bleo0nvxim7yoanuy5a` FOREIGN KEY (`field_id`) REFERENCES `field` (`id`),
+                                 CONSTRAINT `FKm64ejap642t1spd9r74sa7ldf` FOREIGN KEY (`feature_id`) REFERENCES `feature` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- fisport.field_service_item definition
+
+CREATE TABLE `field_service_item` (
+                                      `id` bigint NOT NULL AUTO_INCREMENT,
+                                      `price` decimal(38,2) NOT NULL,
+                                      `quantity` int NOT NULL,
+                                      `status` enum('ACTIVE','INACTIVE') NOT NULL,
+                                      `field_id` bigint DEFAULT NULL,
+                                      `service_item_id` bigint DEFAULT NULL,
+                                      PRIMARY KEY (`id`),
+                                      KEY `FKs9v1kjx530jd9n31e9guub8e4` (`field_id`),
+                                      KEY `FKkw61vguui7v1roexck0tl0j15` (`service_item_id`),
+                                      CONSTRAINT `FKkw61vguui7v1roexck0tl0j15` FOREIGN KEY (`service_item_id`) REFERENCES `service_item` (`id`),
+                                      CONSTRAINT `FKs9v1kjx530jd9n31e9guub8e4` FOREIGN KEY (`field_id`) REFERENCES `field` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- fisport.field_time_slot definition
+
+CREATE TABLE `field_time_slot` (
+                                   `id` bigint NOT NULL AUTO_INCREMENT,
+                                   `price` decimal(38,2) NOT NULL,
+                                   `field_id` bigint NOT NULL,
+                                   `time_slot_id` bigint NOT NULL,
+                                   PRIMARY KEY (`id`),
+                                   KEY `FKdu57n35luii8mn2q15g3lbxjg` (`field_id`),
+                                   KEY `FKo04tetboko11l3g14kruufuf5` (`time_slot_id`),
+                                   CONSTRAINT `FKdu57n35luii8mn2q15g3lbxjg` FOREIGN KEY (`field_id`) REFERENCES `field` (`id`),
+                                   CONSTRAINT `FKo04tetboko11l3g14kruufuf5` FOREIGN KEY (`time_slot_id`) REFERENCES `time_slot` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- fisport.sub_field definition
+
+CREATE TABLE `sub_field` (
+                             `id` bigint NOT NULL AUTO_INCREMENT,
+                             `created_at` datetime(6) DEFAULT NULL,
+                             `name` varchar(255) DEFAULT NULL,
+                             `status` enum('AVAILABLE','INACTIVE','MAINTAIN') DEFAULT NULL,
+                             `updated_at` datetime(6) DEFAULT NULL,
+                             `field_id` bigint DEFAULT NULL,
+                             PRIMARY KEY (`id`),
+                             KEY `FKas0aqg1v1yqhl2wyx0ebm3dht` (`field_id`),
+                             CONSTRAINT `FKas0aqg1v1yqhl2wyx0ebm3dht` FOREIGN KEY (`field_id`) REFERENCES `field` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- fisport.booking definition
+
+CREATE TABLE `booking` (
+                           `id` bigint NOT NULL AUTO_INCREMENT,
+                           `booking_date` date DEFAULT NULL,
+                           `status` enum('CANCELLED','COMPLETED','FAILED','PAID','PENDING') NOT NULL,
+                           `created_at` datetime(6) DEFAULT NULL,
+                           `duration` int NOT NULL,
+                           `end_time` time(6) NOT NULL,
+                           `expired_at` datetime(6) DEFAULT NULL,
+                           `payment_method` enum('BANK_TRANSFER','MOMO','PAYOS','VNPAY','WALLET','ZALOPAY') DEFAULT NULL,
+                           `payment_token` varchar(255) DEFAULT NULL,
+                           `start_time` time(6) NOT NULL,
+                           `total_price` decimal(38,2) NOT NULL,
+                           `updated_at` datetime(6) DEFAULT NULL,
+                           `subfield_id` bigint DEFAULT NULL,
+                           `user_id` bigint DEFAULT NULL,
+                           PRIMARY KEY (`id`),
+                           KEY `FK2aqogf67irx4n7a3t1omakrwn` (`subfield_id`),
+                           KEY `FKkgseyy7t56x7lkjgu3wah5s3t` (`user_id`),
+                           CONSTRAINT `FK2aqogf67irx4n7a3t1omakrwn` FOREIGN KEY (`subfield_id`) REFERENCES `sub_field` (`id`),
+                           CONSTRAINT `FKkgseyy7t56x7lkjgu3wah5s3t` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- fisport.booking_service_item definition
+
+CREATE TABLE `booking_service_item` (
+                                        `id` bigint NOT NULL AUTO_INCREMENT,
+                                        `quantity` int NOT NULL,
+                                        `subtotal` decimal(38,2) DEFAULT NULL,
+                                        `booking_id` bigint DEFAULT NULL,
+                                        `field_service_item_id` bigint DEFAULT NULL,
+                                        PRIMARY KEY (`id`),
+                                        KEY `FKt8kqb37ggu9gvo06jon71a44y` (`booking_id`),
+                                        KEY `FKe6bemvwh68ok15tj9qrx1yuwo` (`field_service_item_id`),
+                                        CONSTRAINT `FKe6bemvwh68ok15tj9qrx1yuwo` FOREIGN KEY (`field_service_item_id`) REFERENCES `field_service_item` (`id`),
+                                        CONSTRAINT `FKt8kqb37ggu9gvo06jon71a44y` FOREIGN KEY (`booking_id`) REFERENCES `booking` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- fisport.challenge_match definition
+
+CREATE TABLE `challenge_match` (
+                                   `id` bigint NOT NULL AUTO_INCREMENT,
+                                   `created_at` datetime(6) DEFAULT NULL,
+                                   `field_type_id` bigint DEFAULT NULL,
+                                   `note` varchar(500) DEFAULT NULL,
+                                   `fee` decimal(38,2) DEFAULT NULL,
+                                   `status` enum('CANCELLED','FULL','MATCHED','OPEN','PENDING') DEFAULT NULL,
+                                   `suggested_level` enum('CHUYEN_NGHIEP','KHA','TRUNGBINH','TRUNGBINH_KHA','TRUNGBINH_YEU','YEU') DEFAULT NULL,
+                                   `title` varchar(100) DEFAULT NULL,
+                                   `updated_at` datetime(6) DEFAULT NULL,
+                                   `booking_id` bigint NOT NULL,
+                                   `challenge_match_type_id` bigint DEFAULT NULL,
+                                   `creator_id` bigint NOT NULL,
+                                   PRIMARY KEY (`id`),
+                                   UNIQUE KEY `UKlphtr07bisihtsgmflgpnns9k` (`booking_id`),
+                                   KEY `FK9irqfre1wt0snbrtvk1ujk2di` (`challenge_match_type_id`),
+                                   KEY `FKebxpdypgrvo9iacdjj71vpgvc` (`creator_id`),
+                                   CONSTRAINT `FK9irqfre1wt0snbrtvk1ujk2di` FOREIGN KEY (`challenge_match_type_id`) REFERENCES `challenge_match_type` (`id`),
+                                   CONSTRAINT `FKanbxr070d3d5xhufr3j7yw7ve` FOREIGN KEY (`booking_id`) REFERENCES `booking` (`id`),
+                                   CONSTRAINT `FKebxpdypgrvo9iacdjj71vpgvc` FOREIGN KEY (`creator_id`) REFERENCES `user` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- fisport.challenge_participant definition
+
+CREATE TABLE `challenge_participant` (
+                                         `id` bigint NOT NULL AUTO_INCREMENT,
+                                         `cancelled_at` datetime(6) DEFAULT NULL,
+                                         `created_at` datetime(6) DEFAULT NULL,
+                                         `paid` bit(1) DEFAULT NULL,
+                                         `paid_at` datetime(6) DEFAULT NULL,
+                                         `request_message` varchar(200) DEFAULT NULL,
+                                         `response_message` varchar(200) DEFAULT NULL,
+                                         `status` enum('ACCEPTED','CANCELLED','NOSHOW','PENDING','REJECTED') DEFAULT NULL,
+                                         `team` enum('TEAM_A','TEAM_B') DEFAULT NULL,
+                                         `updated_at` datetime(6) DEFAULT NULL,
+                                         `match_id` bigint NOT NULL,
+                                         `user_id` bigint NOT NULL,
+                                         PRIMARY KEY (`id`),
+                                         KEY `FKnj4ifv9m86nw9c7uvmkoo932y` (`match_id`),
+                                         KEY `FK8mluajlc6urhowb7nclemis8d` (`user_id`),
+                                         CONSTRAINT `FK8mluajlc6urhowb7nclemis8d` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+                                         CONSTRAINT `FKnj4ifv9m86nw9c7uvmkoo932y` FOREIGN KEY (`match_id`) REFERENCES `challenge_match` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- fisport.challenge_result definition
+
+CREATE TABLE `challenge_result` (
+                                    `id` bigint NOT NULL AUTO_INCREMENT,
+                                    `created_at` datetime(6) DEFAULT NULL,
+                                    `team_a_scort` int DEFAULT NULL,
+                                    `team_b_scort` int DEFAULT NULL,
+                                    `match_id` bigint NOT NULL,
+                                    PRIMARY KEY (`id`),
+                                    UNIQUE KEY `UKcxvm74fyidg5khmbanxkthes0` (`match_id`),
+                                    CONSTRAINT `FKdqj2bghij31brd6l7lvf0641c` FOREIGN KEY (`match_id`) REFERENCES `challenge_match` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- fisport.payment definition
+
+CREATE TABLE `payment` (
+                           `id` bigint NOT NULL AUTO_INCREMENT,
+                           `amount` decimal(38,2) NOT NULL,
+                           `created_at` datetime(6) DEFAULT NULL,
+                           `method` enum('BANK_TRANSFER','MOMO','PAYOS','VNPAY','WALLET','ZALOPAY') NOT NULL,
+                           `payment_time` datetime(6) DEFAULT NULL,
+                           `status` enum('CANCELLED','FAILED','PENDING','REFUNDED','SUCCESS') NOT NULL,
+                           `transaction_code` varchar(255) DEFAULT NULL,
+                           `booking_id` bigint DEFAULT NULL,
+                           PRIMARY KEY (`id`),
+                           UNIQUE KEY `UKfwxx8doixmraxcqckmp1lw2oq` (`transaction_code`),
+                           UNIQUE KEY `UKku02qy6369hn9uhy3n7jk9v6e` (`booking_id`),
+                           CONSTRAINT `FKqewrl4xrv9eiad6eab3aoja65` FOREIGN KEY (`booking_id`) REFERENCES `booking` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- fisport.review definition
+
+CREATE TABLE `review` (
+                          `id` bigint NOT NULL AUTO_INCREMENT,
+                          `comment` varchar(255) DEFAULT NULL,
+                          `create_at` datetime(6) DEFAULT NULL,
+                          `rating` int NOT NULL,
+                          `updated_at` datetime(6) DEFAULT NULL,
+                          `booking_id` bigint DEFAULT NULL,
+                          `field_id` bigint DEFAULT NULL,
+                          `user_id` bigint DEFAULT NULL,
+                          PRIMARY KEY (`id`),
+                          UNIQUE KEY `UKm685o801uf70i84jf94qq3d0b` (`booking_id`),
+                          KEY `FK53y3y4gp6gppyj7oeq4stpr2u` (`field_id`),
+                          KEY `FKiyf57dy48lyiftdrf7y87rnxi` (`user_id`),
+                          CONSTRAINT `FK53y3y4gp6gppyj7oeq4stpr2u` FOREIGN KEY (`field_id`) REFERENCES `field` (`id`),
+                          CONSTRAINT `FKiyf57dy48lyiftdrf7y87rnxi` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`),
+                          CONSTRAINT `FKk4xawqohtguy5yx5nnpba6yf3` FOREIGN KEY (`booking_id`) REFERENCES `booking` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+
+-- fisport.`transaction` definition
+
+CREATE TABLE `transaction` (
+                               `id` bigint NOT NULL AUTO_INCREMENT,
+                               `amount` decimal(18,2) NOT NULL,
+                               `created_at` datetime(6) NOT NULL,
+                               `method` enum('BANK_TRANSFER','MOMO','PAYOS','VNPAY','WALLET','ZALOPAY') DEFAULT NULL,
+                               `status` enum('FAILED','PENDING','SUCCESS') NOT NULL,
+                               `type` enum('BONUS','PAYMENT','RECEIVED','REFUND','TOUP') NOT NULL,
+                               `booking_id` bigint DEFAULT NULL,
+                               `payment_id` bigint DEFAULT NULL,
+                               `wallet_id` bigint DEFAULT NULL,
+                               PRIMARY KEY (`id`),
+                               UNIQUE KEY `UK3d7t68r30gvwq45ekr9hqi6j4` (`payment_id`),
+                               KEY `FKhaefbm92emogmcjh4kuk3esti` (`booking_id`),
+                               KEY `FKtfwlfspv2h4wcgc9rjd1658a6` (`wallet_id`),
+                               CONSTRAINT `FKhaefbm92emogmcjh4kuk3esti` FOREIGN KEY (`booking_id`) REFERENCES `booking` (`id`),
+                               CONSTRAINT `FKq9m7rb5uydysanp8smxcovxlh` FOREIGN KEY (`payment_id`) REFERENCES `payment` (`id`),
+                               CONSTRAINT `FKtfwlfspv2h4wcgc9rjd1658a6` FOREIGN KEY (`wallet_id`) REFERENCES `wallet` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+
+-- ========================================================
+-- 2. Dữ liệu (Data Seeding)
+-- ========================================================
+
+-- [SỬA ĐỔI QUAN TRỌNG]: Thêm cột ID để đảm bảo map đúng với User
+INSERT INTO role (id, name) VALUES
+                                (1, 'ADMIN'),
+                                (2, 'USER'),
+                                (3, 'OWNER');
+
+-- Insert User (role_id phải khớp với id ở trên)
 INSERT INTO user (username, email, password, phone, birth_day, status, gender, is_two_factor, two_fa_secret, role_id)
 VALUES
     ('dattran0901', 'tranquocdat@gmail.com', '$2a$10$s3go5e.GYivSMmrJXG6jceddjfSAbg6O832Sip8XIVNRRLIjXNP6G', '0785819692', '2004-01-09', 'ACTIVE', 'MALE', 0, NULL, 1),
     ('johndoe', 'dattranquoc@gmail.com', '$2a$10$EeSehs49igNMz6Vuk69cDuaAGHFrWSjeOvMmNkaAr6ZwyZtltKStS', '0912345678', '1998-08-15', 'ACTIVE', 'FEMALE', 0,  NULL, 2),
     ('vitidsarn', 'dattran@gmail.com', '$2a$10$llGgE5VlZzM0.pCzbOLGWev.cqdovrjSsq0lGM87wo0FVgATXsh12', '0934567890', '1990-01-10', 'ACTIVE', 'FEMALE', 0, NULL, 3),
     ('dt12', 'tranquocthanhdat@gmail.com', '$2a$10$L1RrZcmnBVdz5EzZ9LtP9eNcPV1CiYvKwhEK/Qs9ocuqHakirdqg6', '0785819680', '2004-09-20', 'ACTIVE', 'MALE', 1, '4EFZSYXKQ6BFDGMAXWQKSFSTZFUYYLQD', 2);
-
 
 -- ========================
 -- 2. Location
@@ -446,7 +671,7 @@ INSERT INTO field_feature (field_id, feature_id) VALUES
 
                                                      (13,1),(13,2),(13,3),(13,4),(13,5),(13,6),(13,9),(13,10),
                                                      (14,1),(14,2),(14,3),(14,4),(14,5),(14,6),(14,9),(14,10),
-                                                     (15,1),(15,2),(15,3),(15,4),(15,5),(15,6),(13,9),(13,10),
+                                                     (15,1),(15,2),(15,3),(15,4),(15,5),(15,6),(15,9),(15,10),
                                                      (16,1),(16,2),(16,3),(16,4),(16,5),(16,6),(16,9),(16,10),
                                                      (17,1),(17,2),(17,3),(17,4),(17,5),(17,6),(17,9),(17,10),
 
