@@ -25,7 +25,7 @@ services:
       DATABASE_HOST: mysql
       DATABASE_PORT: 3306
       DATABASE_USERNAME: docker_user
-      DATABASE_PASSWORD: 1234567
+      DATABASE_PASSWORD: 123456
     depends_on:
       mysql:
         condition: service_healthy
